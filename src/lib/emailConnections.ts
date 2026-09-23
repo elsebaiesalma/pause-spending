@@ -1,10 +1,23 @@
 import { decrypt, encrypt, type EncryptedEnvelope } from "@/lib/encryption";
 import {
+  GoogleTokenExpiredError,
   refreshGoogleAccessToken,
   revokeGoogleToken,
   type StoredGoogleToken,
 } from "@/lib/oauth/google";
 import { prisma } from "@/lib/prisma";
+
+// Thrown when a Gmail connection's token can no longer be refreshed - no
+// refresh token was ever stored, or Google reports it expired/revoked
+// (including the accepted 7-day testing-mode expiry). Callers use this to
+// mark the connection `expired` and stop syncing it rather than failing
+// silently or retrying indefinitely.
+export class GmailConnectionExpiredError extends Error {
+  constructor(public readonly connectionId: string) {
+    super(`Gmail connection ${connectionId} has expired and needs reconnection`);
+    this.name = "GmailConnectionExpiredError";
+  }
+}
 
 export async function revokeConnectionToken(
   provider: string,
@@ -37,10 +50,18 @@ export async function getValidGmailAccessToken(connectionId: string): Promise<st
   }
 
   if (!stored.refreshToken) {
-    throw new Error("Access token expired and no refresh token is stored");
+    throw new GmailConnectionExpiredError(connectionId);
   }
 
-  const refreshed = await refreshGoogleAccessToken(stored.refreshToken);
+  let refreshed;
+  try {
+    refreshed = await refreshGoogleAccessToken(stored.refreshToken);
+  } catch (error) {
+    if (error instanceof GoogleTokenExpiredError) {
+      throw new GmailConnectionExpiredError(connectionId);
+    }
+    throw error;
+  }
 
   const updated: StoredGoogleToken = {
     accessToken: refreshed.access_token,

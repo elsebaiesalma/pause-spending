@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { getValidGmailAccessToken } from "@/lib/emailConnections";
+import { GmailConnectionExpiredError, getValidGmailAccessToken } from "@/lib/emailConnections";
 import {
   fetchRecentMessages,
   getCurrentHistoryId,
@@ -70,7 +70,15 @@ export async function syncGmailConnection(connectionId: string): Promise<SyncRep
     where: { id: connectionId },
   });
 
-  const accessToken = await getValidGmailAccessToken(connectionId);
+  let accessToken: string;
+  try {
+    accessToken = await getValidGmailAccessToken(connectionId);
+  } catch (error) {
+    if (error instanceof GmailConnectionExpiredError) {
+      await prisma.emailConnection.update({ where: { id: connectionId }, data: { status: "expired" } });
+    }
+    throw error;
+  }
   const { mode, messages } = await fetchMessagesForSync(accessToken, connection.syncCursor);
 
   const classifications = await mapWithConcurrency(

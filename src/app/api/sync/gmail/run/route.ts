@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GmailConnectionExpiredError } from "@/lib/emailConnections";
 import { prisma } from "@/lib/prisma";
 import { syncGmailConnection } from "@/lib/sync/syncGmailConnection";
 
@@ -16,6 +17,13 @@ export async function POST() {
     return NextResponse.json({ error: "no_connected_gmail_account" }, { status: 404 });
   }
 
-  const report = await syncGmailConnection(connection.id);
-  return NextResponse.json(report);
+  try {
+    const report = await syncGmailConnection(connection.id);
+    return NextResponse.json(report);
+  } catch (error) {
+    if (error instanceof GmailConnectionExpiredError) {
+      return NextResponse.json({ error: "token_expired" }, { status: 401 });
+    }
+    throw error;
+  }
 }

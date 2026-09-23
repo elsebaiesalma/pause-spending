@@ -47,6 +47,13 @@ export default async function Home() {
           </form>
           <a href="/connect/gmail/delete">Permanently delete my data</a>
         </>
+      ) : gmailConnection?.status === "expired" ? (
+        <>
+          <p>Your Gmail connection has expired and needs to be reconnected before syncing can continue.</p>
+          <a href="/connect/gmail">Reconnect Gmail</a>
+          {" · "}
+          <a href="/connect/gmail/delete">Permanently delete my data</a>
+        </>
       ) : gmailConnection?.status === "disconnected" ? (
         <>
           <p>Gmail is disconnected. Previously parsed data is kept.</p>

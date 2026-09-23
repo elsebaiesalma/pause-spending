@@ -28,7 +28,7 @@ vi.mock("@/lib/emailExtraction/extractReceipt", () => ({
   extractAndPersistPurchase: vi.fn(),
 }));
 
-import { getValidGmailAccessToken } from "@/lib/emailConnections";
+import { GmailConnectionExpiredError, getValidGmailAccessToken } from "@/lib/emailConnections";
 import {
   fetchRecentMessages,
   getCurrentHistoryId,
@@ -170,5 +170,17 @@ describe("syncGmailConnection", () => {
     expect(extractAndPersistPurchase).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.objectContaining({ id: "a" }) })
     );
+  });
+
+  it("marks the connection expired and stops sync, rather than failing silently, when the token can't be refreshed", async () => {
+    vi.mocked(getValidGmailAccessToken).mockRejectedValueOnce(
+      new GmailConnectionExpiredError(connectionId)
+    );
+
+    await expect(syncGmailConnection(connectionId)).rejects.toThrow(GmailConnectionExpiredError);
+
+    const updated = await prisma.emailConnection.findUniqueOrThrow({ where: { id: connectionId } });
+    expect(updated.status).toBe("expired");
+    expect(fetchRecentMessages).not.toHaveBeenCalled();
   });
 });

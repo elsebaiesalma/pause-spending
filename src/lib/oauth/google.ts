@@ -67,6 +67,17 @@ export type RefreshedGoogleToken = {
   token_type: string;
 };
 
+// Thrown specifically when Google reports the refresh token itself is
+// expired or revoked (`invalid_grant`) - distinct from a transient/network
+// failure, since only this case means the connection genuinely needs the
+// user to reconnect (including the accepted 7-day testing-mode expiry).
+export class GoogleTokenExpiredError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "GoogleTokenExpiredError";
+  }
+}
+
 export async function refreshGoogleAccessToken(
   refreshToken: string
 ): Promise<RefreshedGoogleToken> {
@@ -83,6 +94,9 @@ export async function refreshGoogleAccessToken(
 
   if (!response.ok) {
     const body = await response.text();
+    if (response.status === 400 && body.includes("invalid_grant")) {
+      throw new GoogleTokenExpiredError(`Google refresh token is expired or revoked: ${body}`);
+    }
     throw new Error(`Google token refresh failed (${response.status}): ${body}`);
   }
 

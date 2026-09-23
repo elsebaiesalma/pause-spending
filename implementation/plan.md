@@ -21,7 +21,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 13: Redundancy explanation + Pause Decision Screen (core end-to-end demo)
 - [x] Step 14: Wait/Reminder Queue (24h/7d in-app waiting)
 - [x] Step 15: Post-Wait Recommendations (comparables, secondhand, outfit ideas, wishlist)
-- [ ] Step 16: Failure-mode hardening across all flows
+- [x] Step 16: Failure-mode hardening across all flows
 
 ---
 

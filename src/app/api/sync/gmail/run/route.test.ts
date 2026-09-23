@@ -5,6 +5,7 @@ vi.mock("@/lib/sync/syncGmailConnection", () => ({
 }));
 
 import { syncGmailConnection } from "@/lib/sync/syncGmailConnection";
+import { GmailConnectionExpiredError } from "@/lib/emailConnections";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
@@ -54,5 +55,19 @@ describe("POST /api/sync/gmail/run", () => {
     expect(response.status).toBe(200);
     expect(syncGmailConnection).toHaveBeenCalledWith(connection.id);
     expect(body).toEqual(FAKE_REPORT);
+  });
+
+  it("returns a clear token_expired response instead of a raw 500 when reconnection is needed", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const connection = await prisma.emailConnection.create({
+      data: { userId: user.id, provider: "gmail", encryptedToken: encrypt("{}"), status: "connected" },
+    });
+    vi.mocked(syncGmailConnection).mockRejectedValueOnce(new GmailConnectionExpiredError(connection.id));
+
+    const response = await POST();
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body).toEqual({ error: "token_expired" });
   });
 });

@@ -5,6 +5,7 @@ vi.mock("./syncGmailConnection", () => ({
 }));
 
 import { syncGmailConnection } from "./syncGmailConnection";
+import { GmailConnectionExpiredError } from "@/lib/emailConnections";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { runScheduledSyncForAllConnections } from "./scheduledSync";
@@ -93,5 +94,30 @@ describe("runScheduledSyncForAllConnections", () => {
     // mock IS that shared function, so calling it here is calling the
     // identical pipeline the manual route triggers.
     expect(syncGmailConnection).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips a connection whose token expired without aborting the batch for the rest", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const otherUser = await prisma.user.create({ data: {} });
+    createdUserIds.push(otherUser.id);
+
+    const expiring = await prisma.emailConnection.create({
+      data: { userId: user.id, provider: "gmail", encryptedToken: encrypt("{}"), status: "connected" },
+    });
+    const healthy = await prisma.emailConnection.create({
+      data: { userId: otherUser.id, provider: "gmail", encryptedToken: encrypt("{}"), status: "connected" },
+    });
+    createdConnectionIds.push(expiring.id, healthy.id);
+
+    vi.mocked(syncGmailConnection).mockImplementation(async (connectionId: string) => {
+      if (connectionId === expiring.id) {
+        throw new GmailConnectionExpiredError(connectionId);
+      }
+      return FAKE_REPORT;
+    });
+
+    const results = await runScheduledSyncForAllConnections();
+
+    expect(results.map((r) => r.connectionId)).toEqual([healthy.id]);
   });
 });

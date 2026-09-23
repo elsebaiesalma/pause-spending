@@ -62,6 +62,34 @@ export default async function PurchasesPage() {
                   {purchase.merchant} · {purchase.category} ·{" "}
                   {purchase.orderDate.toLocaleDateString()}
                 </div>
+                {purchase.status === "needs_review" && (
+                  <>
+                    <p style={{ fontSize: "0.85rem", color: "#555", marginBottom: "0.25rem" }}>
+                      We couldn&apos;t confidently read this one - confirm the details or discard it.
+                    </p>
+                    <form
+                      action={`/api/purchases/${purchase.id}/confirm`}
+                      method="POST"
+                      style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "0.4rem" }}
+                    >
+                      <input name="itemName" defaultValue={purchase.itemName} placeholder="Item name" required />
+                      <input
+                        name="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        defaultValue={Number(purchase.price)}
+                        placeholder="Price"
+                        required
+                      />
+                      <input name="category" defaultValue={purchase.category} placeholder="Category" required />
+                      <button type="submit">Confirm</button>
+                    </form>
+                    <form action={`/api/purchases/${purchase.id}/discard`} method="POST">
+                      <button type="submit">Discard</button>
+                    </form>
+                  </>
+                )}
               </div>
               <div style={{ fontWeight: 600 }}>${Number(purchase.price).toFixed(2)}</div>
             </li>
