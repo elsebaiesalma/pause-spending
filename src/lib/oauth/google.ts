@@ -1,5 +1,6 @@
 const AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const REVOKE_ENDPOINT = "https://oauth2.googleapis.com/revoke";
 const GMAIL_READONLY_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
 export type GoogleTokenResponse = {
@@ -8,6 +9,12 @@ export type GoogleTokenResponse = {
   expires_in: number;
   scope: string;
   token_type: string;
+};
+
+export type StoredGoogleToken = {
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: number;
 };
 
 function requireEnv(name: string): string {
@@ -51,4 +58,17 @@ export async function exchangeCodeForTokens(code: string): Promise<GoogleTokenRe
   }
 
   return response.json() as Promise<GoogleTokenResponse>;
+}
+
+export async function revokeGoogleToken(token: string): Promise<void> {
+  const response = await fetch(REVOKE_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ token }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Google token revocation failed (${response.status}): ${body}`);
+  }
 }

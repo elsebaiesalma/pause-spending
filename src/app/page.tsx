@@ -13,10 +13,20 @@ export default async function Home() {
       <h1>Pause Before Purchase</h1>
 
       {gmailConnection?.status === "connected" ? (
-        <p>
-          Gmail connected since{" "}
-          {gmailConnection.connectedAt.toLocaleString()}.
-        </p>
+        <>
+          <p>Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
+          <form action="/api/auth/gmail/disconnect" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
+            <button type="submit">Disconnect</button>
+          </form>
+          <a href="/connect/gmail/delete">Permanently delete my data</a>
+        </>
+      ) : gmailConnection?.status === "disconnected" ? (
+        <>
+          <p>Gmail is disconnected. Previously parsed data is kept.</p>
+          <a href="/connect/gmail">Reconnect Gmail</a>
+          {" · "}
+          <a href="/connect/gmail/delete">Permanently delete my data</a>
+        </>
       ) : (
         <a href="/connect/gmail">Connect Gmail</a>
       )}

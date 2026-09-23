@@ -55,7 +55,7 @@ model Purchase {
   status                  String    @default("active")
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  emailConnection EmailConnection? @relation(fields: [sourceEmailConnectionId], references: [id], onDelete: SetNull)
+  emailConnection EmailConnection? @relation(fields: [sourceEmailConnectionId], references: [id], onDelete: Cascade)
   wardrobeItems   WardrobeItem[]
 
   @@map("purchases")
@@ -76,7 +76,7 @@ model WardrobeItem {
   status           String    @default("active")
 
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourcePurchase Purchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: SetNull)
+  sourcePurchase Purchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: Cascade)
 
   @@map("wardrobe_items")
 }
