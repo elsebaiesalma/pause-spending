@@ -220,6 +220,7 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  justify-self: start;
   font-family: var(--font-body);
   font-size: 0.78rem;
   text-transform: uppercase;
