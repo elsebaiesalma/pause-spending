@@ -77,9 +77,17 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         <input type="hidden" name="duration" value="24h" />
         <button type="submit">Wait 24 hours</button>
       </form>
-      <form action={`/api/desired-items/${desiredItem.id}/wait`} method="POST" style={{ display: "inline-block" }}>
+      <form action={`/api/desired-items/${desiredItem.id}/wait`} method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
         <input type="hidden" name="duration" value="7d" />
         <button type="submit">Wait 7 days</button>
+      </form>
+      <form action={`/api/desired-items/${desiredItem.id}/resolve`} method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
+        <input type="hidden" name="outcome" value="proceeded" />
+        <button type="submit">I still want this</button>
+      </form>
+      <form action={`/api/desired-items/${desiredItem.id}/resolve`} method="POST" style={{ display: "inline-block" }}>
+        <input type="hidden" name="outcome" value="saved_for_later" />
+        <button type="submit">Save for later</button>
       </form>
 
       <p>

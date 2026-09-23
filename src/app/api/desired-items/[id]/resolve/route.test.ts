@@ -64,6 +64,27 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     expect(updated.decisionOutcome).toBe("dropped");
   });
 
+  it("records 'saved_for_later' as its own pause_status, distinct from 'proceeded'", async () => {
+    const item = await makeWaitingItem();
+
+    const response = await POST(buildRequest({ outcome: "saved_for_later" }), await ctxFor(item.id));
+    expect(response.status).toBeGreaterThanOrEqual(300);
+    expect(response.status).toBeLessThan(400);
+    expect(response.headers.get("location")).toContain("/wishlist");
+
+    const updated = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(updated.pauseStatus).toBe("saved_for_later");
+    expect(updated.decisionOutcome).toBe("saved_for_later");
+  });
+
+  it("redirects to the recommendations page on 'proceeded'", async () => {
+    const item = await makeWaitingItem();
+
+    const response = await POST(buildRequest({ outcome: "proceeded" }), await ctxFor(item.id));
+
+    expect(response.headers.get("location")).toContain(`/desired-items/${item.id}/recommendations`);
+  });
+
   it("rejects an unrecognized outcome", async () => {
     const item = await makeWaitingItem();
 

@@ -36,6 +36,8 @@ export default async function Home() {
             <a href="/wardrobe">View wardrobe</a>
             {" · "}
             <a href="/budget">View budget</a>
+            {" · "}
+            <a href="/wishlist">View wishlist</a>
           </p>
           <form action="/api/sync/gmail/run" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
             <button type="submit">Sync now</button>
