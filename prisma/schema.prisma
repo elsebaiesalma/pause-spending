@@ -36,6 +36,7 @@ model EmailConnection {
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   purchases Purchase[]
 
+  @@unique([userId, provider])
   @@map("email_connections")
 }
 
