@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanHtmlForExtraction, extractProductImageAndLink, extractProductImageUrl } from "./htmlUtils";
+import { cleanHtmlForExtraction, extractImageCandidates } from "./htmlUtils";
 
 describe("cleanHtmlForExtraction", () => {
   it("strips style and script blocks and collapses whitespace", () => {
@@ -24,32 +24,15 @@ describe("cleanHtmlForExtraction", () => {
   });
 });
 
-describe("extractProductImageUrl", () => {
-  it("returns the first plausible product image", () => {
-    const html = `<img src="https://cdn.retailer.com/products/navy-blazer.jpg" width="400">`;
-    expect(extractProductImageUrl(html)).toBe(
-      "https://cdn.retailer.com/products/navy-blazer.jpg"
-    );
-  });
-
-  it("skips tracking pixels and logos, returning the real product image", () => {
+describe("extractImageCandidates", () => {
+  it("lists a plausible product image, skipping tracking pixels", () => {
     const html = `
       <img src="https://mail.retailer.com/open.gif" width="1" height="1">
-      <img src="https://cdn.retailer.com/assets/logo.png">
       <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
     `;
-    expect(extractProductImageUrl(html)).toBe(
-      "https://cdn.retailer.com/products/navy-blazer.jpg"
-    );
-  });
-
-  it("returns undefined when no plausible product image exists", () => {
-    const html = `<img src="https://mail.retailer.com/pixel-track.gif">`;
-    expect(extractProductImageUrl(html)).toBeUndefined();
-  });
-
-  it("returns undefined for an email with no images", () => {
-    expect(extractProductImageUrl("<p>No images here</p>")).toBeUndefined();
+    expect(extractImageCandidates(html)).toEqual([
+      { imageUrl: "https://cdn.retailer.com/products/navy-blazer.jpg" },
+    ]);
   });
 
   it("skips a shared header/banner image even when its filename doesn't say 'logo'", () => {
@@ -59,33 +42,48 @@ describe("extractProductImageUrl", () => {
       <img src="https://is4.revolveassets.com/images/up/2025/November/Remail_2025Rebrand_Header.png">
       <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
     `;
-    expect(extractProductImageUrl(html)).toBe("https://cdn.retailer.com/products/navy-blazer.jpg");
+    const candidates = extractImageCandidates(html);
+    expect(candidates.map((c) => c.imageUrl)).toEqual(["https://cdn.retailer.com/products/navy-blazer.jpg"]);
   });
-});
 
-describe("extractProductImageAndLink", () => {
-  it("prefers an image wrapped in a link to the specific product page, returning both fields", () => {
+  it("returns an empty list when no plausible product image exists", () => {
+    expect(extractImageCandidates(`<img src="https://mail.retailer.com/pixel-track.gif">`)).toEqual([]);
+    expect(extractImageCandidates("<p>No images here</p>")).toEqual([]);
+  });
+
+  it("lists an image wrapped in a link to its product page first, with the link attached", () => {
     const html = `
       <a href="https://mail.retailer.com/view-in-browser"><img src="https://cdn.retailer.com/assets/header.png"></a>
       <a href="https://retailer.com/products/navy-wool-blazer"><img src="https://cdn.retailer.com/products/navy-blazer.jpg"></a>
     `;
-    expect(extractProductImageAndLink(html)).toEqual({
-      imageUrl: "https://cdn.retailer.com/products/navy-blazer.jpg",
-      productLink: "https://retailer.com/products/navy-wool-blazer",
-    });
+    expect(extractImageCandidates(html)).toEqual([
+      { imageUrl: "https://cdn.retailer.com/products/navy-blazer.jpg", productLink: "https://retailer.com/products/navy-wool-blazer" },
+    ]);
   });
 
-  it("ignores an anchor pointing at unsubscribe/account/etc. even if it wraps a plausible image", () => {
+  it("ignores an anchor pointing at unsubscribe/account/etc. even if it wraps a plausible image, falling back to it as a bare candidate", () => {
     const html = `<a href="https://retailer.com/unsubscribe?id=123"><img src="https://cdn.retailer.com/products/navy-blazer.jpg"></a>`;
-    const result = extractProductImageAndLink(html);
-    expect(result.productLink).toBeUndefined();
+    expect(extractImageCandidates(html)).toEqual([
+      { imageUrl: "https://cdn.retailer.com/products/navy-blazer.jpg" },
+    ]);
   });
 
-  it("falls back to a bare (unlinked) product image with no productLink when no product-page anchor exists", () => {
-    const html = `<img src="https://cdn.retailer.com/products/navy-blazer.jpg">`;
-    expect(extractProductImageAndLink(html)).toEqual({
-      imageUrl: "https://cdn.retailer.com/products/navy-blazer.jpg",
-      productLink: undefined,
-    });
+  it("lists every item's photo in a multi-item order, each paired with its own product link", () => {
+    const html = `
+      <a href="https://retailer.com/products/navy-blazer"><img src="https://cdn.retailer.com/products/blazer.jpg"></a>
+      <a href="https://retailer.com/products/silk-scarf"><img src="https://cdn.retailer.com/products/scarf.jpg"></a>
+    `;
+    expect(extractImageCandidates(html)).toEqual([
+      { imageUrl: "https://cdn.retailer.com/products/blazer.jpg", productLink: "https://retailer.com/products/navy-blazer" },
+      { imageUrl: "https://cdn.retailer.com/products/scarf.jpg", productLink: "https://retailer.com/products/silk-scarf" },
+    ]);
+  });
+
+  it("never lists the same image URL twice", () => {
+    const html = `
+      <a href="https://retailer.com/products/navy-blazer"><img src="https://cdn.retailer.com/products/blazer.jpg"></a>
+      <img src="https://cdn.retailer.com/products/blazer.jpg">
+    `;
+    expect(extractImageCandidates(html)).toHaveLength(1);
   });
 });

@@ -56,51 +56,57 @@ function isPlausibleProductImageSrc(src: string): boolean {
   return src.startsWith("http") && !NON_PRODUCT_IMAGE_PATTERNS.some((pattern) => pattern.test(src));
 }
 
-// Pulls the product image and, when findable, the product page link
-// directly out of the raw HTML - no vision call needed for either field,
-// per the design. Most retailer templates wrap the product photo in an
-// <a href=".../products/..."> pointing at that exact product, so that pairing
-// is tried first since it gives a high-confidence match for both fields
-// at once; a bare <img> (no product-link anchor) is the fallback for
-// templates that don't link the photo.
-export function extractProductImageAndLink(html: string): {
-  imageUrl: string | undefined;
-  productLink: string | undefined;
-} {
-  const anchorMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>((?:(?!<\/a>)[\s\S])*?)<\/a>/gi);
+export type ImageCandidate = {
+  imageUrl: string;
+  productLink?: string;
+};
 
+const MAX_IMAGE_CANDIDATES = 8;
+
+// Collects every plausible product-image candidate in the email, instead
+// of committing to a single "best guess" purely from regex heuristics.
+// A multi-item order has one photo per item, and no amount of URL-pattern
+// guessing can know which photo goes with which item name - that pairing
+// needs the LLM reading the surrounding text, which is why this returns a
+// candidate list for the LLM to choose from (per item) rather than trying
+// to pick a single winner itself.
+//
+// Anchor-wrapped images that link to an actual product page are collected
+// first (highest-confidence: the link target confirms it's a specific
+// product, not chrome), then any remaining bare/unlinked plausible images,
+// deduplicated by URL and capped so the prompt doesn't bloat on emails
+// with dozens of incidental images.
+export function extractImageCandidates(html: string): ImageCandidate[] {
+  const seen = new Set<string>();
+  const candidates: ImageCandidate[] = [];
+
+  const anchorMatches = html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>((?:(?!<\/a>)[\s\S])*?)<\/a>/gi);
   for (const anchor of anchorMatches) {
+    if (candidates.length >= MAX_IMAGE_CANDIDATES) break;
     const href = anchor[1];
     const inner = anchor[2];
     if (!href.startsWith("http")) continue;
     if (NON_PRODUCT_LINK_PATTERNS.some((pattern) => pattern.test(href))) continue;
+    if (!PRODUCT_LINK_PATTERNS.some((pattern) => pattern.test(href))) continue;
 
     const imgMatch = inner.match(/<img[^>]+src=["']([^"']+)["']/i);
     if (!imgMatch) continue;
     const src = imgMatch[1];
-    if (!isPlausibleProductImageSrc(src)) continue;
+    if (!isPlausibleProductImageSrc(src) || seen.has(src)) continue;
 
-    // A product-shaped URL is a strong signal this specific anchor+image
-    // pair is the item, not just "the first image that happens to sit
-    // inside some link" (e.g. a "view in browser" wrapper).
-    if (PRODUCT_LINK_PATTERNS.some((pattern) => pattern.test(href))) {
-      return { imageUrl: src, productLink: href };
-    }
+    seen.add(src);
+    candidates.push({ imageUrl: src, productLink: href });
   }
 
-  return { imageUrl: extractProductImageUrl(html), productLink: undefined };
-}
-
-// Pulls the first plausible product image URL directly out of the raw HTML
-// - no vision call needed for this field, per the design. Used as the
-// fallback when no anchor-wrapped product image/link pairing is found.
-export function extractProductImageUrl(html: string): string | undefined {
-  const matches = html.matchAll(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi);
-
-  for (const match of matches) {
+  const imgMatches = html.matchAll(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi);
+  for (const match of imgMatches) {
+    if (candidates.length >= MAX_IMAGE_CANDIDATES) break;
     const src = match[1];
-    if (isPlausibleProductImageSrc(src)) return src;
+    if (!isPlausibleProductImageSrc(src) || seen.has(src)) continue;
+
+    seen.add(src);
+    candidates.push({ imageUrl: src });
   }
 
-  return undefined;
+  return candidates;
 }

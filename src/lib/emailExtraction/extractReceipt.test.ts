@@ -64,14 +64,20 @@ describe("extractAndPersistPurchase", () => {
   });
 
   it("creates an active purchase row for a confident extraction, with the expected fields", async () => {
-    vi.mocked(getMessageBody).mockResolvedValueOnce(
-      '<html><img src="https://cdn.nike.com/products/shoe.jpg"></html>'
-    );
+    vi.mocked(getMessageBody).mockResolvedValueOnce("<html></html>");
     vi.mocked(extractPurchaseItems).mockResolvedValueOnce({
       merchant: "Nike",
       orderReference: null,
       confident: true,
-      items: [{ itemName: "Air Max 90", price: 129.99, category: "shoes" }],
+      items: [
+        {
+          itemName: "Air Max 90",
+          price: 129.99,
+          category: "shoes",
+          imageUrl: "https://cdn.nike.com/products/shoe.jpg",
+          productLink: null,
+        },
+      ],
     });
 
     const message = buildMessage();
@@ -95,16 +101,21 @@ describe("extractAndPersistPurchase", () => {
     expect(wardrobeItem.status).toBe("active");
   });
 
-  it("persists the product page link when the email links the product photo to its page", async () => {
-    vi.mocked(getMessageBody).mockResolvedValueOnce(
-      '<a href="https://cdn.nike.com/assets/header.png"><img src="https://cdn.nike.com/assets/header.png"></a>' +
-        '<a href="https://nike.com/products/air-max-90"><img src="https://cdn.nike.com/products/shoe.jpg"></a>'
-    );
+  it("persists the product page link the model matched to this item", async () => {
+    vi.mocked(getMessageBody).mockResolvedValueOnce("<html></html>");
     vi.mocked(extractPurchaseItems).mockResolvedValueOnce({
       merchant: "Nike",
       orderReference: null,
       confident: true,
-      items: [{ itemName: "Air Max 90", price: 129.99, category: "shoes" }],
+      items: [
+        {
+          itemName: "Air Max 90",
+          price: 129.99,
+          category: "shoes",
+          imageUrl: "https://cdn.nike.com/products/shoe.jpg",
+          productLink: "https://nike.com/products/air-max-90",
+        },
+      ],
     });
 
     const message = buildMessage({ id: "msg-with-link" });
@@ -115,15 +126,49 @@ describe("extractAndPersistPurchase", () => {
     expect(purchase.productLink).toBe("https://nike.com/products/air-max-90");
   });
 
-  it("creates one row per item for a multi-item order", async () => {
+  it("passes the email's image candidates through to the LLM extraction call", async () => {
+    vi.mocked(getMessageBody).mockResolvedValueOnce(
+      '<a href="https://nike.com/products/air-max-90"><img src="https://cdn.nike.com/products/shoe.jpg"></a>'
+    );
+    vi.mocked(extractPurchaseItems).mockResolvedValueOnce({
+      merchant: "Nike",
+      orderReference: null,
+      confident: true,
+      items: [
+        { itemName: "Air Max 90", price: 129.99, category: "shoes", imageUrl: null, productLink: null },
+      ],
+    });
+
+    const message = buildMessage({ id: "msg-candidates" });
+    await extractAndPersistPurchase({ accessToken: "fake-token", userId, connectionId, message });
+
+    expect(extractPurchaseItems).toHaveBeenCalledWith(
+      expect.objectContaining({ from: message.from, subject: message.subject }),
+      [{ imageUrl: "https://cdn.nike.com/products/shoe.jpg", productLink: "https://nike.com/products/air-max-90" }]
+    );
+  });
+
+  it("gives each item in a multi-item order its own matched image, not one shared image for all", async () => {
     vi.mocked(getMessageBody).mockResolvedValueOnce("<html></html>");
     vi.mocked(extractPurchaseItems).mockResolvedValueOnce({
       merchant: "Zara",
       orderReference: null,
       confident: true,
       items: [
-        { itemName: "Wool Coat", price: 199, category: "outerwear" },
-        { itemName: "Silk Scarf", price: 39, category: "accessories" },
+        {
+          itemName: "Wool Coat",
+          price: 199,
+          category: "outerwear",
+          imageUrl: "https://cdn.zara.com/coat.jpg",
+          productLink: null,
+        },
+        {
+          itemName: "Silk Scarf",
+          price: 39,
+          category: "accessories",
+          imageUrl: "https://cdn.zara.com/scarf.jpg",
+          productLink: null,
+        },
       ],
     });
 
@@ -133,6 +178,10 @@ describe("extractAndPersistPurchase", () => {
     const purchases = await prisma.purchase.findMany({ where: { sourceEmailId: message.id } });
     expect(purchases).toHaveLength(2);
     expect(purchases.map((p) => p.itemName).sort()).toEqual(["Silk Scarf", "Wool Coat"]);
+    const coat = purchases.find((p) => p.itemName === "Wool Coat");
+    const scarf = purchases.find((p) => p.itemName === "Silk Scarf");
+    expect(coat?.imageUrl).toBe("https://cdn.zara.com/coat.jpg");
+    expect(scarf?.imageUrl).toBe("https://cdn.zara.com/scarf.jpg");
 
     const wardrobeItems = await prisma.wardrobeItem.findMany({
       where: { sourcePurchaseId: { in: purchases.map((p) => p.id) } },
@@ -171,7 +220,7 @@ describe("extractAndPersistPurchase", () => {
       merchant: "Nike",
       orderReference: null,
       confident: true,
-      items: [{ itemName: "Air Max 90", price: 129.99, category: "shoes" }],
+      items: [{ itemName: "Air Max 90", price: 129.99, category: "shoes", imageUrl: null, productLink: null }],
     });
 
     const message = buildMessage({ id: "msg-idempotent" });
@@ -189,7 +238,7 @@ describe("extractAndPersistPurchase", () => {
       merchant: "Holt Renfrew",
       orderReference: "30688409",
       confident: true,
-      items: [{ itemName: "Wool Coat", price: 450, category: "outerwear" }],
+      items: [{ itemName: "Wool Coat", price: 450, category: "outerwear", imageUrl: null, productLink: null }],
     });
     const confirmationMessage = buildMessage({ id: "msg-confirmation" });
     await extractAndPersistPurchase({
@@ -254,7 +303,7 @@ describe("extractAndPersistPurchase", () => {
       merchant: "Holt Renfrew",
       orderReference: "30688409",
       confident: true,
-      items: [{ itemName: "Wool Coat", price: 450, category: "outerwear" }],
+      items: [{ itemName: "Wool Coat", price: 450, category: "outerwear", imageUrl: null, productLink: null }],
     });
     const confirmationMessage = buildMessage({ id: "msg-confirmation-second" });
     await extractAndPersistPurchase({

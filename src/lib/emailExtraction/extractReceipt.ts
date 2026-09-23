@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getMessageBody } from "@/lib/gmail/fetchMessages";
-import { extractProductImageAndLink } from "./htmlUtils";
+import { extractImageCandidates } from "./htmlUtils";
 import { extractPurchaseItems } from "./llmExtractor";
 import { seedWardrobeItemFromPurchase } from "@/lib/wardrobe";
 import type { GmailMessageSummary } from "@/lib/gmail/fetchMessages";
@@ -36,13 +36,12 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
   }
 
   const html = await getMessageBody(accessToken, message.id);
-  const { imageUrl, productLink } = extractProductImageAndLink(html);
+  const imageCandidates = extractImageCandidates(html);
   const orderDate = new Date(Number(message.internalDate));
-  const extraction = await extractPurchaseItems({
-    from: message.from,
-    subject: message.subject,
-    html,
-  });
+  const extraction = await extractPurchaseItems(
+    { from: message.from, subject: message.subject, html },
+    imageCandidates
+  );
 
   const isConfident = extraction.confident && extraction.items.length > 0;
 
@@ -83,8 +82,6 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
     merchant: extraction.merchant,
     orderReference: extraction.orderReference,
     orderDate,
-    imageUrl,
-    productLink,
   };
 
   if (!isConfident) {
@@ -95,6 +92,8 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
         itemName: fallbackItem?.itemName ?? message.subject,
         price: (fallbackItem?.price ?? 0).toString(),
         category: fallbackItem?.category ?? "unknown",
+        imageUrl: fallbackItem?.imageUrl ?? imageCandidates[0]?.imageUrl,
+        productLink: fallbackItem?.productLink ?? imageCandidates[0]?.productLink,
         status: "needs_review",
       },
     });
@@ -108,6 +107,8 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
         itemName: item.itemName,
         price: item.price.toString(),
         category: item.category,
+        imageUrl: item.imageUrl ?? undefined,
+        productLink: item.productLink ?? undefined,
         status: "active",
       },
     });
