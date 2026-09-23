@@ -15,6 +15,9 @@ export default async function Home() {
       {gmailConnection?.status === "connected" ? (
         <>
           <p>Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
+          <p>
+            <a href="/purchases">View purchase history</a>
+          </p>
           <form action="/api/auth/gmail/disconnect" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
             <button type="submit">Disconnect</button>
           </form>

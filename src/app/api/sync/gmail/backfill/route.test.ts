@@ -15,9 +15,14 @@ vi.mock("@/lib/emailClassification/classifyEmail", () => ({
   classifyEmail: vi.fn(),
 }));
 
+vi.mock("@/lib/emailExtraction/extractReceipt", () => ({
+  extractAndPersistPurchase: vi.fn(),
+}));
+
 import { getValidGmailAccessToken } from "@/lib/emailConnections";
 import { fetchRecentMessages } from "@/lib/gmail/fetchMessages";
 import { classifyEmail } from "@/lib/emailClassification/classifyEmail";
+import { extractAndPersistPurchase } from "@/lib/emailExtraction/extractReceipt";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
@@ -51,6 +56,7 @@ describe("POST /api/sync/gmail/backfill", () => {
     vi.mocked(getValidGmailAccessToken).mockReset();
     vi.mocked(fetchRecentMessages).mockReset();
     vi.mocked(classifyEmail).mockReset();
+    vi.mocked(extractAndPersistPurchase).mockReset();
     const user = await prisma.user.findFirst();
     if (user) {
       await prisma.emailConnection.deleteMany({ where: { userId: user.id, provider: "gmail" } });
@@ -98,6 +104,7 @@ describe("POST /api/sync/gmail/backfill", () => {
       if (email.id === "2") return "out_of_scope";
       return "needs_review";
     });
+    vi.mocked(extractAndPersistPurchase).mockResolvedValue(undefined);
 
     const response = await POST();
     const body = await response.json();
@@ -114,5 +121,12 @@ describe("POST /api/sync/gmail/backfill", () => {
     expect(body.needsReviewEmails).toEqual([
       { id: "3", from: "orders@target.com", subject: "Your Target order" },
     ]);
+
+    // Extraction only runs for the in-scope message, never for out-of-scope
+    // or needs-review ones.
+    expect(extractAndPersistPurchase).toHaveBeenCalledTimes(1);
+    expect(extractAndPersistPurchase).toHaveBeenCalledWith(
+      expect.objectContaining({ message: expect.objectContaining({ id: "1" }) })
+    );
   });
 });

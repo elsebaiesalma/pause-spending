@@ -52,6 +52,10 @@ model Purchase {
   imageUrl                String?   @map("image_url")
   productLink             String?   @map("product_link")
   sourceEmailId           String?   @map("source_email_id")
+  // The retailer's own order number, when identifiable - used to detect
+  // that a later shipping/delivery email refers to an order a prior
+  // confirmation email already captured, instead of creating a duplicate.
+  orderReference          String?   @map("order_reference")
   status                  String    @default("active")
 
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)

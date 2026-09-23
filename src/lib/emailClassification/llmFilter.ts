@@ -1,6 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { getAnthropicClient } from "@/lib/anthropicClient";
 import type { ClassifiableEmail } from "./ruleBasedFilter";
 
 const ClassificationSchema = z.object({
@@ -18,21 +18,12 @@ const ClassificationSchema = z.object({
 
 export type LLMClassification = z.infer<typeof ClassificationSchema>;
 
-let client: Anthropic | undefined;
-
-function getClient(): Anthropic {
-  if (!client) {
-    client = new Anthropic();
-  }
-  return client;
-}
-
 const SYSTEM_PROMPT = `You classify emails for a personal shopping-tracker app. Given an email's sender, subject, and optionally a short snippet, decide whether it is specifically about a clothing, shoe, or accessory purchase (an order confirmation, shipping/delivery notice, receipt, or return) - as opposed to any other kind of email (other product categories, bills, subscriptions, reservations, newsletters, etc.). Judge only from the given fields; don't assume anything not stated.`;
 
 export async function classifyEmailByLLM(
   email: ClassifiableEmail & { snippet?: string }
 ): Promise<LLMClassification> {
-  const response = await getClient().messages.parse({
+  const response = await getAnthropicClient().messages.parse({
     model: "claude-opus-5",
     max_tokens: 512,
     system: SYSTEM_PROMPT,

@@ -12,7 +12,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 4: Disconnect and permanent-delete privacy controls
 - [x] Step 5: Email backfill fetch + rule-based classification pre-filter
 - [x] Step 6: LLM classification fallback for ambiguous emails
-- [ ] Step 7: Receipt extraction into purchases
+- [x] Step 7: Receipt extraction into purchases
 - [ ] Step 8: Wardrobe seeding and Wardrobe Service CRUD
 - [ ] Step 9: Scheduled periodic sync + manual "sync now"
 - [ ] Step 10: Budget Service (manual budget, AI-suggested starting figure, spend tracking)

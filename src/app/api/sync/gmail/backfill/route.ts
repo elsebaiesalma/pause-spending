@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getValidGmailAccessToken } from "@/lib/emailConnections";
-import { fetchRecentMessages } from "@/lib/gmail/fetchMessages";
+import { fetchRecentMessages, type GmailMessageSummary } from "@/lib/gmail/fetchMessages";
 import { classifyEmail } from "@/lib/emailClassification/classifyEmail";
+import { extractAndPersistPurchase } from "@/lib/emailExtraction/extractReceipt";
 import { mapWithConcurrency } from "@/lib/concurrency";
 
 const BACKFILL_WINDOW_MONTHS = 6;
 const CLASSIFICATION_CONCURRENCY = 5;
+const EXTRACTION_CONCURRENCY = 5;
+
+function summarize(message: GmailMessageSummary) {
+  return { id: message.id, from: message.from, subject: message.subject };
+}
 
 export async function POST() {
   const user = await prisma.user.findFirstOrThrow();
@@ -35,23 +41,36 @@ export async function POST() {
     })
   );
 
-  const inScope: { id: string; from: string; subject: string }[] = [];
-  const outOfScope: { id: string; from: string; subject: string }[] = [];
-  const needsReview: { id: string; from: string; subject: string }[] = [];
+  const inScope: GmailMessageSummary[] = [];
+  const outOfScope: GmailMessageSummary[] = [];
+  const needsReview: GmailMessageSummary[] = [];
 
   for (const { message, result } of classifications) {
-    const summary = { id: message.id, from: message.from, subject: message.subject };
-    if (result === "in_scope") inScope.push(summary);
-    else if (result === "out_of_scope") outOfScope.push(summary);
-    else needsReview.push(summary);
+    if (result === "in_scope") inScope.push(message);
+    else if (result === "out_of_scope") outOfScope.push(message);
+    else needsReview.push(message);
   }
+
+  await mapWithConcurrency(inScope, EXTRACTION_CONCURRENCY, (message) =>
+    extractAndPersistPurchase({
+      accessToken,
+      userId: user.id,
+      connectionId: connection.id,
+      message,
+    })
+  );
+
+  const purchasesCreated = await prisma.purchase.count({
+    where: { userId: user.id, sourceEmailId: { in: inScope.map((m) => m.id) } },
+  });
 
   return NextResponse.json({
     fetched: messages.length,
     inScope: inScope.length,
     outOfScope: outOfScope.length,
     needsReview: needsReview.length,
-    inScopeEmails: inScope,
-    needsReviewEmails: needsReview,
+    purchasesCreated,
+    inScopeEmails: inScope.map(summarize),
+    needsReviewEmails: needsReview.map(summarize),
   });
 }

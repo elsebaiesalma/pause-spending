@@ -105,10 +105,44 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+type GmailMessagePart = {
+  mimeType?: string;
+  body?: { data?: string };
+  parts?: GmailMessagePart[];
+};
+
+function findHtmlPart(part: GmailMessagePart | undefined): string | undefined {
+  if (!part) return undefined;
+  if (part.mimeType === "text/html" && part.body?.data) {
+    return part.body.data;
+  }
+  for (const child of part.parts ?? []) {
+    const found = findHtmlPart(child);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+// Fetches and decodes the full HTML body of a single message, for the
+// receipt-extraction pass (Step 7) - only called for messages already
+// classified in-scope, never for the whole candidate set.
+export async function getMessageBody(accessToken: string, id: string): Promise<string> {
+  const response = await gmailFetch(accessToken, `/messages/${id}?format=full`);
+  const body = (await response.json()) as { payload?: GmailMessagePart };
+
+  const base64url = findHtmlPart(body.payload);
+  if (!base64url) {
+    return "";
+  }
+
+  const base64 = base64url.replace(/-/g, "+").replace(/_/g, "/");
+  return Buffer.from(base64, "base64").toString("utf8");
+}
+
 // Fetches header metadata only (From/Subject) - no message body - for
-// receipt-shaped messages received since `sinceDate`. Full-body extraction
-// is Step 7's job. Fetches details in small batches to stay under Gmail's
-// per-user rate limit rather than firing every request at once.
+// receipt-shaped messages received since `sinceDate`. Fetches details in
+// small batches to stay under Gmail's per-user rate limit rather than
+// firing every request at once.
 export async function fetchRecentMessages(
   accessToken: string,
   sinceDate: Date
