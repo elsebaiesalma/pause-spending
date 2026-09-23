@@ -22,6 +22,7 @@ export type GmailMessageSummary = {
   id: string;
   from: string;
   subject: string;
+  snippet: string;
   internalDate: string;
 };
 
@@ -82,6 +83,7 @@ async function getMessageSummary(
   const response = await gmailFetch(accessToken, `/messages/${id}?${params.toString()}`);
   const body = (await response.json()) as {
     id: string;
+    snippet?: string;
     internalDate: string;
     payload?: { headers?: { name: string; value: string }[] };
   };
@@ -90,7 +92,13 @@ async function getMessageSummary(
   const from = headers.find((h) => h.name === "From")?.value ?? "";
   const subject = headers.find((h) => h.name === "Subject")?.value ?? "";
 
-  return { id: body.id, from, subject, internalDate: body.internalDate };
+  return {
+    id: body.id,
+    from,
+    subject,
+    snippet: body.snippet ?? "",
+    internalDate: body.internalDate,
+  };
 }
 
 function sleep(ms: number): Promise<void> {

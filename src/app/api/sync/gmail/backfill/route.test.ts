@@ -11,22 +11,46 @@ vi.mock("@/lib/gmail/fetchMessages", () => ({
   fetchRecentMessages: vi.fn(),
 }));
 
+vi.mock("@/lib/emailClassification/classifyEmail", () => ({
+  classifyEmail: vi.fn(),
+}));
+
 import { getValidGmailAccessToken } from "@/lib/emailConnections";
 import { fetchRecentMessages } from "@/lib/gmail/fetchMessages";
+import { classifyEmail } from "@/lib/emailClassification/classifyEmail";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
 
 const FIXTURE_MESSAGES = [
-  { id: "1", from: "orders@nike.com", subject: "Your Nike Order Confirmation", internalDate: "0" },
-  { id: "2", from: "receipts@instacart.com", subject: "Your grocery receipt", internalDate: "0" },
-  { id: "3", from: "orders@target.com", subject: "Your Target order", internalDate: "0" },
+  {
+    id: "1",
+    from: "orders@nike.com",
+    subject: "Your Nike Order Confirmation",
+    snippet: "",
+    internalDate: "0",
+  },
+  {
+    id: "2",
+    from: "receipts@instacart.com",
+    subject: "Your grocery receipt",
+    snippet: "",
+    internalDate: "0",
+  },
+  {
+    id: "3",
+    from: "orders@target.com",
+    subject: "Your Target order",
+    snippet: "",
+    internalDate: "0",
+  },
 ];
 
 describe("POST /api/sync/gmail/backfill", () => {
   afterEach(async () => {
     vi.mocked(getValidGmailAccessToken).mockReset();
     vi.mocked(fetchRecentMessages).mockReset();
+    vi.mocked(classifyEmail).mockReset();
     const user = await prisma.user.findFirst();
     if (user) {
       await prisma.emailConnection.deleteMany({ where: { userId: user.id, provider: "gmail" } });
@@ -57,7 +81,7 @@ describe("POST /api/sync/gmail/backfill", () => {
     expect(fetchRecentMessages).not.toHaveBeenCalled();
   });
 
-  it("classifies fetched messages and reports counts by category", async () => {
+  it("classifies every fetched message and reports counts with zero left unresolved", async () => {
     const user = await prisma.user.findFirstOrThrow();
     await prisma.emailConnection.create({
       data: {
@@ -69,6 +93,11 @@ describe("POST /api/sync/gmail/backfill", () => {
     });
     vi.mocked(getValidGmailAccessToken).mockResolvedValueOnce("fake-access-token");
     vi.mocked(fetchRecentMessages).mockResolvedValueOnce(FIXTURE_MESSAGES);
+    vi.mocked(classifyEmail).mockImplementation(async (email) => {
+      if (email.id === "1") return "in_scope";
+      if (email.id === "2") return "out_of_scope";
+      return "needs_review";
+    });
 
     const response = await POST();
     const body = await response.json();
@@ -77,11 +106,12 @@ describe("POST /api/sync/gmail/backfill", () => {
     expect(body.fetched).toBe(3);
     expect(body.inScope).toBe(1);
     expect(body.outOfScope).toBe(1);
-    expect(body.ambiguous).toBe(1);
+    expect(body.needsReview).toBe(1);
+    expect(body.inScope + body.outOfScope + body.needsReview).toBe(body.fetched);
     expect(body.inScopeEmails).toEqual([
       { id: "1", from: "orders@nike.com", subject: "Your Nike Order Confirmation" },
     ]);
-    expect(body.ambiguousEmails).toEqual([
+    expect(body.needsReviewEmails).toEqual([
       { id: "3", from: "orders@target.com", subject: "Your Target order" },
     ]);
   });

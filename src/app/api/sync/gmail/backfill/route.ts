@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getValidGmailAccessToken } from "@/lib/emailConnections";
 import { fetchRecentMessages } from "@/lib/gmail/fetchMessages";
-import { classifyEmailByRules } from "@/lib/emailClassification/ruleBasedFilter";
+import { classifyEmail } from "@/lib/emailClassification/classifyEmail";
+import { mapWithConcurrency } from "@/lib/concurrency";
 
 const BACKFILL_WINDOW_MONTHS = 6;
+const CLASSIFICATION_CONCURRENCY = 5;
 
 export async function POST() {
   const user = await prisma.user.findFirstOrThrow();
@@ -24,24 +26,32 @@ export async function POST() {
 
   const messages = await fetchRecentMessages(accessToken, sinceDate);
 
+  const classifications = await mapWithConcurrency(
+    messages,
+    CLASSIFICATION_CONCURRENCY,
+    async (message) => ({
+      message,
+      result: await classifyEmail(message),
+    })
+  );
+
   const inScope: { id: string; from: string; subject: string }[] = [];
   const outOfScope: { id: string; from: string; subject: string }[] = [];
-  const ambiguous: { id: string; from: string; subject: string }[] = [];
+  const needsReview: { id: string; from: string; subject: string }[] = [];
 
-  for (const message of messages) {
-    const result = classifyEmailByRules(message);
+  for (const { message, result } of classifications) {
     const summary = { id: message.id, from: message.from, subject: message.subject };
     if (result === "in_scope") inScope.push(summary);
     else if (result === "out_of_scope") outOfScope.push(summary);
-    else ambiguous.push(summary);
+    else needsReview.push(summary);
   }
 
   return NextResponse.json({
     fetched: messages.length,
     inScope: inScope.length,
     outOfScope: outOfScope.length,
-    ambiguous: ambiguous.length,
+    needsReview: needsReview.length,
     inScopeEmails: inScope,
-    ambiguousEmails: ambiguous,
+    needsReviewEmails: needsReview,
   });
 }
