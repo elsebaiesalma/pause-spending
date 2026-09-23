@@ -15,7 +15,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 7: Receipt extraction into purchases
 - [x] Step 8: Wardrobe seeding and Wardrobe Service CRUD
 - [x] Step 9: Scheduled periodic sync + manual "sync now"
-- [ ] Step 10: Budget Service (manual budget, AI-suggested starting figure, spend tracking)
+- [x] Step 10: Budget Service (manual budget, AI-suggested starting figure, spend tracking)
 - [ ] Step 11: Structured tag extraction and similarity shortlist matching
 - [ ] Step 12: Item Extraction Service (URL / screenshot / typed input, with confirmation)
 - [ ] Step 13: Redundancy explanation + Pause Decision Screen (core end-to-end demo)
