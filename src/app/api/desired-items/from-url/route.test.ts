@@ -27,11 +27,14 @@ describe("POST /api/desired-items/from-url", () => {
     createdIds.length = 0;
   });
 
-  it("creates an unconfirmed desired item with the extracted fields", async () => {
+  it("creates an unconfirmed desired item with the extracted fields, including tags", async () => {
     vi.mocked(extractFromUrl).mockResolvedValueOnce({
       itemName: "Navy Wool Blazer",
       price: 189.99,
       imageUrl: "https://cdn.retailer.com/blazer.jpg",
+      category: "outerwear",
+      primaryColor: "navy",
+      styleTags: ["business-casual"],
     });
 
     const response = await POST(buildRequest("https://retailer.com/blazer"));
@@ -47,6 +50,9 @@ describe("POST /api/desired-items/from-url", () => {
     expect(item.itemName).toBe("Navy Wool Blazer");
     expect(Number(item.price)).toBeCloseTo(189.99);
     expect(item.imageUrl).toBe("https://cdn.retailer.com/blazer.jpg");
+    expect(item.category).toBe("outerwear");
+    expect(item.primaryColor).toBe("navy");
+    expect(item.styleTags).toEqual(["business-casual"]);
     expect(item.userConfirmed).toBe(false);
     expect(item.pauseStatus).toBe("pending_confirmation");
   });

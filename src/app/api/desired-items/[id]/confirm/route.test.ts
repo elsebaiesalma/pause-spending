@@ -60,6 +60,30 @@ describe("POST /api/desired-items/[id]/confirm", () => {
     expect(Number(updated.price)).toBeCloseTo(189.99);
   });
 
+  it("persists corrected category, color, and style tags", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const item = await prisma.desiredItem.create({
+      data: { userId: user.id, sourceType: "url", rawInput: "https://retailer.com/blazer", itemName: null },
+    });
+    createdIds.push(item.id);
+
+    await POST(
+      buildRequest({
+        itemName: "Navy Wool Blazer",
+        price: "189.99",
+        category: "outerwear",
+        primaryColor: "navy",
+        styleTags: "business-casual, tailored",
+      }),
+      await ctxFor(item.id)
+    );
+
+    const updated = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(updated.category).toBe("outerwear");
+    expect(updated.primaryColor).toBe("navy");
+    expect(updated.styleTags).toEqual(["business-casual", "tailored"]);
+  });
+
   it("rejects confirmation with no item name", async () => {
     const user = await prisma.user.findFirstOrThrow();
     const item = await prisma.desiredItem.create({

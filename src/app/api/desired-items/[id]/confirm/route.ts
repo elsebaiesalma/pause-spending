@@ -16,6 +16,15 @@ export async function POST(
   const priceRaw = form.get("price")?.toString();
   const price = priceRaw ? Number(priceRaw) : null;
   const imageUrl = form.get("imageUrl")?.toString().trim() || null;
+  const category = form.get("category")?.toString().trim() || null;
+  const primaryColor = form.get("primaryColor")?.toString().trim() || null;
+  const styleTags =
+    form
+      .get("styleTags")
+      ?.toString()
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean) ?? [];
 
   const user = await prisma.user.findFirstOrThrow();
 
@@ -25,6 +34,9 @@ export async function POST(
       itemName,
       price: price !== null && Number.isFinite(price) ? price.toString() : null,
       imageUrl,
+      category,
+      primaryColor,
+      styleTags,
       userConfirmed: true,
     },
   });

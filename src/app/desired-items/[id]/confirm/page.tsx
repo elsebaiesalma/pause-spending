@@ -48,6 +48,17 @@ export default async function ConfirmDesiredItemPage({
         />
         <label htmlFor="imageUrl">Image URL</label>
         <input id="imageUrl" name="imageUrl" defaultValue={item.imageUrl ?? ""} placeholder="Image URL" />
+        <label htmlFor="category">Category</label>
+        <input id="category" name="category" defaultValue={item.category ?? ""} placeholder="Category, e.g. tops" />
+        <label htmlFor="primaryColor">Color</label>
+        <input id="primaryColor" name="primaryColor" defaultValue={item.primaryColor ?? ""} placeholder="Color" />
+        <label htmlFor="styleTags">Style tags</label>
+        <input
+          id="styleTags"
+          name="styleTags"
+          defaultValue={item.styleTags.join(", ")}
+          placeholder="Style tags (comma separated)"
+        />
         <button type="submit" className="btn-primary">
           Confirm
         </button>

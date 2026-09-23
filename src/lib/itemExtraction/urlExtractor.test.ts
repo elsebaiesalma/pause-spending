@@ -1,5 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/tagging/llmTagger", () => ({
+  extractWardrobeItemTags: vi.fn(),
+}));
+
+import { extractWardrobeItemTags } from "@/lib/tagging/llmTagger";
 import { extractFromUrl } from "./urlExtractor";
+
+const FAKE_TAGS = {
+  category: "outerwear",
+  primaryColor: "navy",
+  secondaryColor: null,
+  styleTags: ["business-casual"],
+  useCaseTags: ["work"],
+};
 
 function fakeResponse(html: string, ok = true) {
   return {
@@ -11,9 +25,10 @@ function fakeResponse(html: string, ok = true) {
 describe("extractFromUrl", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.mocked(extractWardrobeItemTags).mockReset();
   });
 
-  it("extracts name/price/image from JSON-LD Product schema when present", async () => {
+  it("extracts name/price/image from JSON-LD Product schema when present, and tags via the wardrobe tagger", async () => {
     const html = `
       <html><head>
         <script type="application/ld+json">
@@ -23,12 +38,21 @@ describe("extractFromUrl", () => {
       </head></html>
     `;
     vi.spyOn(global, "fetch").mockResolvedValueOnce(fakeResponse(html));
+    vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce(FAKE_TAGS);
 
     const result = await extractFromUrl("https://retailer.com/blazer");
 
     expect(result).toEqual({
       itemName: "Navy Wool Blazer",
       price: 189.99,
+      imageUrl: "https://cdn.retailer.com/blazer.jpg",
+      category: "outerwear",
+      primaryColor: "navy",
+      styleTags: ["business-casual"],
+    });
+    expect(extractWardrobeItemTags).toHaveBeenCalledWith({
+      itemName: "Navy Wool Blazer",
+      category: null,
       imageUrl: "https://cdn.retailer.com/blazer.jpg",
     });
   });
@@ -41,19 +65,35 @@ describe("extractFromUrl", () => {
       </head></html>
     `;
     vi.spyOn(global, "fetch").mockResolvedValueOnce(fakeResponse(html));
+    vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce(FAKE_TAGS);
 
     const result = await extractFromUrl("https://retailer.com/blazer");
 
-    expect(result).toEqual({
-      itemName: "Navy Wool Blazer",
-      price: null,
-      imageUrl: "https://cdn.retailer.com/blazer.jpg",
-    });
+    expect(result?.itemName).toBe("Navy Wool Blazer");
+    expect(result?.price).toBeNull();
+    expect(result?.imageUrl).toBe("https://cdn.retailer.com/blazer.jpg");
+  });
+
+  it("falls back to a plausible <img> candidate in the page body when there's no JSON-LD image or og:image", async () => {
+    const html = `
+      <html><body>
+        <title>Navy Wool Blazer</title>
+        <img src="https://cdn.retailer.com/assets/header-logo.png">
+        <img src="https://cdn.retailer.com/products/blazer-detail.jpg">
+      </body></html>
+    `;
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(fakeResponse(html));
+    vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce(FAKE_TAGS);
+
+    const result = await extractFromUrl("https://retailer.com/blazer");
+
+    expect(result?.imageUrl).toBe("https://cdn.retailer.com/products/blazer-detail.jpg");
   });
 
   it("falls back to the <title> tag when there is no structured metadata at all", async () => {
     const html = `<html><head><title>Navy Wool Blazer - Retailer</title></head></html>`;
     vi.spyOn(global, "fetch").mockResolvedValueOnce(fakeResponse(html));
+    vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce(FAKE_TAGS);
 
     const result = await extractFromUrl("https://retailer.com/blazer");
 
@@ -66,6 +106,7 @@ describe("extractFromUrl", () => {
     const result = await extractFromUrl("https://retailer.com/blazer");
 
     expect(result).toBeNull();
+    expect(extractWardrobeItemTags).not.toHaveBeenCalled();
   });
 
   it("returns null when the response is not ok", async () => {
@@ -82,5 +123,17 @@ describe("extractFromUrl", () => {
     const result = await extractFromUrl("https://retailer.com/blazer");
 
     expect(result).toBeNull();
+  });
+
+  it("still returns the found name/price/image with empty tags if tag extraction itself fails", async () => {
+    const html = `<html><head><title>Navy Wool Blazer</title></head></html>`;
+    vi.spyOn(global, "fetch").mockResolvedValueOnce(fakeResponse(html));
+    vi.mocked(extractWardrobeItemTags).mockRejectedValueOnce(new Error("model unavailable"));
+
+    const result = await extractFromUrl("https://retailer.com/blazer");
+
+    expect(result?.itemName).toBe("Navy Wool Blazer");
+    expect(result?.category).toBeNull();
+    expect(result?.styleTags).toEqual([]);
   });
 });

@@ -1,7 +1,13 @@
+import { extractImageCandidates } from "@/lib/emailExtraction/htmlUtils";
+import { extractWardrobeItemTags } from "@/lib/tagging/llmTagger";
+
 export type UrlExtraction = {
   itemName: string;
   price: number | null;
   imageUrl: string | null;
+  category: string | null;
+  primaryColor: string | null;
+  styleTags: string[];
 };
 
 function extractMetaContent(html: string, property: string): string | null {
@@ -79,10 +85,13 @@ function parsePriceFromMeta(html: string): number | null {
 }
 
 // Fetches a product page and scrapes structured metadata (JSON-LD Product
-// schema, then Open Graph tags, then a bare <title> as a last resort).
-// Returns null on any failure - fetch error, non-2xx response, or no
-// identifiable item name - so the caller can fall back to manual entry
-// rather than blocking, per the design's error handling.
+// schema, then Open Graph tags, then a bare <title> as a last resort; the
+// image specifically also falls back to a scan of plausible <img>
+// candidates in the page body, reusing the same heuristic the email
+// pipeline uses to skip site chrome like logos/nav banners). Returns null
+// on any failure - fetch error, non-2xx response, or no identifiable item
+// name - so the caller can fall back to manual entry rather than blocking,
+// per the design's error handling.
 export async function extractFromUrl(url: string): Promise<UrlExtraction | null> {
   let html: string;
   try {
@@ -107,8 +116,40 @@ export async function extractFromUrl(url: string): Promise<UrlExtraction | null>
     return null;
   }
 
-  const imageUrl = firstImage(jsonLd?.image) ?? extractMetaContent(html, "og:image");
+  const imageUrl =
+    firstImage(jsonLd?.image) ??
+    extractMetaContent(html, "og:image") ??
+    extractImageCandidates(html)[0]?.imageUrl ??
+    null;
   const price = jsonLd?.price ?? parsePriceFromMeta(html);
+  const trimmedName = itemName.trim();
 
-  return { itemName: itemName.trim(), price: price ?? null, imageUrl };
+  const tags = await extractItemTags(trimmedName, imageUrl);
+
+  return {
+    itemName: trimmedName,
+    price: price ?? null,
+    imageUrl,
+    ...tags,
+  };
+}
+
+// Reuses the same tag-extraction call the wardrobe uses (Step 11) so a
+// desired item pulled from a URL already has real style/color/category
+// data to show for confirmation, instead of leaving those blank until the
+// pause screen tags it later. A tagging failure must never block getting
+// to the confirmation screen with the name/price/image already found, so
+// this degrades to "no tags yet" (picked up by the pause screen's own
+// tagging pass) rather than throwing.
+async function extractItemTags(
+  itemName: string,
+  imageUrl: string | null
+): Promise<Pick<UrlExtraction, "category" | "primaryColor" | "styleTags">> {
+  try {
+    const tags = await extractWardrobeItemTags({ itemName, category: null, imageUrl });
+    return { category: tags.category, primaryColor: tags.primaryColor, styleTags: tags.styleTags };
+  } catch (error) {
+    console.warn(`Tag extraction failed for URL-sourced item "${itemName}":`, error instanceof Error ? error.message : error);
+    return { category: null, primaryColor: null, styleTags: [] };
+  }
 }
