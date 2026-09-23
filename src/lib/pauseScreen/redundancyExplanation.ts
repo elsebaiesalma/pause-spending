@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
+import { normalizeAiText } from "@/lib/text";
 import type { DesiredItem, WardrobeItem } from "@prisma/client";
 
 const ExplanationSchema = z.object({
@@ -58,5 +59,5 @@ export async function generateRedundancyExplanation(
     throw new Error("Redundancy explanation response failed to parse against the expected schema");
   }
 
-  return response.parsed_output.explanation;
+  return normalizeAiText(response.parsed_output.explanation);
 }

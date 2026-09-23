@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
+import { normalizeAiText } from "@/lib/text";
 import type { DesiredItem, WardrobeItem } from "@prisma/client";
 
 export type Alternative = {
@@ -64,7 +65,16 @@ export async function generateShoppingAlternatives(
     throw new Error("Shopping alternatives response failed to parse against the expected schema");
   }
 
-  return response.parsed_output;
+  const normalize = (alt: Alternative): Alternative => ({
+    ...alt,
+    name: normalizeAiText(alt.name),
+    note: normalizeAiText(alt.note),
+  });
+
+  return {
+    comparables: response.parsed_output.comparables.map(normalize),
+    secondhand: response.parsed_output.secondhand.map(normalize),
+  };
 }
 
 export type OutfitIdea = {
@@ -131,7 +141,7 @@ export async function generateOutfitIdeas(
   for (const idea of response.parsed_output.ideas) {
     const wardrobeItem = byId.get(idea.wardrobeItemId);
     if (wardrobeItem) {
-      ideas.push({ wardrobeItem, suggestion: idea.suggestion });
+      ideas.push({ wardrobeItem, suggestion: normalizeAiText(idea.suggestion) });
     }
   }
   return ideas;

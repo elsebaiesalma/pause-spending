@@ -57,4 +57,17 @@ describe("generateRedundancyExplanation", () => {
     const content = parseMock.mock.calls[0][0].messages[0].content as string;
     expect(content).toContain("Navy Blazer");
   });
+
+  it("normalizes a stray literal unicode escape from the model into a real character", async () => {
+    parseMock.mockResolvedValueOnce({
+      parsed_output: { explanation: "You already own something similar \\u2014 a navy blazer." },
+    });
+
+    const result = await generateRedundancyExplanation(
+      { itemName: "Navy Wool Coat", category: "outerwear", primaryColor: "navy", styleTags: [] },
+      [makeWardrobeItem({})]
+    );
+
+    expect(result).toBe("You already own something similar — a navy blazer.");
+  });
 });
