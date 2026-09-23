@@ -1,5 +1,10 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+
+vi.mock("@/lib/tagging/tagWardrobeItem", () => ({
+  ensureWardrobeItemTagged: vi.fn(async (item) => item),
+}));
+
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
 

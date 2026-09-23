@@ -1,13 +1,43 @@
+/*
+  Design system: "effortless editorial" - a cream/blush/burgundy palette,
+  a romantic serif for display type paired with a geometric sans for
+  everything functional. One theme, locked (no auto dark mode) so the
+  palette never gets overridden by a system preference mid-flow.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-cream: #f4ede3;
+  --color-cream-deep: #ece0d2;
+  --color-surface: #fffbf6;
+  --color-ink: #2b211c;
+  --color-ink-soft: #5c4c44;
+  --color-line: #ddccbc;
+  --color-line-soft: #e8dcc9;
+  --color-blush: #e6c6bd;
+  --color-rose: #c68f85;
+  --color-mauve: #9c747a;
+  --color-burgundy: #6d3138;
+
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-jost), "Helvetica Neue", Arial, sans-serif;
+
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1.25rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 5rem;
+
+  --width-narrow: 32rem;
+  --width-wide: 46rem;
+
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html {
@@ -22,19 +52,15 @@ body {
 
 body {
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  background: var(--color-cream);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  /* A faint grain so the flat cream field doesn't read as sterile/digital. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
 a {
@@ -42,8 +68,319 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
+}
+
+h2 {
+  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+}
+
+p {
+  max-width: 60ch;
+}
+
+/* ---------- Site chrome ---------- */
+
+.site-header {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-line-soft);
+}
+
+.site-header__brand {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+.site-main {
+  flex: 1;
+  padding: var(--space-6) var(--space-4) var(--space-6);
+}
+
+.page {
+  max-width: var(--width-narrow);
+  margin: 0 auto;
+}
+
+.page--wide {
+  max-width: var(--width-wide);
+}
+
+.page__eyebrow {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-mauve);
+  margin-bottom: var(--space-1);
+}
+
+.page__lede {
+  color: var(--color-ink-soft);
+  margin-top: var(--space-2);
+}
+
+/* ---------- Layout helpers ---------- */
+
+.stack {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.stack--tight {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: var(--space-4) 0;
+}
+
+.section {
+  margin-top: var(--space-5);
+}
+
+/* ---------- Forms ---------- */
+
+form {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 26rem;
+}
+
+form.row {
+  display: flex;
+}
+
+label {
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+}
+
+input,
+textarea,
+select {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-radius: 1px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-ink-soft);
+  opacity: 0.65;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-burgundy);
+  box-shadow: 0 0 0 3px rgba(109, 49, 56, 0.12);
+}
+
+input[type="file"] {
+  border: none;
+  padding: 0.3rem 0;
+  background: none;
+}
+
+/* ---------- Buttons ---------- */
+
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 1px;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+}
+
+button:hover,
+.btn:hover {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(1px);
+}
+
+button:focus-visible,
+.btn:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-mauve);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  border-color: var(--color-burgundy);
+  background: var(--color-burgundy);
+  color: var(--color-surface);
+}
+
+.btn-primary:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.btn-quiet {
+  border-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-line);
+}
+
+.btn-quiet:hover {
+  background: transparent;
+  color: var(--color-burgundy);
+  text-decoration-color: var(--color-burgundy);
+}
+
+.btn-danger {
+  border-color: var(--color-burgundy);
+  color: var(--color-burgundy);
+}
+
+.btn-danger:hover {
+  background: var(--color-burgundy);
+  color: var(--color-surface);
+}
+
+/* ---------- Links (inline, in prose) ---------- */
+
+.link {
+  color: var(--color-burgundy);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-blush);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.link:hover {
+  text-decoration-color: var(--color-burgundy);
+}
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: 0.85rem;
+}
+
+/* ---------- Item rows (purchases, wardrobe, wishlist, waiting) ---------- */
+
+.item-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-line-soft);
+}
+
+.item-row__thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 1px;
+  flex-shrink: 0;
+  background: var(--color-cream-deep);
+}
+
+.item-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-row__title {
+  font-weight: 500;
+}
+
+.item-row__meta {
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  margin-top: 0.15rem;
+}
+
+.item-row__price {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+/* ---------- Tags / badges ---------- */
+
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-burgundy);
+}
+
+.badge-review {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-mauve);
+  border: 1px solid var(--color-mauve);
+  padding: 0.15rem 0.5rem;
+  border-radius: 1px;
+}
+
+/* ---------- Callout / note block ---------- */
+
+.note {
+  border-left: 2px solid var(--color-blush);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  font-size: 0.92rem;
+}
+
+.note--quiet {
+  border-left-color: var(--color-line);
+  background: transparent;
+  padding-left: var(--space-2);
 }

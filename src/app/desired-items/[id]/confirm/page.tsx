@@ -8,17 +8,18 @@ export default async function ConfirmDesiredItemPage({
   const extractionFailed = !item.itemName;
 
   return (
-    <main style={{ maxWidth: 480, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
+    <div className="page">
+      <span className="page__eyebrow">One more look</span>
       <h1>Confirm this item</h1>
 
       {extractionFailed ? (
-        <p>
+        <p className="page__lede">
           We couldn&apos;t automatically identify the item{" "}
-          {item.sourceType === "url" ? "from that link" : "from that screenshot"}. Please fill in
-          the details yourself.
+          {item.sourceType === "url" ? "from that link" : "from that screenshot"}. Please fill in the
+          details yourself.
         </p>
       ) : (
-        <p>Here&apos;s what we found - correct anything that&apos;s wrong before continuing.</p>
+        <p className="page__lede">Here&apos;s what we found - correct anything that&apos;s wrong before continuing.</p>
       )}
 
       {item.imageUrl && (
@@ -28,17 +29,16 @@ export default async function ConfirmDesiredItemPage({
           alt={item.itemName ?? "Item"}
           width={120}
           height={120}
-          style={{ objectFit: "cover", borderRadius: 6, marginBottom: "1rem" }}
+          style={{ objectFit: "cover", marginTop: "1.25rem", marginBottom: "0.5rem" }}
         />
       )}
 
-      <form
-        action={`/api/desired-items/${item.id}/confirm`}
-        method="POST"
-        style={{ display: "grid", gap: "0.5rem" }}
-      >
-        <input name="itemName" defaultValue={item.itemName ?? ""} placeholder="Item name" required />
+      <form action={`/api/desired-items/${item.id}/confirm`} method="POST" className="section">
+        <label htmlFor="itemName">Item name</label>
+        <input id="itemName" name="itemName" defaultValue={item.itemName ?? ""} placeholder="Item name" required />
+        <label htmlFor="price">Price</label>
         <input
+          id="price"
           name="price"
           type="number"
           step="0.01"
@@ -46,13 +46,18 @@ export default async function ConfirmDesiredItemPage({
           defaultValue={item.price ? Number(item.price) : ""}
           placeholder="Price"
         />
-        <input name="imageUrl" defaultValue={item.imageUrl ?? ""} placeholder="Image URL" />
-        <button type="submit">Confirm</button>
+        <label htmlFor="imageUrl">Image URL</label>
+        <input id="imageUrl" name="imageUrl" defaultValue={item.imageUrl ?? ""} placeholder="Image URL" />
+        <button type="submit" className="btn-primary">
+          Confirm
+        </button>
       </form>
 
-      <p>
-        <a href="/desired-items/new">Cancel, start over</a>
+      <p className="section">
+        <a href="/desired-items/new" className="btn-quiet">
+          Cancel, start over
+        </a>
       </p>
-    </main>
+    </div>
   );
 }

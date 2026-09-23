@@ -10,67 +10,40 @@ export default async function PurchasesPage() {
     : [];
 
   return (
-    <main style={{ maxWidth: 720, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
-      <h1>Purchase History</h1>
-      <p>
-        <a href="/">Back to home</a>
-      </p>
+    <div className="page page--wide">
+      <span className="page__eyebrow">History</span>
+      <h1>Purchase history</h1>
 
       {purchases.length === 0 ? (
-        <p>No purchases yet - run a sync to import some from your connected email.</p>
+        <p className="page__lede section">No purchases yet - run a sync to import some from your connected email.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <div className="section">
           {purchases.map((purchase) => (
-            <li
-              key={purchase.id}
-              style={{
-                display: "flex",
-                gap: "1rem",
-                alignItems: "center",
-                borderBottom: "1px solid #ddd",
-                padding: "0.75rem 0",
-              }}
-            >
+            <div key={purchase.id} className="item-row" style={{ alignItems: "flex-start" }}>
               {purchase.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={purchase.imageUrl}
-                  alt={purchase.itemName}
-                  width={56}
-                  height={56}
-                  style={{ objectFit: "cover", borderRadius: 6, flexShrink: 0 }}
-                />
+                <img src={purchase.imageUrl} alt={purchase.itemName} className="item-row__thumb" />
               ) : (
-                <div
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 6,
-                    background: "#eee",
-                    flexShrink: 0,
-                  }}
-                />
+                <div className="item-row__thumb" />
               )}
-              <div style={{ flex: 1 }}>
-                <div>
-                  <strong>{purchase.itemName}</strong>{" "}
-                  {purchase.status === "needs_review" && (
-                    <span style={{ color: "#c5221f", fontSize: "0.85rem" }}>(needs review)</span>
-                  )}
+              <div className="item-row__body">
+                <div className="item-row__title">
+                  {purchase.itemName}{" "}
+                  {purchase.status === "needs_review" && <span className="badge-review">Needs review</span>}
                 </div>
-                <div style={{ fontSize: "0.9rem", color: "#555" }}>
-                  {purchase.merchant} · {purchase.category} ·{" "}
-                  {purchase.orderDate.toLocaleDateString()}
+                <div className="item-row__meta">
+                  {purchase.merchant} · {purchase.category} · {purchase.orderDate.toLocaleDateString()}
                 </div>
                 {purchase.status === "needs_review" && (
-                  <>
-                    <p style={{ fontSize: "0.85rem", color: "#555", marginBottom: "0.25rem" }}>
+                  <div className="stack" style={{ marginTop: "0.6rem" }}>
+                    <p className="page__lede" style={{ fontSize: "0.85rem" }}>
                       We couldn&apos;t confidently read this one - confirm the details or discard it.
                     </p>
                     <form
                       action={`/api/purchases/${purchase.id}/confirm`}
                       method="POST"
-                      style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap", marginBottom: "0.4rem" }}
+                      className="row"
+                      style={{ maxWidth: "none" }}
                     >
                       <input name="itemName" defaultValue={purchase.itemName} placeholder="Item name" required />
                       <input
@@ -86,16 +59,18 @@ export default async function PurchasesPage() {
                       <button type="submit">Confirm</button>
                     </form>
                     <form action={`/api/purchases/${purchase.id}/discard`} method="POST">
-                      <button type="submit">Discard</button>
+                      <button type="submit" className="btn-quiet">
+                        Discard
+                      </button>
                     </form>
-                  </>
+                  </div>
                 )}
               </div>
-              <div style={{ fontWeight: 600 }}>${Number(purchase.price).toFixed(2)}</div>
-            </li>
+              <div className="item-row__price">${Number(purchase.price).toFixed(2)}</div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
-    </main>
+    </div>
   );
 }

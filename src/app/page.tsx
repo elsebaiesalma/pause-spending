@@ -11,59 +11,92 @@ export default async function Home() {
   const waitingQueue = user ? await listWaitingQueue(user.id) : null;
 
   return (
-    <main style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
-      <h1>Pause Before Purchase</h1>
+    <div className="page">
+      <span className="page__eyebrow">Before you buy</span>
+      <h1>A moment, before the cart.</h1>
+      <p className="page__lede">
+        What you already own that&apos;s like it, what it costs you this month, and whether it&apos;s
+        worth the wait.
+      </p>
 
       {waitingQueue && waitingQueue.elapsed.length > 0 && (
-        <p>
-          <a href="/waiting">
+        <p className="section">
+          <a href="/waiting" className="link">
             {waitingQueue.elapsed.length} item{waitingQueue.elapsed.length === 1 ? "" : "s"} ready for
             your decision
           </a>
         </p>
       )}
 
-      <p>
-        <a href="/desired-items/new">I want to buy something</a>
+      <p className="section">
+        <a href="/desired-items/new" className="btn btn-primary">
+          I want to buy something
+        </a>
       </p>
 
       {gmailConnection?.status === "connected" ? (
-        <>
-          <p>Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
-          <p>
-            <a href="/purchases">View purchase history</a>
-            {" · "}
-            <a href="/wardrobe">View wardrobe</a>
-            {" · "}
-            <a href="/budget">View budget</a>
-            {" · "}
-            <a href="/wishlist">View wishlist</a>
-          </p>
-          <form action="/api/sync/gmail/run" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
-            <button type="submit">Sync now</button>
-          </form>
-          <form action="/api/auth/gmail/disconnect" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
-            <button type="submit">Disconnect</button>
-          </form>
-          <a href="/connect/gmail/delete">Permanently delete my data</a>
-        </>
+        <div className="section stack">
+          <p className="page__lede">Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
+          <nav className="nav-links">
+            <a href="/purchases" className="link">
+              Purchase history
+            </a>
+            <a href="/wardrobe" className="link">
+              Wardrobe
+            </a>
+            <a href="/budget" className="link">
+              Budget
+            </a>
+            <a href="/wishlist" className="link">
+              Wishlist
+            </a>
+          </nav>
+          <hr className="divider" />
+          <div className="row">
+            <form action="/api/sync/gmail/run" method="POST">
+              <button type="submit">Sync now</button>
+            </form>
+            <form action="/api/auth/gmail/disconnect" method="POST">
+              <button type="submit">Disconnect</button>
+            </form>
+            <a href="/connect/gmail/delete" className="btn btn-danger">
+              Permanently delete my data
+            </a>
+          </div>
+        </div>
       ) : gmailConnection?.status === "expired" ? (
-        <>
-          <p>Your Gmail connection has expired and needs to be reconnected before syncing can continue.</p>
-          <a href="/connect/gmail">Reconnect Gmail</a>
-          {" · "}
-          <a href="/connect/gmail/delete">Permanently delete my data</a>
-        </>
+        <div className="section stack">
+          <p className="page__lede">
+            Your Gmail connection has expired and needs to be reconnected before syncing can continue.
+          </p>
+          <div className="row">
+            <a href="/connect/gmail" className="btn btn-primary">
+              Reconnect Gmail
+            </a>
+            <a href="/connect/gmail/delete" className="btn-quiet">
+              Permanently delete my data
+            </a>
+          </div>
+        </div>
       ) : gmailConnection?.status === "disconnected" ? (
-        <>
-          <p>Gmail is disconnected. Previously parsed data is kept.</p>
-          <a href="/connect/gmail">Reconnect Gmail</a>
-          {" · "}
-          <a href="/connect/gmail/delete">Permanently delete my data</a>
-        </>
+        <div className="section stack">
+          <p className="page__lede">Gmail is disconnected. Previously parsed data is kept.</p>
+          <div className="row">
+            <a href="/connect/gmail" className="btn btn-primary">
+              Reconnect Gmail
+            </a>
+            <a href="/connect/gmail/delete" className="btn-quiet">
+              Permanently delete my data
+            </a>
+          </div>
+        </div>
       ) : (
-        <a href="/connect/gmail">Connect Gmail</a>
+        <p className="section">
+          <a href="/connect/gmail" className="btn">
+            Connect Gmail
+          </a>
+        </p>
       )}
-    </main>
+    </div>
   );
 }

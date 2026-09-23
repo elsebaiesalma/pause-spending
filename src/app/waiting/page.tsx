@@ -8,56 +8,51 @@ export default async function WaitingQueuePage() {
     : { elapsed: [], stillWaiting: [] };
 
   return (
-    <main style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
+    <div className="page">
+      <span className="page__eyebrow">The pause</span>
       <h1>Waiting on these</h1>
-      <p>
-        <a href="/">Back to home</a>
-      </p>
 
       <h2>Ready for a decision</h2>
       {elapsed.length === 0 ? (
-        <p>Nothing has finished waiting yet.</p>
+        <p className="page__lede">Nothing has finished waiting yet.</p>
       ) : (
-        <ul style={{ padding: 0, listStyle: "none", display: "grid", gap: "1rem" }}>
+        <div>
           {elapsed.map((item) => (
-            <li key={item.id} style={{ borderBottom: "1px solid #ddd", paddingBottom: "1rem" }}>
-              <div>
-                <strong>{item.itemName}</strong>
+            <div key={item.id} className="section stack--tight" style={{ marginTop: "var(--space-2)" }}>
+              <div className="item-row__title">
+                {item.itemName}
                 {item.price && ` - $${Number(item.price).toFixed(2)}`}
               </div>
-              <form
-                action={`/api/desired-items/${item.id}/resolve`}
-                method="POST"
-                style={{ display: "inline-block", marginRight: "0.75rem", marginTop: "0.5rem" }}
-              >
-                <input type="hidden" name="outcome" value="proceeded" />
-                <button type="submit">I still want this</button>
-              </form>
-              <form
-                action={`/api/desired-items/${item.id}/resolve`}
-                method="POST"
-                style={{ display: "inline-block", marginTop: "0.5rem" }}
-              >
-                <input type="hidden" name="outcome" value="dropped" />
-                <button type="submit">No, drop it</button>
-              </form>
-            </li>
+              <div className="row">
+                <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
+                  <input type="hidden" name="outcome" value="proceeded" />
+                  <button type="submit">I still want this</button>
+                </form>
+                <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
+                  <input type="hidden" name="outcome" value="dropped" />
+                  <button type="submit" className="btn-quiet">
+                    No, drop it
+                  </button>
+                </form>
+              </div>
+              <hr className="divider" style={{ margin: "var(--space-2) 0 0" }} />
+            </div>
           ))}
-        </ul>
+        </div>
       )}
 
-      <h2 style={{ marginTop: "2rem" }}>Still waiting</h2>
+      <h2>Still waiting</h2>
       {stillWaiting.length === 0 ? (
-        <p>Nothing else is currently waiting.</p>
+        <p className="page__lede">Nothing else is currently waiting.</p>
       ) : (
-        <ul>
+        <div className="stack--tight">
           {stillWaiting.map((item) => (
-            <li key={item.id}>
+            <p key={item.id} className="page__lede">
               {item.itemName} - until {item.waitUntil?.toLocaleString()}
-            </li>
+            </p>
           ))}
-        </ul>
+        </div>
       )}
-    </main>
+    </div>
   );
 }

@@ -10,36 +10,28 @@ export default async function WishlistPage() {
     : [];
 
   return (
-    <main style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
+    <div className="page">
+      <span className="page__eyebrow">Parked for now</span>
       <h1>Wishlist</h1>
-      <p>
-        <a href="/">Back to home</a>
-      </p>
 
       {items.length === 0 ? (
-        <p>Nothing saved for later yet.</p>
+        <p className="page__lede section">Nothing saved for later yet.</p>
       ) : (
-        <ul style={{ padding: 0, listStyle: "none", display: "grid", gap: "1rem" }}>
+        <div className="section">
           {items.map((item) => (
-            <li key={item.id} style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+            <div key={item.id} className="item-row">
               {item.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={item.imageUrl}
-                  alt={item.itemName ?? "Item"}
-                  width={56}
-                  height={56}
-                  style={{ objectFit: "cover", borderRadius: 6 }}
-                />
+                <img src={item.imageUrl} alt={item.itemName ?? "Item"} className="item-row__thumb" />
               )}
-              <span>
+              <span className="item-row__title" style={{ flex: 1 }}>
                 {item.itemName}
-                {item.price && ` - $${Number(item.price).toFixed(2)}`}
               </span>
-            </li>
+              {item.price && <span className="item-row__price">${Number(item.price).toFixed(2)}</span>}
+            </div>
           ))}
-        </ul>
+        </div>
       )}
-    </main>
+    </div>
   );
 }
