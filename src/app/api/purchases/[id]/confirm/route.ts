@@ -11,9 +11,21 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/purchas
   const priceRaw = form.get("price")?.toString();
   const price = priceRaw ? Number(priceRaw) : NaN;
 
-  if (!itemName || !category || !Number.isFinite(price) || price < 0) {
+  // The form is pre-filled with the review-queue placeholder's defaults
+  // (price "0", category "unknown") so the fields are never empty even
+  // when nothing has actually been corrected yet. Requiring a genuine
+  // positive price and a real category - not just "non-empty" - stops a
+  // click on Confirm with no edits from silently promoting the untouched
+  // placeholder into a real, active purchase.
+  if (
+    !itemName ||
+    !category ||
+    category.toLowerCase() === "unknown" ||
+    !Number.isFinite(price) ||
+    price <= 0
+  ) {
     return NextResponse.json(
-      { error: "itemName, category, and a non-negative price are required" },
+      { error: "itemName, a real category, and a price greater than 0 are required" },
       { status: 400 }
     );
   }

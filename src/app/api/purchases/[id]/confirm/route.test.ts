@@ -71,4 +71,19 @@ describe("POST /api/purchases/[id]/confirm", () => {
     const unchanged = await prisma.purchase.findUniqueOrThrow({ where: { id: purchase.id } });
     expect(unchanged.status).toBe("needs_review");
   });
+
+  it("rejects a Confirm click that submits the pre-filled placeholder defaults unedited", async () => {
+    const purchase = await makeReviewPurchase();
+
+    // Exactly what the review-queue form's own defaultValues are - i.e.
+    // the user clicked Confirm without correcting anything.
+    const response = await POST(
+      buildRequest({ itemName: purchase.itemName, price: "0", category: "unknown" }),
+      await ctxFor(purchase.id)
+    );
+
+    expect(response.status).toBe(400);
+    const unchanged = await prisma.purchase.findUniqueOrThrow({ where: { id: purchase.id } });
+    expect(unchanged.status).toBe("needs_review");
+  });
 });

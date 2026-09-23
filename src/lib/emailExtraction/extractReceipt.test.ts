@@ -95,6 +95,26 @@ describe("extractAndPersistPurchase", () => {
     expect(wardrobeItem.status).toBe("active");
   });
 
+  it("persists the product page link when the email links the product photo to its page", async () => {
+    vi.mocked(getMessageBody).mockResolvedValueOnce(
+      '<a href="https://cdn.nike.com/assets/header.png"><img src="https://cdn.nike.com/assets/header.png"></a>' +
+        '<a href="https://nike.com/products/air-max-90"><img src="https://cdn.nike.com/products/shoe.jpg"></a>'
+    );
+    vi.mocked(extractPurchaseItems).mockResolvedValueOnce({
+      merchant: "Nike",
+      orderReference: null,
+      confident: true,
+      items: [{ itemName: "Air Max 90", price: 129.99, category: "shoes" }],
+    });
+
+    const message = buildMessage({ id: "msg-with-link" });
+    await extractAndPersistPurchase({ accessToken: "fake-token", userId, connectionId, message });
+
+    const purchase = await prisma.purchase.findFirstOrThrow({ where: { sourceEmailId: message.id } });
+    expect(purchase.imageUrl).toBe("https://cdn.nike.com/products/shoe.jpg");
+    expect(purchase.productLink).toBe("https://nike.com/products/air-max-90");
+  });
+
   it("creates one row per item for a multi-item order", async () => {
     vi.mocked(getMessageBody).mockResolvedValueOnce("<html></html>");
     vi.mocked(extractPurchaseItems).mockResolvedValueOnce({

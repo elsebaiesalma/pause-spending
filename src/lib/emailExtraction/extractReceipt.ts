@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getMessageBody } from "@/lib/gmail/fetchMessages";
-import { extractProductImageUrl } from "./htmlUtils";
+import { extractProductImageAndLink } from "./htmlUtils";
 import { extractPurchaseItems } from "./llmExtractor";
 import { seedWardrobeItemFromPurchase } from "@/lib/wardrobe";
 import type { GmailMessageSummary } from "@/lib/gmail/fetchMessages";
@@ -36,7 +36,7 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
   }
 
   const html = await getMessageBody(accessToken, message.id);
-  const imageUrl = extractProductImageUrl(html);
+  const { imageUrl, productLink } = extractProductImageAndLink(html);
   const orderDate = new Date(Number(message.internalDate));
   const extraction = await extractPurchaseItems({
     from: message.from,
@@ -84,6 +84,7 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
     orderReference: extraction.orderReference,
     orderDate,
     imageUrl,
+    productLink,
   };
 
   if (!isConfident) {
