@@ -1,0 +1,321 @@
+/* Scoped to the home/landing page only - the rest of the app keeps the
+   cream/blush design system in globals.css untouched. */
+
+.root {
+  --landing-bg: #050505;
+  --landing-surface: #0d0d0d;
+  --landing-fg: #ffffff;
+  --landing-fg-muted: rgba(255, 255, 255, 0.6);
+  --landing-fg-faint: rgba(255, 255, 255, 0.4);
+  --landing-line: rgba(255, 255, 255, 0.08);
+  --landing-line-muted: rgba(255, 255, 255, 0.16);
+  --landing-accent: #fecdd3;
+  --landing-accent-dim: #fdb3b9;
+  font-family: var(--font-body);
+  color: var(--landing-fg);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: var(--landing-bg);
+}
+
+.glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.glowBlob {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(120px);
+  animation: float 16s ease-in-out infinite alternate;
+}
+
+.glowBlob:nth-child(1) {
+  top: -10%;
+  right: -10%;
+  width: 40rem;
+  height: 40rem;
+  background: rgba(253, 179, 185, 0.12);
+}
+
+.glowBlob:nth-child(2) {
+  bottom: -10%;
+  left: -12%;
+  width: 44rem;
+  height: 44rem;
+  background: rgba(30, 58, 138, 0.14);
+  animation-delay: -6s;
+}
+
+@keyframes float {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(18px, -18px) scale(1.06);
+  }
+}
+
+/* ---------- Layout ---------- */
+
+.section {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  border-bottom: 1px solid var(--landing-line);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--landing-accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.eyebrowDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--landing-accent);
+}
+
+.display {
+  font-family: var(--font-clash), sans-serif;
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  padding: 6rem 1.5rem 4rem;
+  max-width: 78rem;
+  margin: 0 auto;
+}
+
+.heroHeadline {
+  composes: display;
+  font-size: clamp(3rem, 9vw, 7rem);
+  margin: 1rem 0 1.5rem;
+}
+
+.heroHeadline em {
+  font-style: normal;
+  color: var(--landing-accent);
+}
+
+.heroLede {
+  max-width: 42ch;
+  font-size: 1.15rem;
+  font-weight: 300;
+  color: var(--landing-fg-muted);
+  line-height: 1.6;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.75rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  border-radius: 999px;
+  background: var(--landing-fg);
+  color: var(--landing-bg);
+  border: 1px solid var(--landing-fg);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.btnPrimary:hover {
+  background: var(--landing-accent);
+  border-color: var(--landing-accent);
+}
+
+.btnPrimary:active {
+  transform: translateY(1px);
+}
+
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.75rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--landing-fg);
+  border: 1px solid var(--landing-line-muted);
+  transition: border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.btnGhost:hover {
+  border-color: var(--landing-fg);
+}
+
+.btnGhost:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Stat grid ---------- */
+
+.statGrid {
+  max-width: 78rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-bottom: 1px solid var(--landing-line);
+}
+
+@media (min-width: 900px) {
+  .statGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stat {
+  padding: 2.5rem 2rem;
+  border-top: 1px solid var(--landing-line);
+  border-right: 1px solid var(--landing-line);
+}
+
+.stat:nth-child(2n) {
+  border-right: none;
+}
+
+@media (min-width: 900px) {
+  .stat:nth-child(2n) {
+    border-right: 1px solid var(--landing-line);
+  }
+
+  .stat:nth-child(4n) {
+    border-right: none;
+  }
+}
+
+.statLabel {
+  display: block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--landing-accent-dim);
+  margin-bottom: 0.75rem;
+}
+
+.statValue {
+  composes: display;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.statNote {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--landing-fg-faint);
+}
+
+/* ---------- Nav grid ---------- */
+
+.navGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+@media (min-width: 700px) {
+  .navGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  padding: 1.75rem 0;
+  border-top: 1px solid var(--landing-line);
+  font-family: var(--font-clash), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.navLink:hover {
+  color: var(--landing-accent);
+  padding-left: 0.5rem;
+}
+
+.navLinkArrow {
+  font-size: 1.1rem;
+  color: var(--landing-accent-dim);
+}
+
+/* ---------- Status panel ---------- */
+
+.statusPanel {
+  border: 1px solid var(--landing-line-muted);
+  border-radius: 4px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.statusHeading {
+  composes: display;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.statusBody {
+  color: var(--landing-fg-muted);
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* ---------- Ghost brand mark ---------- */
+
+.ghostMark {
+  composes: display;
+  font-size: 22vw;
+  line-height: 1;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.04);
+  white-space: nowrap;
+  padding: 2rem 0 0;
+  overflow: hidden;
+}

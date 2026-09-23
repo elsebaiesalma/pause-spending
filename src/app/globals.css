@@ -93,9 +93,18 @@ p {
 
 /* ---------- Site chrome ---------- */
 
+/* Fixed + blended so the same header reads correctly whether the page
+   beneath it is the light cream app or the dark landing page: white
+   difference-blended against light cream resolves near-black, against
+   near-black resolves near-white. */
 .site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-line-soft);
+  mix-blend-mode: difference;
 }
 
 .site-header__brand {
@@ -103,11 +112,12 @@ p {
   font-size: 1.35rem;
   font-style: italic;
   letter-spacing: 0.01em;
+  color: #fff;
 }
 
 .site-main {
   flex: 1;
-  padding: var(--space-6) var(--space-4) var(--space-6);
+  padding: calc(var(--space-6) + 2.5rem) var(--space-4) var(--space-6);
 }
 
 .page {
@@ -384,4 +394,20 @@ a:focus-visible {
   border-left-color: var(--color-line);
   background: transparent;
   padding-left: var(--space-2);
+}
+
+/* ---------- Scroll reveal (used by the home page's ScrollReveal.tsx) ----------
+   Deliberately a plain global class, not a CSS Module one: the reveal
+   script toggles "visible" via plain classList.add on the DOM node, so the
+   selector has to match that literal, unhashed class name. */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
