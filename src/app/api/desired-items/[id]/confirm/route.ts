@@ -29,5 +29,5 @@ export async function POST(
     },
   });
 
-  return NextResponse.redirect(new URL("/", request.url));
+  return NextResponse.redirect(new URL(`/desired-items/${id}/pause`, request.url));
 }
