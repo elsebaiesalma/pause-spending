@@ -8,6 +8,12 @@ vi.mock("./llmExtractor", () => ({
   extractPurchaseItems: vi.fn(),
 }));
 
+// Tagging behavior is covered by tagWardrobeItem.test.ts - here it's just
+// a pass-through so this doesn't make real LLM calls.
+vi.mock("@/lib/tagging/tagWardrobeItem", () => ({
+  ensureWardrobeItemTagged: vi.fn(async (item) => item),
+}));
+
 import { getMessageBody } from "@/lib/gmail/fetchMessages";
 import { extractPurchaseItems } from "./llmExtractor";
 import { prisma } from "@/lib/prisma";

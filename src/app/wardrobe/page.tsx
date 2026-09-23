@@ -70,6 +70,7 @@ export default async function WardrobePage() {
                   {item.category ?? "uncategorized"}
                   {item.primaryColor ? ` · ${item.primaryColor}` : ""}
                   {item.styleTags.length > 0 ? ` · ${item.styleTags.join(", ")}` : ""}
+                  {item.useCaseTags.length > 0 ? ` · ${item.useCaseTags.join(", ")}` : ""}
                 </div>
               </div>
               <a href={`/wardrobe/${item.id}/edit`}>Edit</a>

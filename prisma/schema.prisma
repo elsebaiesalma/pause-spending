@@ -78,6 +78,11 @@ model WardrobeItem {
   useCaseTags      String[]  @map("use_case_tags")
   ownedSince       DateTime? @map("owned_since") @db.Date
   status           String    @default("active")
+  // Set once tag extraction has run for this item - the explicit signal
+  // that extraction is cached, rather than inferring it from whether the
+  // tag fields happen to be non-empty (a genuinely tag-less item would
+  // otherwise look "not yet tagged" forever and re-run on every read).
+  tagsExtractedAt  DateTime? @map("tags_extracted_at")
 
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   sourcePurchase Purchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: Cascade)

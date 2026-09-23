@@ -1,4 +1,11 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+// Tagging behavior itself is covered by tagWardrobeItem.test.ts - here it's
+// just a pass-through so these CRUD tests don't make real LLM calls.
+vi.mock("@/lib/tagging/tagWardrobeItem", () => ({
+  ensureWardrobeItemTagged: vi.fn(async (item) => item),
+}));
+
 import { prisma } from "@/lib/prisma";
 import {
   createManualWardrobeItem,

@@ -1,11 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { ensureWardrobeItemTagged } from "@/lib/tagging/tagWardrobeItem";
 import type { Purchase, WardrobeItem } from "@prisma/client";
 
 // Auto-seeds a wardrobe item from a confidently-extracted purchase. Only
 // `active` purchases seed a wardrobe item - a `needs_review` draft's
 // item_name/price/category are placeholders, not real data worth adding to
 // the wardrobe yet. Idempotent per purchase (safe to call more than once
-// for the same purchase, e.g. if seeding is ever re-run).
+// for the same purchase, e.g. if seeding is ever re-run). Tags immediately
+// at ingestion time, per the design.
 export async function seedWardrobeItemFromPurchase(purchase: Purchase): Promise<void> {
   if (purchase.status !== "active") {
     return;
@@ -18,7 +20,7 @@ export async function seedWardrobeItemFromPurchase(purchase: Purchase): Promise<
     return;
   }
 
-  await prisma.wardrobeItem.create({
+  const item = await prisma.wardrobeItem.create({
     data: {
       userId: purchase.userId,
       sourcePurchaseId: purchase.id,
@@ -29,6 +31,8 @@ export async function seedWardrobeItemFromPurchase(purchase: Purchase): Promise<
       status: "active",
     },
   });
+
+  await ensureWardrobeItemTagged(item);
 }
 
 export type ManualWardrobeItemInput = {
@@ -44,11 +48,18 @@ export type ManualWardrobeItemInput = {
 };
 
 // Adds a wardrobe item the user enters directly - gifts, hand-me-downs, or
-// anything never bought online - never linked to a purchase row.
+// anything never bought online - never linked to a purchase row. If the
+// user typed in any tag info themselves, that's respected as-is (never
+// overwritten by auto-tagging); auto-tagging only fills in items left
+// untagged.
 export async function createManualWardrobeItem(
   input: ManualWardrobeItemInput
 ): Promise<WardrobeItem> {
-  return prisma.wardrobeItem.create({
+  const userProvidedTags = Boolean(
+    input.primaryColor || input.styleTags?.length || input.useCaseTags?.length
+  );
+
+  const item = await prisma.wardrobeItem.create({
     data: {
       userId: input.userId,
       itemName: input.itemName,
@@ -60,8 +71,15 @@ export async function createManualWardrobeItem(
       imageUrl: input.imageUrl ?? null,
       ownedSince: input.ownedSince ?? null,
       status: "active",
+      tagsExtractedAt: userProvidedTags ? new Date() : null,
     },
   });
+
+  if (userProvidedTags) {
+    return item;
+  }
+
+  return ensureWardrobeItemTagged(item);
 }
 
 export type WardrobeItemEditInput = {
