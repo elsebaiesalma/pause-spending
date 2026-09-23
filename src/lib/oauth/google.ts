@@ -60,6 +60,35 @@ export async function exchangeCodeForTokens(code: string): Promise<GoogleTokenRe
   return response.json() as Promise<GoogleTokenResponse>;
 }
 
+export type RefreshedGoogleToken = {
+  access_token: string;
+  expires_in: number;
+  scope: string;
+  token_type: string;
+};
+
+export async function refreshGoogleAccessToken(
+  refreshToken: string
+): Promise<RefreshedGoogleToken> {
+  const response = await fetch(TOKEN_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: requireEnv("GOOGLE_OAUTH_CLIENT_ID"),
+      client_secret: requireEnv("GOOGLE_OAUTH_CLIENT_SECRET"),
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Google token refresh failed (${response.status}): ${body}`);
+  }
+
+  return response.json() as Promise<RefreshedGoogleToken>;
+}
+
 export async function revokeGoogleToken(token: string): Promise<void> {
   const response = await fetch(REVOKE_ENDPOINT, {
     method: "POST",

@@ -10,7 +10,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 2: Database choice + data schema (users, email_connections, purchases, wardrobe_items, desired_items, budgets)
 - [x] Step 3: Gmail OAuth connect flow with encrypted token storage (Outlook deferred as a quick follow-on)
 - [x] Step 4: Disconnect and permanent-delete privacy controls
-- [ ] Step 5: Email backfill fetch + rule-based classification pre-filter
+- [x] Step 5: Email backfill fetch + rule-based classification pre-filter
 - [ ] Step 6: LLM classification fallback for ambiguous emails
 - [ ] Step 7: Receipt extraction into purchases
 - [ ] Step 8: Wardrobe seeding and Wardrobe Service CRUD
