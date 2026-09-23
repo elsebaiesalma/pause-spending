@@ -81,6 +81,12 @@ describe("extractAndPersistPurchase", () => {
     expect(purchase.status).toBe("active");
     expect(purchase.imageUrl).toBe("https://cdn.nike.com/products/shoe.jpg");
     expect(purchase.orderDate.toISOString().slice(0, 10)).toBe("2026-03-01");
+
+    const wardrobeItem = await prisma.wardrobeItem.findFirstOrThrow({
+      where: { sourcePurchaseId: purchase.id },
+    });
+    expect(wardrobeItem.itemName).toBe("Air Max 90");
+    expect(wardrobeItem.status).toBe("active");
   });
 
   it("creates one row per item for a multi-item order", async () => {
@@ -101,6 +107,11 @@ describe("extractAndPersistPurchase", () => {
     const purchases = await prisma.purchase.findMany({ where: { sourceEmailId: message.id } });
     expect(purchases).toHaveLength(2);
     expect(purchases.map((p) => p.itemName).sort()).toEqual(["Silk Scarf", "Wool Coat"]);
+
+    const wardrobeItems = await prisma.wardrobeItem.findMany({
+      where: { sourcePurchaseId: { in: purchases.map((p) => p.id) } },
+    });
+    expect(wardrobeItems).toHaveLength(2);
   });
 
   it("lands a low-confidence extraction in the review queue instead of creating a bad row", async () => {
@@ -121,6 +132,11 @@ describe("extractAndPersistPurchase", () => {
     expect(purchase.status).toBe("needs_review");
     expect(purchase.itemName).toBe("Your package is on the way");
     expect(Number(purchase.price)).toBe(0);
+
+    const wardrobeItem = await prisma.wardrobeItem.findFirst({
+      where: { sourcePurchaseId: purchase.id },
+    });
+    expect(wardrobeItem).toBeNull();
   });
 
   it("is idempotent - re-running extraction for an already-extracted email does not duplicate or re-fetch", async () => {

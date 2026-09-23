@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getMessageBody } from "@/lib/gmail/fetchMessages";
 import { extractProductImageUrl } from "./htmlUtils";
 import { extractPurchaseItems } from "./llmExtractor";
+import { seedWardrobeItemFromPurchase } from "@/lib/wardrobe";
 import type { GmailMessageSummary } from "@/lib/gmail/fetchMessages";
 
 export type ExtractReceiptParams = {
@@ -100,7 +101,7 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
   }
 
   for (const item of extraction.items) {
-    await prisma.purchase.create({
+    const purchase = await prisma.purchase.create({
       data: {
         ...baseData,
         itemName: item.itemName,
@@ -109,5 +110,6 @@ export async function extractAndPersistPurchase(params: ExtractReceiptParams): P
         status: "active",
       },
     });
+    await seedWardrobeItemFromPurchase(purchase);
   }
 }

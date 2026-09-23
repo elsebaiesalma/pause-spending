@@ -13,7 +13,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 5: Email backfill fetch + rule-based classification pre-filter
 - [x] Step 6: LLM classification fallback for ambiguous emails
 - [x] Step 7: Receipt extraction into purchases
-- [ ] Step 8: Wardrobe seeding and Wardrobe Service CRUD
+- [x] Step 8: Wardrobe seeding and Wardrobe Service CRUD
 - [ ] Step 9: Scheduled periodic sync + manual "sync now"
 - [ ] Step 10: Budget Service (manual budget, AI-suggested starting figure, spend tracking)
 - [ ] Step 11: Structured tag extraction and similarity shortlist matching
