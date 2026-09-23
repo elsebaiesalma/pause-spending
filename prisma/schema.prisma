@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// The single current user. Every other table carries a userId from day one
+// so a second real user is a row insert later, not a migration.
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  emailConnections EmailConnection[]
+  purchases        Purchase[]
+  wardrobeItems    WardrobeItem[]
+  desiredItems     DesiredItem[]
+  budgets          Budget[]
+
+  @@map("users")
+}
+
+model EmailConnection {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  provider       String
+  // {iv, tag, ciphertext} AES-256-GCM envelope, encrypted at the app level
+  // on top of the provider's disk-level encryption. Written starting in
+  // implementation Step 3.
+  encryptedToken Json     @map("encrypted_token")
+  syncCursor     String?  @map("sync_cursor")
+  connectedAt    DateTime @default(now()) @map("connected_at")
+  status         String   @default("connected")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchases Purchase[]
+
+  @@map("email_connections")
+}
+
+model Purchase {
+  id                      String    @id @default(uuid()) @db.Uuid
+  userId                  String    @map("user_id") @db.Uuid
+  sourceEmailConnectionId String?   @map("source_email_connection_id") @db.Uuid
+  merchant                String
+  orderDate               DateTime  @map("order_date") @db.Date
+  itemName                String    @map("item_name")
+  price                   Decimal   @db.Decimal(10, 2)
+  category                String
+  imageUrl                String?   @map("image_url")
+  productLink             String?   @map("product_link")
+  sourceEmailId           String?   @map("source_email_id")
+  status                  String    @default("active")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailConnection EmailConnection? @relation(fields: [sourceEmailConnectionId], references: [id], onDelete: SetNull)
+  wardrobeItems   WardrobeItem[]
+
+  @@map("purchases")
+}
+
+model WardrobeItem {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  sourcePurchaseId String?   @map("source_purchase_id") @db.Uuid
+  itemName         String    @map("item_name")
+  imageUrl         String?   @map("image_url")
+  category         String?
+  primaryColor     String?   @map("primary_color")
+  secondaryColor   String?   @map("secondary_color")
+  styleTags        String[]  @map("style_tags")
+  useCaseTags      String[]  @map("use_case_tags")
+  ownedSince       DateTime? @map("owned_since") @db.Date
+  status           String    @default("active")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourcePurchase Purchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: SetNull)
+
+  @@map("wardrobe_items")
+}
+
+model DesiredItem {
+  id              String    @id @default(uuid()) @db.Uuid
+  userId          String    @map("user_id") @db.Uuid
+  sourceType      String    @map("source_type")
+  rawInput        String?   @map("raw_input")
+  itemName        String?   @map("item_name")
+  price           Decimal?  @db.Decimal(10, 2)
+  imageUrl        String?   @map("image_url")
+  category        String?
+  primaryColor    String?   @map("primary_color")
+  styleTags       String[]  @map("style_tags")
+  userConfirmed   Boolean   @default(false) @map("user_confirmed")
+  pauseStatus     String    @default("pending_confirmation") @map("pause_status")
+  waitUntil       DateTime? @map("wait_until")
+  decisionOutcome String?   @map("decision_outcome")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("desired_items")
+}
+
+model Budget {
+  id            String  @id @default(uuid()) @db.Uuid
+  userId        String  @map("user_id") @db.Uuid
+  month         String
+  amount        Decimal @db.Decimal(10, 2)
+  categoryScope String  @default("clothing_shoes_accessories") @map("category_scope")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@map("budgets")
+}

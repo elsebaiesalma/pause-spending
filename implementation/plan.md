@@ -7,7 +7,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 ## Checklist
 
 - [x] Step 1: Project scaffold and health check
-- [ ] Step 2: Database choice + data schema (users, email_connections, purchases, wardrobe_items, desired_items, budgets)
+- [x] Step 2: Database choice + data schema (users, email_connections, purchases, wardrobe_items, desired_items, budgets)
 - [ ] Step 3: Gmail/Outlook OAuth connect flow with encrypted token storage
 - [ ] Step 4: Disconnect and permanent-delete privacy controls
 - [ ] Step 5: Email backfill fetch + rule-based classification pre-filter
