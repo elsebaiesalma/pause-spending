@@ -33,10 +33,20 @@ function formatGmailDate(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
+// Thrown when Gmail can't satisfy an incremental history.list request
+// because the stored cursor is older than Gmail's retention window (Gmail
+// returns 404 in this case) - the caller should fall back to a full
+// backfill rather than treating this as a hard failure.
+export class HistoryTooOldError extends Error {}
+
 async function gmailFetch(accessToken: string, path: string): Promise<Response> {
   const response = await fetch(`${GMAIL_API_BASE}${path}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
+
+  if (response.status === 404 && path.startsWith("/history")) {
+    throw new HistoryTooOldError("Gmail history cursor is older than the retention window");
+  }
 
   if (!response.ok) {
     const body = await response.text();
@@ -139,15 +149,13 @@ export async function getMessageBody(accessToken: string, id: string): Promise<s
   return Buffer.from(base64, "base64").toString("utf8");
 }
 
-// Fetches header metadata only (From/Subject) - no message body - for
-// receipt-shaped messages received since `sinceDate`. Fetches details in
-// small batches to stay under Gmail's per-user rate limit rather than
-// firing every request at once.
-export async function fetchRecentMessages(
+// Fetches header metadata for a specific list of message ids, in small
+// batches, to stay under Gmail's per-user rate limit rather than firing
+// every request at once.
+export async function getMessageSummaries(
   accessToken: string,
-  sinceDate: Date
+  ids: string[]
 ): Promise<GmailMessageSummary[]> {
-  const ids = await listMessageIds(accessToken, sinceDate);
   const summaries: GmailMessageSummary[] = [];
 
   for (let i = 0; i < ids.length; i += DETAIL_FETCH_BATCH_SIZE) {
@@ -163,4 +171,57 @@ export async function fetchRecentMessages(
   }
 
   return summaries;
+}
+
+// Fetches header metadata only (From/Subject) - no message body - for
+// receipt-shaped messages received since `sinceDate`. Used for the initial
+// backfill, when there's no history cursor yet.
+export async function fetchRecentMessages(
+  accessToken: string,
+  sinceDate: Date
+): Promise<GmailMessageSummary[]> {
+  const ids = await listMessageIds(accessToken, sinceDate);
+  return getMessageSummaries(accessToken, ids);
+}
+
+// The mailbox's current historyId - the cursor to store after a sync run
+// so the next run can fetch only what changed since then.
+export async function getCurrentHistoryId(accessToken: string): Promise<string> {
+  const response = await gmailFetch(accessToken, "/profile");
+  const body = (await response.json()) as { historyId: string };
+  return body.historyId;
+}
+
+// Lists message ids added to the mailbox since `startHistoryId`, paginating
+// as needed. Throws HistoryTooOldError if Gmail can no longer satisfy this
+// cursor (retention window exceeded) - the caller should fall back to a
+// full backfill in that case.
+export async function listNewMessageIdsSinceHistory(
+  accessToken: string,
+  startHistoryId: string
+): Promise<string[]> {
+  const ids = new Set<string>();
+  let pageToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({ startHistoryId, historyTypes: "messageAdded" });
+    if (pageToken) {
+      params.set("pageToken", pageToken);
+    }
+
+    const response = await gmailFetch(accessToken, `/history?${params.toString()}`);
+    const body = (await response.json()) as {
+      history?: { messagesAdded?: { message: { id: string } }[] }[];
+      nextPageToken?: string;
+    };
+
+    for (const entry of body.history ?? []) {
+      for (const added of entry.messagesAdded ?? []) {
+        ids.add(added.message.id);
+      }
+    }
+    pageToken = body.nextPageToken;
+  } while (pageToken);
+
+  return Array.from(ids);
 }

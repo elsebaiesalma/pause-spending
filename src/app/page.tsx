@@ -20,6 +20,9 @@ export default async function Home() {
             {" · "}
             <a href="/wardrobe">View wardrobe</a>
           </p>
+          <form action="/api/sync/gmail/run" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
+            <button type="submit">Sync now</button>
+          </form>
           <form action="/api/auth/gmail/disconnect" method="POST" style={{ display: "inline-block", marginRight: "1rem" }}>
             <button type="submit">Disconnect</button>
           </form>
