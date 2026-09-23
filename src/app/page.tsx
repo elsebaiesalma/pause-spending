@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { listWaitingQueue } from "@/lib/waitQueue";
 
 export default async function Home() {
   const user = await prisma.user.findFirst();
@@ -7,10 +8,20 @@ export default async function Home() {
         where: { userId_provider: { userId: user.id, provider: "gmail" } },
       })
     : null;
+  const waitingQueue = user ? await listWaitingQueue(user.id) : null;
 
   return (
     <main style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
       <h1>Pause Before Purchase</h1>
+
+      {waitingQueue && waitingQueue.elapsed.length > 0 && (
+        <p>
+          <a href="/waiting">
+            {waitingQueue.elapsed.length} item{waitingQueue.elapsed.length === 1 ? "" : "s"} ready for
+            your decision
+          </a>
+        </p>
+      )}
 
       <p>
         <a href="/desired-items/new">I want to buy something</a>

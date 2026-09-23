@@ -19,7 +19,7 @@ step and ends fully wired in — nothing is left orphaned or unintegrated.
 - [x] Step 11: Structured tag extraction and similarity shortlist matching
 - [x] Step 12: Item Extraction Service (URL / screenshot / typed input, with confirmation)
 - [x] Step 13: Redundancy explanation + Pause Decision Screen (core end-to-end demo)
-- [ ] Step 14: Wait/Reminder Queue (24h/7d in-app waiting)
+- [x] Step 14: Wait/Reminder Queue (24h/7d in-app waiting)
 - [ ] Step 15: Post-Wait Recommendations (comparables, secondhand, outfit ideas, wishlist)
 - [ ] Step 16: Failure-mode hardening across all flows
 
