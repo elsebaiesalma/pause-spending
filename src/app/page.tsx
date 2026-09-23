@@ -12,6 +12,10 @@ export default async function Home() {
     <main style={{ maxWidth: 560, margin: "4rem auto", padding: "0 1.5rem", lineHeight: 1.6 }}>
       <h1>Pause Before Purchase</h1>
 
+      <p>
+        <a href="/desired-items/new">I want to buy something</a>
+      </p>
+
       {gmailConnection?.status === "connected" ? (
         <>
           <p>Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
