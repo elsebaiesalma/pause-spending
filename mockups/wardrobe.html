@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wardrobe — Pause</title>
+<link rel="stylesheet" href="./design-system.css" />
+<style>
+  .wardrobe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .wardrobe-card {
+    border: 1px solid var(--line);
+    background: var(--bg-alt);
+  }
+  .wardrobe-card__image {
+    aspect-ratio: 3/4;
+    background: linear-gradient(135deg, var(--line-muted), var(--bg-alt));
+  }
+  .wardrobe-card__body {
+    padding: 0.9rem;
+  }
+  .wardrobe-card__name {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .wardrobe-card__meta {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    margin-top: 0.3rem;
+  }
+  .filter-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+  .filter-pill {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--line-muted);
+    border-radius: 999px;
+  }
+  .filter-pill.active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="site-header__brand">Pause</a>
+  <nav class="site-header__nav">
+    <a href="about.html">About</a>
+    <a href="wardrobe.html">Wardrobe</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="wishlist.html">Wishlist</a>
+    <a href="saved-for-later.html">Saved</a>
+  </nav>
+</header>
+
+<main>
+  <section class="section" style="border-bottom: 1px solid var(--line); padding-bottom: 2rem;">
+    <span class="eyebrow">What you own</span>
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+      <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem);">Wardrobe</h1>
+      <a href="#" class="btn-primary">+ Add an item</a>
+    </div>
+    <div class="filter-row">
+      <span class="filter-pill active">All (128)</span>
+      <span class="filter-pill">Dresses</span>
+      <span class="filter-pill">Tops</span>
+      <span class="filter-pill">Outerwear</span>
+      <span class="filter-pill">Shoes</span>
+      <span class="filter-pill">Bags</span>
+      <span class="filter-pill">Accessories</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wardrobe-grid">
+      <!-- Placeholder cards -->
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Dresses · Navy · <span class="badge" style="margin-left:0.3rem;">Manual</span></div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Outerwear · Camel</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Shoes · Black</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Bags · Cream</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Tops · White</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Accessories · Gold</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Dresses · Red</div>
+        </div>
+      </div>
+      <div class="wardrobe-card">
+        <div class="wardrobe-card__image"></div>
+        <div class="wardrobe-card__body">
+          <div class="wardrobe-card__name">[Placeholder item name]</div>
+          <div class="wardrobe-card__meta">Outerwear · Black</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <span class="eyebrow" style="justify-content:center; color: var(--accent-dim);">Pause — mockup preview, placeholder content</span>
+  <div class="ghost-mark">PAUSE</div>
+</footer>
+
+</body>
+</html>

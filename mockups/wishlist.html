@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wishlist — Pause</title>
+<link rel="stylesheet" href="./design-system.css" />
+<style>
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .wishlist-card {
+    border: 1px solid var(--line);
+  }
+  .wishlist-card__image {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, var(--line-muted), var(--bg-alt));
+  }
+  .wishlist-card__body {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="site-header__brand">Pause</a>
+  <nav class="site-header__nav">
+    <a href="about.html">About</a>
+    <a href="wardrobe.html">Wardrobe</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="wishlist.html">Wishlist</a>
+    <a href="saved-for-later.html">Saved</a>
+  </nav>
+</header>
+
+<main>
+  <section class="section" style="padding-bottom: 1.5rem;">
+    <span class="eyebrow">Parked for now</span>
+    <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem);">Wishlist</h1>
+  </section>
+
+  <section class="section" style="border-bottom: none;">
+    <div class="wishlist-grid">
+      <div class="wishlist-card">
+        <div class="wishlist-card__image"></div>
+        <div class="wishlist-card__body">
+          <span>[Placeholder] Wool Blazer</span>
+          <span class="item-row__price">$210.00</span>
+        </div>
+      </div>
+      <div class="wishlist-card">
+        <div class="wishlist-card__image"></div>
+        <div class="wishlist-card__body">
+          <span>[Placeholder] Suede Loafers</span>
+          <span class="item-row__price">$145.00</span>
+        </div>
+      </div>
+      <div class="wishlist-card">
+        <div class="wishlist-card__image"></div>
+        <div class="wishlist-card__body">
+          <span>[Placeholder] Cashmere Scarf</span>
+          <span class="item-row__price">$88.00</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <span class="eyebrow" style="justify-content:center; color: var(--accent-dim);">Pause — mockup preview, placeholder content</span>
+  <div class="ghost-mark">PAUSE</div>
+</footer>
+
+</body>
+</html>

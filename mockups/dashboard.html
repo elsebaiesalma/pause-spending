@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard — Pause</title>
+<link rel="stylesheet" href="./design-system.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="site-header__brand">Pause</a>
+  <nav class="site-header__nav">
+    <a href="about.html">About</a>
+    <a href="wardrobe.html">Wardrobe</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="transactions.html">Transactions</a>
+    <a href="wishlist.html">Wishlist</a>
+    <a href="saved-for-later.html">Saved</a>
+  </nav>
+</header>
+
+<main>
+  <section class="section" style="padding-bottom: 2rem;">
+    <span class="eyebrow">Your account</span>
+    <h1 style="font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 4rem);">Dashboard</h1>
+    <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap;">
+      <a href="#" class="btn-primary">I want to buy something</a>
+      <a href="#" class="btn-ghost">2 items ready for a decision</a>
+    </div>
+  </section>
+
+  <div class="stat-grid">
+    <div class="stat">
+      <span class="stat-label">In your wardrobe</span>
+      <div class="stat-value">128</div>
+      <p style="font-size:0.8rem; color:var(--ink-faint); margin-top:0.5rem;">[Placeholder]</p>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Talked yourself out of</span>
+      <div class="stat-value" style="color:var(--accent-dim)">6</div>
+      <p style="font-size:0.8rem; color:var(--ink-faint); margin-top:0.5rem;">$412.00 not spent</p>
+    </div>
+    <div class="stat">
+      <span class="stat-label">This month</span>
+      <div class="stat-value">$238</div>
+      <p style="font-size:0.8rem; color:var(--ink-faint); margin-top:0.5rem;">of a $600 budget</p>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Still waiting</span>
+      <div class="stat-value">2</div>
+      <p style="font-size:0.8rem; color:var(--ink-faint); margin-top:0.5rem;">[Placeholder]</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <span class="eyebrow">Your closet</span>
+    <div class="nav-grid">
+      <a href="transactions.html" class="nav-link">Purchase history <span class="arrow">&rarr;</span></a>
+      <a href="wardrobe.html" class="nav-link">Wardrobe <span class="arrow">&rarr;</span></a>
+      <a href="#" class="nav-link">Budget <span class="arrow">&rarr;</span></a>
+      <a href="wishlist.html" class="nav-link">Wishlist <span class="arrow">&rarr;</span></a>
+    </div>
+  </section>
+
+  <section class="section" style="border-bottom: none;">
+    <div class="card">
+      <span class="eyebrow">Gmail sync</span>
+      <h2 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom:0.5rem;">Connected</h2>
+      <p style="color:var(--ink-muted); margin-bottom:1.5rem;">[Placeholder] Since Sep 22, 2026. New order confirmations sync in automatically.</p>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button class="btn-ghost">Sync now</button>
+        <button class="btn-ghost">Disconnect</button>
+        <a href="#" class="btn-ghost">Permanently delete my data</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <span class="eyebrow" style="justify-content:center; color: var(--accent-dim);">Pause — mockup preview, placeholder content</span>
+  <div class="ghost-mark">PAUSE</div>
+</footer>
+
+</body>
+</html>

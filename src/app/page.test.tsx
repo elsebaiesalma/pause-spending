@@ -1,79 +1,29 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
-vi.mock("@/lib/waitQueue", () => ({
-  listWaitingQueue: vi.fn().mockResolvedValue({ elapsed: [], stillWaiting: [] }),
-}));
-
-vi.mock("@/lib/wardrobe", () => ({
-  listActiveWardrobeItems: vi.fn().mockResolvedValue([]),
-}));
-
-vi.mock("@/lib/budget", () => ({
-  currentMonthKey: vi.fn().mockReturnValue("2026-09"),
-  getBudgetForMonth: vi.fn().mockResolvedValue(null),
-  getMonthSpend: vi.fn().mockResolvedValue(0),
-}));
-
 vi.mock("./fonts", () => ({
   clashDisplay: { variable: "mock-font-clash" },
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
-    user: { findFirst: vi.fn() },
-    emailConnection: { findUnique: vi.fn() },
-    desiredItem: { findMany: vi.fn().mockResolvedValue([]) },
-  },
-}));
-
-import { prisma } from "@/lib/prisma";
 import Home from "./page";
 
-describe("Home", () => {
-  it("shows a clear reconnect prompt, not an error, when the Gmail connection has expired", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({ id: "u1" } as never);
-    vi.mocked(prisma.emailConnection.findUnique).mockResolvedValueOnce({
-      status: "expired",
-    } as never);
+describe("Home (landing page)", () => {
+  it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
+    const html = renderToStaticMarkup(Home());
+    expect(html).toContain("CALIB");
+  });
 
-    const element = await Home();
-    const html = renderToStaticMarkup(element);
+  it("points every real CTA at the actual Gmail connect flow, not a fake signup", () => {
+    const html = renderToStaticMarkup(Home());
 
-    expect(html).toContain("expired");
     expect(html).toContain('href="/connect/gmail"');
+    expect(html).not.toContain("mailto:");
   });
 
-  it("shows real computed stats, not placeholder numbers", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce({ id: "u1" } as never);
-    vi.mocked(prisma.emailConnection.findUnique).mockResolvedValueOnce(null);
-    const { listActiveWardrobeItems } = await import("@/lib/wardrobe");
-    vi.mocked(listActiveWardrobeItems).mockResolvedValueOnce(
-      Array.from({ length: 7 }, (_, i) => ({ id: String(i) })) as never
-    );
-    vi.mocked(prisma.desiredItem.findMany).mockResolvedValueOnce([
-      { price: "50.00" },
-      { price: "20.00" },
-    ] as never);
+  it("describes the real sync mechanism (Gmail), not fictional IMAP/OCR/browser-extension claims", () => {
+    const html = renderToStaticMarkup(Home());
 
-    const element = await Home();
-    const html = renderToStaticMarkup(element);
-
-    expect(html).toContain("7");
-    expect(html).toContain("$70.00");
-    expect(html).toContain("Connect Gmail");
-  });
-
-  it("links to the real app routes, not placeholder anchors", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValueOnce(null);
-
-    const element = await Home();
-    const html = renderToStaticMarkup(element);
-
-    expect(html).toContain('href="/purchases"');
-    expect(html).toContain('href="/wardrobe"');
-    expect(html).toContain('href="/budget"');
-    expect(html).toContain('href="/wishlist"');
-    expect(html).toContain('href="/desired-items/new"');
+    expect(html).toContain("Gmail");
+    expect(html).not.toMatch(/IMAP|OCR|browser extension/i);
   });
 });
