@@ -43,6 +43,22 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 - Destructive or hard-to-reverse migrations (renames, drops, anything with real data behind it) are not applied through `scripts/apply-migration-via-http.mjs`. Hand-write the SQL, show it for review, and let the user run `prisma migrate deploy` themselves.
 - A migration that must run only after a verified backfill is kept outside `prisma/migrations/` until the backfill is checked.
 
+## Model IDs
+
+- Every Claude call uses `ANTHROPIC_MODEL` from `src/lib/anthropicModel.ts`. It defaults to `claude-sonnet-5-5` and can be overridden with the `ANTHROPIC_MODEL` environment variable.
+- Checked live on 2026-10-05 with a one-off call (`stop_reason: end_turn`, reply "ok"): `claude-sonnet-5-5`, `claude-sonnet-5` and `claude-opus-5` all succeeded. The change from `claude-opus-5` was a deliberate move to one model, not a fix for a bad ID. Every LLM feature now runs on Sonnet, so check tagging and extraction quality after this change.
+- Mocked tests cannot catch a bad model ID. Re-run a real call after changing the model.
+
+## Still want it (built 2026-10-05; SQL not yet applied)
+
+- The page is at `src/app/desired-items/[id]/still-want-it`, reached from "Buy anyway". Its state is in two columns, `went_to_store_at` and `store_visit_answer`, described in `prisma/manual/still-want-it-store-visit.sql`. They are read and written with raw SQL until that SQL is confirmed on both branches. After that, move them into `schema.prisma` with a recorded migration and run `prisma generate`.
+- **Section 02 (lower-priced options) is hidden until alternatives are stored at intake.** Nothing at intake persists other-retailer results yet. `getStoredRetailerAlternatives()` returns nothing, and no price is ever estimated. Before this section can show anything, intake must store the results, and this function must read them.
+- **The outfit cache is in-memory and must be made durable before deploy.** It lives in `globalThis` per process, so each cold start re-calls the model. It is keyed by user, desired item and wardrobe version. Move it to a table or column first.
+- **"Yes" creates no `Purchase` row.** It only sets the desired item to `proceeded` with a price. Email sync must dedupe against that proceeded item, or it will create a second record for the same purchase.
+- "Not sure yet" keeps the item `proceeded` with `decision_outcome` `proceeded`, and sets `store_visit_answer` to `not_sure`. Considering lists it under "Went to the store, undecided". The Kept total (dropped only) and the 60-day sweep (saved_for_later only) never touch it. Clicking "Go to" again clears the answer, so the next visit asks again.
+- Pausing again from this page clears a stale `proceeded` outcome (`/wait` sets `decision_outcome` to null).
+- The retailer link is a GET route that records the visit and redirects. It is the only write that happens on GET.
+
 ## Parked items (not yet scoped; do not build without an explicit go-ahead)
 
 **Email parsing (open)**
