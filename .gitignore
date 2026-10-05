@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Vendored skill packs and generated lock file (not app code)
+/.agents/
+/.claude/skills/
+/skills-lock.json

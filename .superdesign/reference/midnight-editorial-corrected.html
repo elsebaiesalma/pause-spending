@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Midnight Editorial | Digital Luxury</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Clash%2BDisplay:wght@100;200;300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --black: #050505;
+            --footer-black: #0a0a0a;
+            --white: #ffffff;
+            --border: rgba(255, 255, 255, 0.05);
+            --muted: rgba(255, 255, 255, 0.4);
+            --rose-accent: #fecdd3;
+            --rose-accent-glow: rgba(254, 205, 211, 0.12);
+            --clash: 'Clash Display', sans-serif;
+            --inter: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            font-family: var(--inter);
+            margin: 0;
+            padding: 0;
+        }
+
+        .font-display { font-family: var(--clash); }
+        .font-body { font-family: var(--inter); }
+
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            animation: revealUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes revealUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        .mix-difference {
+            mix-blend-mode: difference;
+        }
+
+        .light-leak-rose {
+            background: var(--rose-accent);
+            filter: blur(120px);
+            opacity: 0.1;
+            width: 45vw;
+            height: 45vw;
+            border-radius: 9999px;
+        }
+
+        .image-zoom-container:hover img {
+            transform: scale(1.08);
+        }
+
+        .image-zoom-container img {
+            transition: transform 2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .custom-cursor-hover:hover {
+            cursor: pointer;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .metadata {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            transition: color 0.3s ease;
+        }
+        .metadata:hover { color: var(--rose-accent); }
+
+        .footer-ghost-text {
+            font-size: 20vw;
+            line-height: 0.8;
+            opacity: 0.03;
+            letter-spacing: -0.05em;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen relative overflow-x-hidden" data-sd-id="1">
+        
+        <!-- Navigation -->
+        <nav class="fixed top-0 left-0 w-full h-[100px] z-50 flex items-center justify-between px-10 mix-difference text-white" data-sd-id="2">
+            <a href="#" id="brand-logo" class="font-display font-bold text-2xl tracking-tighter" data-sd-id="3">MIDNIGHT.</a>
+            <div class="hidden md:flex items-center gap-12" data-sd-id="4">
+                <a href="#" id="nav-archive" class="metadata text-white hover:opacity-70 transition-opacity" data-sd-id="5">Archive</a>
+                <a href="#" id="nav-studio" class="metadata text-white hover:opacity-70 transition-opacity" data-sd-id="6">Studio</a>
+                <a href="#" id="nav-edits" class="metadata text-white hover:opacity-70 transition-opacity" data-sd-id="7">Edits</a>
+                <a href="#" id="nav-contact" class="metadata border border-[#fecdd3]/20 rounded-[2px] px-6 py-3 hover:bg-[#fecdd3] hover:text-black transition-all duration-300" data-sd-id="8">Contact</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="relative h-screen w-full flex items-center justify-center overflow-hidden" data-sd-id="9">
+            <!-- Light Leaks -->
+            <div class="absolute -top-40 -left-40 light-leak-rose pointer-events-none" data-sd-id="10"></div>
+            <div class="absolute -bottom-40 -right-40 light-leak-rose opacity-50 pointer-events-none" data-sd-id="11"></div>
+
+            <!-- Center Content -->
+            <div class="relative w-full max-w-7xl mx-auto px-10 h-full flex items-center" data-sd-id="12">
+                <div class="relative z-10 w-full flex items-end justify-between" data-sd-id="13">
+                    <!-- Hero Image Container -->
+                    <div class="relative w-1/2 aspect-[4/5] overflow-hidden rounded-[2px] reveal-up" data-sd-id="14">
+                        <img src="https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&amp;w=1287&amp;auto=format&amp;fit=crop" alt="Editorial fashion" class="w-full h-full object-cover grayscale brightness-90" data-sd-id="15">
+                    </div>
+                    
+                    <!-- Hero Desc -->
+                    <div class="w-64 pb-20 reveal-up stagger-2" data-sd-id="16">
+                        <p class="text-sm text-white/40 leading-relaxed" data-sd-id="17">
+                            AUTOMATED RECEIPT PARSING MEETS BEHAVIORAL FRICTION. DETECTING REDUNDANCY IN YOUR WARDROBE THROUGH INTELLIGENT DELAY.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Floating Typography Overlay -->
+                <h1 class="absolute bottom-10 left-0 z-20 font-display font-bold text-[15vw] leading-[0.8] tracking-tighter reveal-up stagger-1 mix-difference select-none" data-sd-id="18">
+                    NOCTURNAL
+                </h1>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="w-full border-t border-white/5 bg-black py-20 px-10" data-sd-id="19">
+            <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10" data-sd-id="20">
+                <div class="flex flex-col gap-4 reveal-up stagger-1" data-sd-id="21">
+                    <span class="metadata" data-sd-id="22">Late Payments · LendingTree, 2026</span>
+                    <span class="font-display text-2xl" data-sd-id="23">47% BNPL</span>
+                </div>
+                <div class="flex flex-col gap-4 reveal-up stagger-2" data-sd-id="24">
+                    <span class="metadata" data-sd-id="25">Gen Z Regret · LendingTree</span>
+                    <span class="font-display text-2xl" data-sd-id="26">62% USERS</span>
+                </div>
+                <div class="flex flex-col gap-4 reveal-up stagger-3" data-sd-id="27">
+                    <span class="metadata" data-sd-id="28">Plan Ahead · GoDaddy, 2024</span>
+                    <span class="font-display text-2xl" data-sd-id="29">9% GEN Z</span>
+                </div>
+                <div class="flex flex-col gap-4 reveal-up stagger-4" data-sd-id="30">
+                    <span class="metadata" data-sd-id="31">Delay Impact · Moser, U. Michigan, 2020</span>
+                    <span class="font-display text-2xl" data-sd-id="32">~25 HOURS</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editorial Content Block -->
+        <section class="w-full py-40 px-10 border-t border-white/5" data-sd-id="33">
+            <div class="max-w-7xl mx-auto grid grid-cols-12 gap-20" data-sd-id="34">
+                <div class="col-span-12 md:col-span-3" data-sd-id="35">
+                    <h2 class="font-display text-6xl sticky top-32 reveal-up" data-sd-id="36">01</h2>
+                </div>
+                <div class="col-span-12 md:col-span-9 flex flex-col gap-10 reveal-up stagger-1" data-sd-id="37">
+                    <h3 class="metadata tracking-[0.3em]" data-sd-id="38">The Manifesto</h3>
+                    <p class="font-body font-light text-2xl md:text-3xl leading-[1.6] max-w-2xl" data-sd-id="39">
+                        We parse the digital noise of your inbox to extract the essential truth of your spending. By identifying merchants, dates, and prices automatically—while maintaining your control with manual overrides—we build a definitive history that detects redundancy before you hit buy.
+                    </p>
+                    <a href="#" id="explore-manifesto" class="group flex items-center gap-4 w-fit pb-2 border-b border-[#fecdd3]/30" data-sd-id="40">
+                        <span class="metadata text-white" data-sd-id="41">Explore Case Study</span>
+                        <iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-2 transition-transform duration-300"></iconify-icon>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section class="w-full space-y-10 py-20" data-sd-id="42">
+            <div class="w-full aspect-[21/9] overflow-hidden image-zoom-container reveal-up" data-sd-id="43">
+                <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&amp;w=2040&amp;auto=format&amp;fit=crop" alt="Gallery 1" class="w-full h-full object-cover grayscale" data-sd-id="44">
+            </div>
+
+            <div class="max-w-7xl mx-auto px-10 grid grid-cols-1 md:grid-cols-2 gap-10" data-sd-id="45">
+                <div class="relative aspect-[4/3] overflow-hidden image-zoom-container group reveal-up" data-sd-id="46">
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&amp;w=2070&amp;auto=format&amp;fit=crop" alt="Gallery 2" class="w-full h-full object-cover grayscale" data-sd-id="47">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-10" data-sd-id="48">
+                        <p class="metadata text-white" data-sd-id="49">STRUCTURE / FORM. 2024</p>
+                    </div>
+                </div>
+                <div class="relative aspect-[4/3] overflow-hidden image-zoom-container group reveal-up stagger-1" data-sd-id="50">
+                    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&amp;w=1288&amp;auto=format&amp;fit=crop" alt="Gallery 3" class="w-full h-full object-cover grayscale" data-sd-id="51">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-700 flex items-end p-10" data-sd-id="52">
+                        <p class="metadata text-white" data-sd-id="53">LIGHT / SHADOW. 2024</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Block 02 -->
+        <section class="w-full py-40 px-10 border-t border-white/5" data-sd-id="54">
+            <div class="max-w-7xl mx-auto grid grid-cols-12 gap-20" data-sd-id="55">
+                <div class="col-span-12 md:col-span-3" data-sd-id="56">
+                    <h2 class="font-display text-6xl sticky top-32 reveal-up" data-sd-id="57">02</h2>
+                </div>
+                <div class="col-span-12 md:col-span-9 flex flex-col gap-10 reveal-up stagger-1" data-sd-id="58">
+                    <h3 class="metadata tracking-[0.3em]" data-sd-id="59">The Execution</h3>
+                    <p class="font-body font-light text-2xl md:text-3xl leading-[1.6] max-w-2xl text-white/80" data-sd-id="60">
+                        A 24-hour pause is the ultimate luxury for the modern mind. Research shows a brief delay significantly lowers the urge to buy. We facilitate this friction, allowing you to cross-reference new intents against your existing wardrobe and purchase history.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="relative w-full bg-[#0a0a0a] py-40 px-10 overflow-hidden" data-sd-id="61">
+            <!-- Light Leak -->
+            <div class="absolute top-0 right-0 light-leak-rose pointer-events-none" data-sd-id="62"></div>
+            
+            <div class="max-w-7xl mx-auto flex flex-col items-center text-center" data-sd-id="63">
+                <h3 class="metadata mb-10" data-sd-id="64">Get in touch</h3>
+                <a href="mailto:hello@midnight.editorial" id="footer-email" class="group relative inline-block reveal-up" data-sd-id="65">
+                    <span class="font-display text-4xl md:text-7xl lg:text-9xl font-bold tracking-tighter uppercase transition-opacity duration-300 group-hover:text-[#fecdd3]" data-sd-id="66">
+                        hello@midnight.ed
+                    </span>
+                    <span class="absolute bottom-0 left-0 w-full h-[1px] bg-[#fecdd3] group-hover:h-[4px] transition-all duration-300" data-sd-id="67"></span>
+                </a>
+
+                <div class="mt-40 grid grid-cols-2 md:grid-cols-4 gap-12 w-full max-w-2xl reveal-up stagger-2" data-sd-id="68">
+                    <a href="#" id="soc-ig" class="metadata hover:text-[#fecdd3] transition-colors" data-sd-id="69">Instagram</a>
+                    <a href="#" id="soc-tw" class="metadata hover:text-[#fecdd3] transition-colors" data-sd-id="70">Twitter / X</a>
+                    <a href="#" id="soc-be" class="metadata hover:text-[#fecdd3] transition-colors" data-sd-id="71">Behance</a>
+                    <a href="#" id="soc-li" class="metadata hover:text-[#fecdd3] transition-colors" data-sd-id="72">LinkedIn</a>
+                </div>
+            </div>
+
+            <!-- Ghost Mark -->
+            <div class="absolute bottom-[-100px] left-1/2 -translate-x-1/2 font-display font-bold footer-ghost-text select-none" data-sd-id="73">
+                MIDNIGHT
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Basic intersection observer for reveal-up animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-up');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+    </script>
+
+</body></html>
