@@ -1,0 +1,422 @@
+/* Pause screen: light theme, tighter editorial, reading through the same
+   shared tokens (globals.css) as the rest of the app. */
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-ink-soft);
+  margin-bottom: var(--space-2);
+}
+
+.emptyNote {
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 1. Wanted item ---------- */
+
+.wantedItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.wantedImage {
+  flex: 0 0 200px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+  background: var(--color-bg-alt);
+}
+
+@media (min-width: 640px) {
+  .wantedImage {
+    flex-basis: 240px;
+  }
+}
+
+.wantedImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wantedPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill);
+  text-align: center;
+  padding: var(--space-2);
+}
+
+.wantedPlaceholderLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-fill-ink);
+}
+
+.wantedDetails {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-faint);
+}
+
+.metaLine {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 2. Already in your wardrobe ---------- */
+
+.similarTrack {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 0.5rem;
+  margin: 0 calc(var(--space-4) * -1);
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  .similarTrack {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    overflow-x: visible;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.similarCard {
+  flex: 0 0 auto;
+  width: 150px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 900px) {
+  .similarCard {
+    width: auto;
+  }
+}
+
+.similarImage {
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--color-bg-alt);
+}
+
+.similarImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.similarName {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.similarMeta {
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  color: var(--color-ink-faint);
+}
+
+.similarReason {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 3. A moment to think ---------- */
+
+.reflectionForm {
+  display: block;
+  max-width: none;
+}
+
+.question {
+  margin-top: var(--space-4);
+}
+
+.question:first-child {
+  margin-top: 0;
+}
+
+.questionLabel {
+  font-weight: 500;
+}
+
+.chipRow {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chipOption {
+  position: relative;
+}
+
+.chipOption input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.chipOption span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.chipOption:has(input:checked) span {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.chipOption:has(input:focus-visible) span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.scaleRow {
+  margin-top: var(--space-2);
+  display: flex;
+  gap: 0.4rem;
+}
+
+.scaleOption {
+  position: relative;
+  flex: 1;
+}
+
+.scaleOption input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.scaleOption span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+
+.scaleOption:has(input:checked) span {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+.scaleOption:has(input:focus-visible) span {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.scaleCaption {
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--color-ink-faint);
+}
+
+.reasonGrid {
+  margin-top: var(--space-2);
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (min-width: 640px) {
+  .reasonGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.reasonField {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.reasonField input {
+  width: 100%;
+}
+
+/* ---------- 4. This month ---------- */
+
+.budgetSection {
+  margin-top: var(--space-5);
+}
+
+.budgetBar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--color-bg-alt);
+  overflow: hidden;
+}
+
+.budgetBarProjected {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  border-radius: 999px;
+}
+
+.budgetBarSpend {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: var(--color-ink);
+  border-radius: 999px;
+}
+
+.budgetLine {
+  margin-top: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.budgetPercent {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+}
+
+.overPlan {
+  margin-top: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+/* ---------- 5. Actions ---------- */
+
+.actions {
+  margin-top: var(--space-5);
+  display: grid;
+  gap: 0.6rem;
+  max-width: 24rem;
+}
+
+.secondaryPauseOption {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.secondaryPauseOption:hover {
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.buyAnywayWrap {
+  margin-top: 0.4rem;
+  justify-self: center;
+}
+
+.buyAnywayLink {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.buyAnywayWarning {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  text-align: center;
+}
+
+/* ---------- Skeleton (loading.tsx) ---------- */
+
+.skel {
+  background: var(--color-bg-alt);
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+.skelWantedItem {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.skelImage {
+  composes: skel;
+  flex: 0 0 200px;
+  aspect-ratio: 4 / 5;
+}
+
+.skelLine {
+  composes: skel;
+  height: 0.9rem;
+  width: 60%;
+  margin-top: 0.75rem;
+}
+
+.skelLineShort {
+  composes: skel;
+  height: 0.9rem;
+  width: 35%;
+  margin-top: 0.5rem;
+}
+
+.skelTrack {
+  margin-top: var(--space-2);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.skelCard {
+  composes: skel;
+  width: 150px;
+  height: 12rem;
+  flex: 0 0 auto;
+}

@@ -1,4 +1,9 @@
-export default function DeleteGmailDataPage() {
+import { requireUserIdOrRedirect } from "@/lib/session";
+import { csrfTokenForUser } from "@/lib/csrf";
+
+export default async function DeleteGmailDataPage() {
+  const userId = await requireUserIdOrRedirect();
+
   return (
     <div className="page">
       <span className="page__eyebrow">Careful, this is permanent</span>
@@ -14,6 +19,7 @@ export default function DeleteGmailDataPage() {
         not affected.
       </p>
       <form action="/api/auth/gmail/delete" method="POST" className="section">
+        <input type="hidden" name="csrfToken" value={csrfTokenForUser(userId)} />
         <button type="submit" className="btn-danger">
           Yes, permanently delete everything
         </button>

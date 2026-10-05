@@ -1,0 +1,41 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
+import ConsideringPage from "./page";
+
+describe("ConsideringPage", () => {
+  describe("cross-tenant isolation", () => {
+    let fixture: TwoTenantFixture;
+
+    afterEach(async () => {
+      vi.mocked(auth).mockReset();
+      await fixture?.cleanup();
+    });
+
+    it("never lists another user's waiting or saved items", async () => {
+      fixture = await createTwoTenantFixture();
+      await prisma.desiredItem.update({
+        where: { id: fixture.userA.desiredItem.id },
+        data: { pauseStatus: "waiting", waitUntil: new Date("2099-01-01") },
+      });
+      await prisma.desiredItem.update({
+        where: { id: fixture.userB.desiredItem.id },
+        data: { pauseStatus: "waiting", waitUntil: new Date("2099-01-01") },
+      });
+      vi.mocked(auth).mockResolvedValueOnce({ user: { id: fixture.userA.user.id } } as never);
+
+      const element = await ConsideringPage();
+      const html = renderToStaticMarkup(element);
+
+      expect(html).toContain(fixture.userA.desiredItem.itemName);
+      expect(html).not.toContain(fixture.userB.desiredItem.itemName);
+    });
+  });
+});

@@ -5,7 +5,13 @@ vi.mock("@/lib/tagging/tagWardrobeItem", () => ({
   ensureWardrobeItemTagged: vi.fn(async (item) => item),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import { POST } from "./route";
 
 function buildRequest(fields: Record<string, string>) {
@@ -24,6 +30,7 @@ describe("POST /api/purchases/[id]/confirm", () => {
   const createdPurchaseIds: string[] = [];
 
   afterEach(async () => {
+    vi.mocked(auth).mockReset();
     await prisma.wardrobeItem.deleteMany({ where: { sourcePurchaseId: { in: createdPurchaseIds } } });
     await prisma.purchase.deleteMany({ where: { id: { in: createdPurchaseIds } } });
     createdPurchaseIds.length = 0;
@@ -43,8 +50,17 @@ describe("POST /api/purchases/[id]/confirm", () => {
       },
     });
     createdPurchaseIds.push(purchase.id);
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     return purchase;
   }
+
+  it("returns 401 when there is no active session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+
+    const response = await POST(buildRequest({ itemName: "Navy Wool Coat" }), await ctxFor("some-id"));
+
+    expect(response.status).toBe(401);
+  });
 
   it("confirms with corrected fields and redirects to the purchase list", async () => {
     const purchase = await makeReviewPurchase();
@@ -85,5 +101,40 @@ describe("POST /api/purchases/[id]/confirm", () => {
     expect(response.status).toBe(400);
     const unchanged = await prisma.purchase.findUniqueOrThrow({ where: { id: purchase.id } });
     expect(unchanged.status).toBe("needs_review");
+  });
+
+  describe("cross-tenant isolation", () => {
+    let fixture: TwoTenantFixture;
+
+    afterEach(async () => {
+      await fixture?.cleanup();
+    });
+
+    it("returns 404 and never confirms another user's review-queue purchase", async () => {
+      fixture = await createTwoTenantFixture();
+      const reviewPurchase = await prisma.purchase.create({
+        data: {
+          userId: fixture.userB.user.id,
+          merchant: "Unknown Retailer",
+          orderDate: new Date("2026-02-01"),
+          itemName: "Order from Unknown Retailer",
+          price: "0",
+          category: "unknown",
+          status: "needs_review",
+        },
+      });
+      vi.mocked(auth).mockResolvedValueOnce({ user: { id: fixture.userA.user.id } } as never);
+
+      const response = await POST(
+        buildRequest({ itemName: "Stolen Coat", price: "189.99", category: "outerwear" }),
+        await ctxFor(reviewPurchase.id)
+      );
+
+      expect(response.status).toBe(404);
+
+      const unchanged = await prisma.purchase.findUniqueOrThrow({ where: { id: reviewPurchase.id } });
+      expect(unchanged.status).toBe("needs_review");
+      expect(unchanged.itemName).toBe("Order from Unknown Retailer");
+    });
   });
 });

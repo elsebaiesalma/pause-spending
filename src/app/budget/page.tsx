@@ -1,13 +1,13 @@
-import { prisma } from "@/lib/prisma";
 import { computeSuggestedBudget, currentMonthKey, getBudgetForMonth, getMonthSpend } from "@/lib/budget";
+import { requireUserIdOrRedirect } from "@/lib/session";
 
 export default async function BudgetPage() {
-  const user = await prisma.user.findFirst();
+  const userId = await requireUserIdOrRedirect();
   const monthKey = currentMonthKey();
 
-  const budget = user ? await getBudgetForMonth(user.id, monthKey) : null;
-  const spend = user ? await getMonthSpend(user.id, monthKey) : 0;
-  const suggestion = !budget && user ? await computeSuggestedBudget(user.id, monthKey) : null;
+  const budget = await getBudgetForMonth(userId, monthKey);
+  const spend = await getMonthSpend(userId, monthKey);
+  const suggestion = !budget ? await computeSuggestedBudget(userId, monthKey) : null;
 
   return (
     <div className="page">

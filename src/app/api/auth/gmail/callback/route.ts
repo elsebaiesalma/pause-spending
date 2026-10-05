@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { exchangeCodeForTokens } from "@/lib/oauth/google";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
@@ -15,8 +21,6 @@ export async function GET(request: NextRequest) {
 
   const tokens = await exchangeCodeForTokens(code);
 
-  const user = await prisma.user.findFirstOrThrow();
-
   const envelope = encrypt(
     JSON.stringify({
       accessToken: tokens.access_token,
@@ -26,9 +30,9 @@ export async function GET(request: NextRequest) {
   );
 
   await prisma.emailConnection.upsert({
-    where: { userId_provider: { userId: user.id, provider: "gmail" } },
+    where: { userId_provider: { userId: session.user.id, provider: "gmail" } },
     create: {
-      userId: user.id,
+      userId: session.user.id,
       provider: "gmail",
       encryptedToken: envelope,
       status: "connected",

@@ -1,0 +1,130 @@
+/* Considering tab + its let-go sub-page (which imports this same module for
+   the shared row style - see src/app/considering/let-go/page.tsx). Light
+   theme, on-brand but deliberately plain: text rows, hairline dividers, no
+   images, no hover-zoom or reveal animation anywhere on either page. */
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--color-ink-soft);
+  margin-bottom: var(--space-2);
+}
+
+.emptyNote {
+  color: var(--color-ink-soft);
+}
+
+/* ---------- Rows ---------- */
+
+.row {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.rowTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.rowBrand {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-faint);
+}
+
+.rowName {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Deliberately plain - same size/weight as the surrounding text, never the
+   larger Clash Display treatment .item-row__price uses elsewhere. This
+   page is about the user's own reasoning, not a highlighted number. */
+.rowPrice {
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+}
+
+.rowMeta {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+}
+
+.rowReflection {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+
+.rowAutoTag {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-faint);
+}
+
+.rowActions {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: var(--space-3);
+}
+
+.rowActions button,
+.rowActions a {
+  border: none;
+  background: none;
+  padding: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-line-strong);
+  cursor: pointer;
+}
+
+.rowActions button:hover,
+.rowActions a:hover {
+  background: none;
+  color: var(--color-ink);
+  text-decoration-color: var(--color-ink);
+}
+
+/* ---------- Let go totals (main Considering page) ---------- */
+
+.totals {
+  display: flex;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.totalValue {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.totalLabel {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
+}

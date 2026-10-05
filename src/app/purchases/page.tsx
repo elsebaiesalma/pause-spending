@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/prisma";
+import { requireUserIdOrRedirect } from "@/lib/session";
 
 export default async function PurchasesPage() {
-  const user = await prisma.user.findFirst();
-  const purchases = user
-    ? await prisma.purchase.findMany({
-        where: { userId: user.id },
-        orderBy: { orderDate: "desc" },
-      })
-    : [];
+  const userId = await requireUserIdOrRedirect();
+  const purchases = await prisma.purchase.findMany({
+    where: { userId },
+    orderBy: { orderDate: "desc" },
+  });
 
   return (
     <div className="page page--wide">
@@ -37,7 +36,9 @@ export default async function PurchasesPage() {
                 {purchase.status === "needs_review" && (
                   <div className="stack" style={{ marginTop: "0.6rem" }}>
                     <p className="page__lede" style={{ fontSize: "0.85rem" }}>
-                      We couldn&apos;t confidently read this one - confirm the details or discard it.
+                      {purchase.price === null
+                        ? "We couldn't confidently read this one's price - enter it to confirm, or discard it."
+                        : "We couldn't confidently read this one - confirm the details or discard it."}
                     </p>
                     <form
                       action={`/api/purchases/${purchase.id}/confirm`}
@@ -51,7 +52,7 @@ export default async function PurchasesPage() {
                         type="number"
                         step="0.01"
                         min="0"
-                        defaultValue={Number(purchase.price)}
+                        defaultValue={purchase.price === null ? undefined : Number(purchase.price)}
                         placeholder="Price"
                         required
                       />
@@ -66,7 +67,9 @@ export default async function PurchasesPage() {
                   </div>
                 )}
               </div>
-              <div className="item-row__price">${Number(purchase.price).toFixed(2)}</div>
+              <div className="item-row__price">
+                {purchase.price === null ? "price unknown" : `$${Number(purchase.price).toFixed(2)}`}
+              </div>
             </div>
           ))}
         </div>

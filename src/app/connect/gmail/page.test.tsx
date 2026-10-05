@@ -6,8 +6,8 @@ describe("ConnectGmailPage (consent step)", () => {
   it("discloses what is read and what is never done, before any Google redirect", () => {
     const html = renderToStaticMarkup(ConnectGmailPage());
 
-    expect(html).toContain("order-confirmation emails");
-    expect(html).toContain("never send, delete, or modify");
+    expect(html).toContain("order confirmations");
+    expect(html).toContain("never send, delete, reply to, or change");
     expect(html).toContain("never share your data");
   });
 

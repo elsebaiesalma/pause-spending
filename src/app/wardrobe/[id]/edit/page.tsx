@@ -1,10 +1,17 @@
+import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserIdOrRedirect } from "@/lib/session";
+import { COLOR_FAMILIES } from "@/lib/colorFamily";
 
 export default async function EditWardrobeItemPage({
   params,
 }: PageProps<"/wardrobe/[id]/edit">) {
+  const userId = await requireUserIdOrRedirect();
   const { id } = await params;
-  const item = await prisma.wardrobeItem.findUniqueOrThrow({ where: { id } });
+  const item = await prisma.wardrobeItem.findFirst({ where: { id, userId } });
+  if (!item) {
+    notFound();
+  }
 
   return (
     <div className="page">
@@ -15,8 +22,17 @@ export default async function EditWardrobeItemPage({
         <input id="itemName" name="itemName" defaultValue={item.itemName} required />
         <label htmlFor="category">Category</label>
         <input id="category" name="category" defaultValue={item.category ?? ""} placeholder="Category" />
-        <label htmlFor="primaryColor">Color</label>
-        <input id="primaryColor" name="primaryColor" defaultValue={item.primaryColor ?? ""} placeholder="Color" />
+        <label htmlFor="colorName">Color</label>
+        <input id="colorName" name="colorName" defaultValue={item.colorName ?? ""} placeholder="e.g. Espresso" />
+        <label htmlFor="colorFamily">Color family</label>
+        <select id="colorFamily" name="colorFamily" defaultValue={item.colorFamily ?? ""}>
+          <option value="">Unset</option>
+          {COLOR_FAMILIES.map((family) => (
+            <option key={family} value={family}>
+              {family}
+            </option>
+          ))}
+        </select>
         <label htmlFor="styleTags">Style tags</label>
         <input
           id="styleTags"

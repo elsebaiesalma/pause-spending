@@ -1,6 +1,13 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import { POST } from "./route";
 
 function buildRequest(fields: Record<string, string>) {
@@ -22,6 +29,7 @@ describe("POST /api/desired-items/[id]/resolve", () => {
   const createdIds: string[] = [];
 
   afterEach(async () => {
+    vi.mocked(auth).mockReset();
     await prisma.desiredItem.deleteMany({ where: { id: { in: createdIds } } });
     createdIds.length = 0;
   });
@@ -39,8 +47,17 @@ describe("POST /api/desired-items/[id]/resolve", () => {
       },
     });
     createdIds.push(item.id);
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     return item;
   }
+
+  it("returns 401 when there is no active session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+
+    const response = await POST(buildRequest({ outcome: "proceeded" }), await ctxFor("some-id"));
+
+    expect(response.status).toBe(401);
+  });
 
   it("records 'proceeded' and resolves pause_status", async () => {
     const item = await makeWaitingItem();
@@ -64,13 +81,21 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     expect(updated.decisionOutcome).toBe("dropped");
   });
 
+  it("redirects a 'dropped' outcome to the Considering tab", async () => {
+    const item = await makeWaitingItem();
+
+    const response = await POST(buildRequest({ outcome: "dropped" }), await ctxFor(item.id));
+
+    expect(response.headers.get("location")).toContain("/considering");
+  });
+
   it("records 'saved_for_later' as its own pause_status, distinct from 'proceeded'", async () => {
     const item = await makeWaitingItem();
 
     const response = await POST(buildRequest({ outcome: "saved_for_later" }), await ctxFor(item.id));
     expect(response.status).toBeGreaterThanOrEqual(300);
     expect(response.status).toBeLessThan(400);
-    expect(response.headers.get("location")).toContain("/wishlist");
+    expect(response.headers.get("location")).toContain("/considering");
 
     const updated = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
     expect(updated.pauseStatus).toBe("saved_for_later");
@@ -85,6 +110,20 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     expect(response.headers.get("location")).toContain(`/desired-items/${item.id}/recommendations`);
   });
 
+  it("still resolves the outcome when a reflection answer is included, even though its migration isn't applied yet", async () => {
+    const item = await makeWaitingItem();
+
+    const response = await POST(
+      buildRequest({ outcome: "dropped", reflectionReplaces: "__nothing__", reflectionReasonAgainst: "too similar" }),
+      await ctxFor(item.id)
+    );
+
+    expect(response.status).toBeGreaterThanOrEqual(300);
+    expect(response.status).toBeLessThan(400);
+    const updated = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(updated.decisionOutcome).toBe("dropped");
+  });
+
   it("rejects an unrecognized outcome", async () => {
     const item = await makeWaitingItem();
 
@@ -94,5 +133,31 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     const unchanged = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
     expect(unchanged.pauseStatus).toBe("waiting");
     expect(unchanged.decisionOutcome).toBeNull();
+  });
+
+  describe("cross-tenant isolation", () => {
+    let fixture: TwoTenantFixture;
+
+    afterEach(async () => {
+      await fixture?.cleanup();
+    });
+
+    it("returns 404 and never resolves an item belonging to another user", async () => {
+      fixture = await createTwoTenantFixture();
+      vi.mocked(auth).mockResolvedValueOnce({ user: { id: fixture.userA.user.id } } as never);
+
+      const response = await POST(
+        buildRequest({ outcome: "proceeded" }),
+        await ctxFor(fixture.userB.desiredItem.id)
+      );
+
+      expect(response.status).toBe(404);
+
+      const unchanged = await prisma.desiredItem.findUniqueOrThrow({
+        where: { id: fixture.userB.desiredItem.id },
+      });
+      expect(unchanged.pauseStatus).toBe(fixture.userB.desiredItem.pauseStatus);
+      expect(unchanged.decisionOutcome).toBeNull();
+    });
   });
 });

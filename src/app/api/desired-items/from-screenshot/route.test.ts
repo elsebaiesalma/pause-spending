@@ -5,7 +5,12 @@ vi.mock("@/lib/itemExtraction/screenshotExtractor", () => ({
   extractFromScreenshot: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
 import { extractFromScreenshot } from "@/lib/itemExtraction/screenshotExtractor";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
 
@@ -24,11 +29,23 @@ describe("POST /api/desired-items/from-screenshot", () => {
 
   afterEach(async () => {
     vi.mocked(extractFromScreenshot).mockReset();
+    vi.mocked(auth).mockReset();
     await prisma.desiredItem.deleteMany({ where: { id: { in: createdIds } } });
     createdIds.length = 0;
   });
 
+  it("returns 401 when there is no active session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+
+    const response = await POST(buildRequest());
+
+    expect(response.status).toBe(401);
+    expect(extractFromScreenshot).not.toHaveBeenCalled();
+  });
+
   it("creates an unconfirmed desired item with the identified fields", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     vi.mocked(extractFromScreenshot).mockResolvedValueOnce({
       itemName: "Navy Wool Blazer",
       price: 189.99,
@@ -49,6 +66,8 @@ describe("POST /api/desired-items/from-screenshot", () => {
   });
 
   it("still creates a row (blank fields) when the screenshot can't be identified, rather than blocking", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     vi.mocked(extractFromScreenshot).mockResolvedValueOnce(null);
 
     const response = await POST(buildRequest());
@@ -65,6 +84,8 @@ describe("POST /api/desired-items/from-screenshot", () => {
   });
 
   it("rejects a request with no file", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     const request = new NextRequest("http://localhost:3000/api/desired-items/from-screenshot", {
       method: "POST",
       body: new FormData(),

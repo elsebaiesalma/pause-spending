@@ -1,6 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 import { assembleRecommendations } from "@/lib/recommendations/assembleRecommendations";
 import type { Alternative } from "@/lib/recommendations/postWaitRecommendations";
+import { requireUserIdOrRedirect } from "@/lib/session";
+import { isRecordNotFoundError } from "@/lib/prismaErrors";
 
 function AlternativeList({ title, items }: { title: string; items: Alternative[] }) {
   if (items.length === 0) return null;
@@ -24,12 +26,19 @@ function AlternativeList({ title, items }: { title: string; items: Alternative[]
 export default async function RecommendationsPage({
   params,
 }: PageProps<"/desired-items/[id]/recommendations">) {
+  const userId = await requireUserIdOrRedirect();
   const { id } = await params;
-  const user = await prisma.user.findFirstOrThrow();
-  const { desiredItem, comparables, secondhand, outfitIdeas } = await assembleRecommendations(
-    user.id,
-    id
-  );
+
+  let payload;
+  try {
+    payload = await assembleRecommendations(userId, id);
+  } catch (error) {
+    if (isRecordNotFoundError(error)) {
+      notFound();
+    }
+    throw error;
+  }
+  const { desiredItem, comparables, secondhand, outfitIdeas } = payload;
 
   return (
     <div className="page">

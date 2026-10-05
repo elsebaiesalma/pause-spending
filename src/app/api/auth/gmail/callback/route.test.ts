@@ -11,7 +11,12 @@ vi.mock("@/lib/oauth/google", async () => {
   };
 });
 
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
 import { exchangeCodeForTokens } from "@/lib/oauth/google";
+import { auth } from "@/lib/auth";
 import { decrypt, type EncryptedEnvelope } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { GET } from "./route";
@@ -40,13 +45,26 @@ function buildRequest(params: { code?: string; state?: string; cookieState?: str
 describe("GET /api/auth/gmail/callback", () => {
   afterEach(async () => {
     vi.mocked(exchangeCodeForTokens).mockReset();
+    vi.mocked(auth).mockReset();
     const user = await prisma.user.findFirst();
     if (user) {
       await prisma.emailConnection.deleteMany({ where: { userId: user.id, provider: "gmail" } });
     }
   });
 
+  it("redirects to /login without touching Google when there's no active session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+    const request = buildRequest({ code: "abc", state: "match", cookieState: "match" });
+
+    const response = await GET(request);
+
+    expect(response.headers.get("location")).toContain("/login");
+    expect(exchangeCodeForTokens).not.toHaveBeenCalled();
+  });
+
   it("rejects a mismatched state without exchanging any code", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     const request = buildRequest({ code: "abc", state: "one", cookieState: "two" });
 
     const response = await GET(request);
@@ -56,6 +74,8 @@ describe("GET /api/auth/gmail/callback", () => {
   });
 
   it("stores the token encrypted (never in plaintext) and it decrypts back to the original", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
     vi.mocked(exchangeCodeForTokens).mockResolvedValueOnce(FAKE_TOKENS);
     const request = buildRequest({ code: "real-code", state: "match", cookieState: "match" });
 
@@ -64,7 +84,6 @@ describe("GET /api/auth/gmail/callback", () => {
     expect(response.status).toBeGreaterThanOrEqual(300);
     expect(response.status).toBeLessThan(400);
 
-    const user = await prisma.user.findFirstOrThrow();
     const connection = await prisma.emailConnection.findUniqueOrThrow({
       where: { userId_provider: { userId: user.id, provider: "gmail" } },
     });

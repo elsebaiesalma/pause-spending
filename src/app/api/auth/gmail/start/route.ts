@@ -1,8 +1,16 @@
 import crypto from "node:crypto";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { buildGoogleAuthorizationUrl } from "@/lib/oauth/google";
+import { auth } from "@/lib/auth";
 
-export async function GET() {
+// Connecting Gmail is a second, separate consent step after signing into
+// the app itself - it must never be reachable by a signed-out visitor.
+export async function GET(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   const state = crypto.randomBytes(16).toString("hex");
   const response = NextResponse.redirect(buildGoogleAuthorizationUrl(state));
 

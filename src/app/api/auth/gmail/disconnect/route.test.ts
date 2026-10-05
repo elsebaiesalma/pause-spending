@@ -8,7 +8,13 @@ vi.mock("@/lib/oauth/google", async () => {
   return { ...actual, revokeGoogleToken: vi.fn() };
 });
 
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(),
+}));
+
 import { revokeGoogleToken } from "@/lib/oauth/google";
+import { auth } from "@/lib/auth";
+import { csrfTokenForUser } from "@/lib/csrf";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
 import { POST } from "./route";
@@ -19,15 +25,23 @@ const FAKE_STORED_TOKEN = JSON.stringify({
   expiresAt: Date.now() + 3_600_000,
 });
 
-function buildRequest() {
+function buildRequest(csrfToken?: string) {
+  const form = new FormData();
+  if (csrfToken !== undefined) form.set("csrfToken", csrfToken);
   return new NextRequest("http://localhost:3000/api/auth/gmail/disconnect", {
     method: "POST",
+    body: form,
   });
+}
+
+function mockSession(userId: string) {
+  vi.mocked(auth).mockResolvedValueOnce({ user: { id: userId } } as never);
 }
 
 describe("POST /api/auth/gmail/disconnect", () => {
   afterEach(async () => {
     vi.mocked(revokeGoogleToken).mockReset();
+    vi.mocked(auth).mockReset();
     const user = await prisma.user.findFirst();
     if (user) {
       // Cascades to any purchases/wardrobe items created against this connection.
@@ -35,8 +49,30 @@ describe("POST /api/auth/gmail/disconnect", () => {
     }
   });
 
+  it("returns 401 when there is no active session", async () => {
+    vi.mocked(auth).mockResolvedValueOnce(null as never);
+
+    const response = await POST(buildRequest("anything"));
+
+    expect(response.status).toBe(401);
+    expect(revokeGoogleToken).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 when the csrf token is missing or wrong", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    mockSession(user.id);
+
+    const response = await POST(buildRequest("wrong-token"));
+
+    expect(response.status).toBe(403);
+    expect(revokeGoogleToken).not.toHaveBeenCalled();
+  });
+
   it("returns 404 when there is no connection to disconnect", async () => {
-    const response = await POST(buildRequest());
+    const user = await prisma.user.findFirstOrThrow();
+    mockSession(user.id);
+
+    const response = await POST(buildRequest(csrfTokenForUser(user.id)));
 
     expect(response.status).toBe(404);
     expect(revokeGoogleToken).not.toHaveBeenCalled();
@@ -46,6 +82,7 @@ describe("POST /api/auth/gmail/disconnect", () => {
     vi.mocked(revokeGoogleToken).mockResolvedValueOnce(undefined);
 
     const user = await prisma.user.findFirstOrThrow();
+    mockSession(user.id);
     const connection = await prisma.emailConnection.create({
       data: {
         userId: user.id,
@@ -69,7 +106,7 @@ describe("POST /api/auth/gmail/disconnect", () => {
       data: { userId: user.id, sourcePurchaseId: purchase.id, itemName: "Test Item" },
     });
 
-    const response = await POST(buildRequest());
+    const response = await POST(buildRequest(csrfTokenForUser(user.id)));
 
     expect(response.status).toBeGreaterThanOrEqual(300);
     expect(response.status).toBeLessThan(400);

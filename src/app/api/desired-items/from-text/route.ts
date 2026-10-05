@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+  const userId = await requireUserId();
+  if (typeof userId !== "string") return userId;
+
   const form = await request.formData();
   const text = form.get("text")?.toString().trim();
 
@@ -9,11 +13,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "text is required" }, { status: 400 });
   }
 
-  const user = await prisma.user.findFirstOrThrow();
-
   const desiredItem = await prisma.desiredItem.create({
     data: {
-      userId: user.id,
+      userId,
       sourceType: "typed",
       rawInput: text,
       itemName: text,

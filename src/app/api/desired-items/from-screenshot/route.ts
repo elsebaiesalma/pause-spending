@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { extractFromScreenshot } from "@/lib/itemExtraction/screenshotExtractor";
+import { requireUserId } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
+  const userId = await requireUserId();
+  if (typeof userId !== "string") return userId;
+
   const form = await request.formData();
   const file = form.get("screenshot");
 
@@ -14,11 +18,9 @@ export async function POST(request: NextRequest) {
   const base64 = buffer.toString("base64");
   const extraction = await extractFromScreenshot(base64, file.type || "image/png");
 
-  const user = await prisma.user.findFirstOrThrow();
-
   const desiredItem = await prisma.desiredItem.create({
     data: {
-      userId: user.id,
+      userId,
       sourceType: "screenshot",
       itemName: extraction?.itemName ?? null,
       price: extraction?.price?.toString() ?? null,
