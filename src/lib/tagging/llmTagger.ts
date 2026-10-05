@@ -1,3 +1,4 @@
+import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
@@ -42,7 +43,7 @@ async function requestTags(
     : [{ type: "text", text: textContent }];
 
   const response = await getAnthropicClient().messages.parse({
-    model: "claude-opus-5",
+    model: ANTHROPIC_MODEL,
     max_tokens: 1024,
     system: SYSTEM_PROMPT,
     messages: [{ role: "user", content }],

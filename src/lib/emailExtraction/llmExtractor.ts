@@ -1,3 +1,4 @@
+import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
@@ -118,7 +119,7 @@ export async function extractPurchaseItems(
   imageCandidates: ImageCandidate[] = []
 ): Promise<ReceiptExtraction> {
   const response = await getAnthropicClient().messages.parse({
-    model: "claude-opus-5",
+    model: ANTHROPIC_MODEL,
     max_tokens: 2048,
     system: SYSTEM_PROMPT,
     messages: [
