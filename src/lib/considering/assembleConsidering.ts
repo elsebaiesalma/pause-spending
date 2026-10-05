@@ -4,11 +4,17 @@ import { listWaitingQueue } from "@/lib/waitQueue";
 import { getReflectionAnswer } from "@/lib/pauseScreen/reflection";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { getConsideringMeta, sweepStaleSavedItems, SAVED_RETENTION_DAYS } from "./consideringMeta";
+import { listUndecidedVisits } from "@/lib/stillWantIt/storeVisit";
 
 export type OnPauseRow = {
   item: DesiredItem;
   pausedAt: Date;
   reflectionSummary: string | null;
+};
+
+export type UndecidedRow = {
+  item: DesiredItem;
+  wentToStoreAt: Date;
 };
 
 export type SavedRow = {
@@ -23,11 +29,12 @@ export type LetGoTotals = {
 
 export type ConsideringPayload = {
   onPause: OnPauseRow[];
+  undecided: UndecidedRow[];
   saved: SavedRow[];
   letGo: LetGoTotals;
 };
 
-function buildReflectionSummary(
+export function buildReflectionSummary(
   reflection: { needScore: number | null; replacesWardrobeItemId: string | null; replacesNothing: boolean } | null,
   replacedItemName: string | null
 ): string | null {
@@ -88,10 +95,23 @@ export async function assembleConsidering(userId: string, now: Date = new Date()
     return { item, savedDaysAgo };
   });
 
+  const undecidedVisits = await listUndecidedVisits(userId);
+  const undecidedItems = undecidedVisits.length
+    ? await prisma.desiredItem.findMany({
+        where: { userId, id: { in: undecidedVisits.map((v) => v.id) } },
+      })
+    : [];
+  const undecidedById = new Map(undecidedItems.map((item) => [item.id, item]));
+  const undecided: UndecidedRow[] = undecidedVisits.flatMap((visit) => {
+    const item = undecidedById.get(visit.id);
+    return item ? [{ item, wentToStoreAt: visit.wentToStoreAt }] : [];
+  });
+
   const letGoSummary = await getKeptSummary(userId, "all_time", now);
 
   return {
     onPause,
+    undecided,
     saved,
     letGo: { itemsLetGo: letGoSummary.itemsLetGo, totalKept: letGoSummary.totalKept },
   };

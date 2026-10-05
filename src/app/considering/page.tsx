@@ -14,7 +14,7 @@ function savedDaysAgoLabel(days: number): string {
 
 export default async function ConsideringPage() {
   const userId = await requireUserIdOrRedirect();
-  const { onPause, saved, letGo } = await assembleConsidering(userId);
+  const { onPause, undecided, saved, letGo } = await assembleConsidering(userId);
 
   return (
     <div className="page page--wide">
@@ -59,8 +59,36 @@ export default async function ConsideringPage() {
         )}
       </section>
 
+      {undecided.length > 0 && (
+        <section className="section">
+          <p className={styles.sectionLabel}>02 / Went to the store</p>
+          <div>
+            {undecided.map(({ item, wentToStoreAt }) => {
+              const price = item.price ? Number(item.price) : null;
+              return (
+                <div key={item.id} className={styles.row}>
+                  <div className={styles.rowTop}>
+                    <div>
+                      {item.brand && <p className={styles.rowBrand}>{item.brand}</p>}
+                      <p className={styles.rowName}>{item.itemName || "Untitled item"}</p>
+                    </div>
+                    {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
+                  </div>
+                  <p className={styles.rowMeta}>
+                    Went to the store, undecided · visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}
+                  </p>
+                  <div className={styles.rowActions}>
+                    <a href={`/desired-items/${item.id}/still-want-it`}>Decide now</a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <section className="section">
-        <p className={styles.sectionLabel}>02 / Saved for later</p>
+        <p className={styles.sectionLabel}>03 / Saved for later</p>
         {saved.length === 0 ? (
           <p className={styles.emptyNote}>Nothing saved for later.</p>
         ) : (
@@ -92,7 +120,7 @@ export default async function ConsideringPage() {
       </section>
 
       <section className="section">
-        <p className={styles.sectionLabel}>03 / Let go</p>
+        <p className={styles.sectionLabel}>04 / Let go</p>
         <div className={styles.totals}>
           <div>
             <div className={styles.totalValue}>{letGo.itemsLetGo}</div>
