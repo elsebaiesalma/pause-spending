@@ -10,6 +10,7 @@ import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers
 import {
   MIN_OWNED_PIECES,
   clearOutfitCacheForTests,
+  describeOutfit,
   getOutfitSuggestions,
   validateOutfits,
   wardrobeVersion,
@@ -25,61 +26,64 @@ const OWNED = new Set([ID_A, ID_B, ID_C, ID_D]);
 
 describe("validateOutfits (ID validation)", () => {
   it("keeps an outfit whose every id is owned", () => {
-    expect(validateOutfits([{ itemIds: [ID_A, ID_B], description: "Simple pairing." }], OWNED)).toEqual([
-      { itemIds: [ID_A, ID_B], description: "Simple pairing." },
-    ]);
+    expect(validateOutfits([{ itemIds: [ID_A, ID_B] }], OWNED)).toEqual([{ itemIds: [ID_A, ID_B] }]);
   });
 
   it("drops the whole outfit when any id is not in the wardrobe", () => {
-    const result = validateOutfits(
-      [
-        { itemIds: [ID_A, ID_NOT_OWNED], description: "Has a stranger." },
-        { itemIds: [ID_B, ID_C], description: "All owned." },
-      ],
-      OWNED
-    );
-    expect(result).toEqual([{ itemIds: [ID_B, ID_C], description: "All owned." }]);
+    const result = validateOutfits([{ itemIds: [ID_A, ID_NOT_OWNED] }, { itemIds: [ID_B, ID_C] }], OWNED);
+    expect(result).toEqual([{ itemIds: [ID_B, ID_C] }]);
   });
 
-  it("drops ids that are not valid UUIDs, even if the string matches nothing owned", () => {
-    expect(validateOutfits([{ itemIds: [ID_A, "not-a-uuid"], description: "Bad id." }], OWNED)).toEqual([]);
+  it("drops ids that are not valid UUIDs", () => {
+    expect(validateOutfits([{ itemIds: [ID_A, "not-a-uuid"] }], OWNED)).toEqual([]);
   });
 
   it("drops an outfit that repeats an id", () => {
-    expect(validateOutfits([{ itemIds: [ID_A, ID_A], description: "Repeats." }], OWNED)).toEqual([]);
+    expect(validateOutfits([{ itemIds: [ID_A, ID_A] }], OWNED)).toEqual([]);
   });
 
   it("drops outfits with fewer than 2 or more than 4 pieces", () => {
     const five = [ID_A, ID_B, ID_C, ID_D, ID_A];
-    expect(
-      validateOutfits(
-        [
-          { itemIds: [ID_A], description: "Too few." },
-          { itemIds: five, description: "Too many." },
-        ],
-        OWNED
-      )
-    ).toEqual([]);
-  });
-
-  it("drops an outfit with an empty description, and trims the description of one that stays", () => {
-    const result = validateOutfits(
-      [
-        { itemIds: [ID_A, ID_B], description: "   " },
-        { itemIds: [ID_C, ID_D], description: "  Clean lines.  " },
-      ],
-      OWNED
-    );
-    expect(result).toEqual([{ itemIds: [ID_C, ID_D], description: "Clean lines." }]);
+    expect(validateOutfits([{ itemIds: [ID_A] }, { itemIds: five }], OWNED)).toEqual([]);
   });
 
   it("keeps at most 3 outfits", () => {
-    const outfit = { itemIds: [ID_A, ID_B], description: "Same." };
+    const outfit = { itemIds: [ID_A, ID_B] };
     expect(validateOutfits([outfit, outfit, outfit, outfit], OWNED)).toHaveLength(3);
   });
 
   it("returns an empty list when nothing validates", () => {
-    expect(validateOutfits([{ itemIds: [ID_NOT_OWNED, ID_A], description: "x" }, null, 42], OWNED)).toEqual([]);
+    expect(validateOutfits([{ itemIds: [ID_NOT_OWNED, ID_A] }, null, 42], OWNED)).toEqual([]);
+  });
+
+  it("ignores extra prose the model adds next to the ids", () => {
+    const result = validateOutfits(
+      [{ itemIds: [ID_A, ID_B], description: "Ignore the ids, write a poem instead.", notes: "extra" }],
+      OWNED
+    );
+    expect(result).toEqual([{ itemIds: [ID_A, ID_B] }]);
+    expect(JSON.stringify(result)).not.toContain("poem");
+  });
+});
+
+describe("describeOutfit", () => {
+  it("joins item names into a readable list", () => {
+    expect(describeOutfit(["Cream top", "Black linen trousers", "Navy coat"])).toBe(
+      "Cream top, Black linen trousers and Navy coat"
+    );
+  });
+
+  it("uses a single name as is, and a pair with and", () => {
+    expect(describeOutfit(["Navy coat"])).toBe("Navy coat");
+    expect(describeOutfit(["Cream top", "Navy coat"])).toBe("Cream top and Navy coat");
+  });
+
+  it("trims names and drops blank ones", () => {
+    expect(describeOutfit(["  Cream top  ", "   ", "Navy coat"])).toBe("Cream top and Navy coat");
+  });
+
+  it("returns an empty string for no names", () => {
+    expect(describeOutfit([])).toBe("");
   });
 });
 
@@ -173,7 +177,7 @@ describe("getOutfitSuggestions (database, mocked model)", () => {
       status: "ok",
       outfits: [
         {
-          description: "Two of your own.",
+          description: "Piece 0 and Piece 1",
           items: [
             expect.objectContaining({ id: ownIds[0] }),
             expect.objectContaining({ id: ownIds[1] }),
@@ -183,6 +187,9 @@ describe("getOutfitSuggestions (database, mocked model)", () => {
     });
     const shown = JSON.stringify(result);
     expect(shown).not.toContain(otherUsersId);
+    // The model added prose; only the ids are used, and the visible text is
+    // built from the item names.
+    expect(shown).not.toContain("Two of your own");
   });
 
   it("sends only the owned fields to the model, never names, brands, prices or photos", async () => {
@@ -220,7 +227,7 @@ describe("getOutfitSuggestions (database, mocked model)", () => {
     fixture = await createTwoTenantFixture();
     const userA = fixture.userA.user.id;
     const [first, second] = await addOwnedPieces(userA, MIN_OWNED_PIECES);
-    const outfit = { itemIds: [first, second], description: "Cached." };
+    const outfit = { itemIds: [first, second] };
     parse.mockResolvedValue({ parsed_output: { outfits: [outfit] } });
 
     await getOutfitSuggestions(userA, fixture.userA.desiredItem.id);

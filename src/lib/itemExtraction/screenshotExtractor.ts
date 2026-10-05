@@ -1,4 +1,4 @@
-import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
+import { SCREENSHOT_MODEL } from "@/lib/anthropicModels";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
@@ -38,7 +38,7 @@ export async function extractFromScreenshot(
 ): Promise<ScreenshotExtraction | null> {
   try {
     const response = await getAnthropicClient().messages.parse({
-      model: ANTHROPIC_MODEL,
+      model: SCREENSHOT_MODEL,
       max_tokens: 512,
       system: SYSTEM_PROMPT,
       messages: [

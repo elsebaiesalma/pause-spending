@@ -1,4 +1,4 @@
-import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
+import { TAGGING_MODEL } from "@/lib/anthropicModels";
 // The fixed set redundancy matching compares on. Kept as an app-validated
 // String column (matching this codebase's existing convention for
 // status/pauseStatus) rather than a Postgres native enum - see
@@ -181,7 +181,7 @@ export async function classifyColorFamilyByLLM(colorName: string): Promise<Color
   });
 
   const response = await getAnthropicClient().messages.parse({
-    model: ANTHROPIC_MODEL,
+    model: TAGGING_MODEL,
     max_tokens: 256,
     system: `You classify a free-text clothing color name (e.g. "Espresso", "Oatmeal", "Dusty Rose") into exactly one of these fixed color families: ${COLOR_FAMILIES.join(", ")}. A two-tone or patterned description maps to "multi". Pick the single closest family - never invent a new one.`,
     messages: [{ role: "user", content: `Color name: ${colorName}` }],

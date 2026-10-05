@@ -1,4 +1,4 @@
-import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
+import { RECOMMENDATIONS_MODEL } from "@/lib/anthropicModels";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
@@ -42,7 +42,7 @@ export async function generateShoppingAlternatives(
   desiredItem: Pick<DesiredItem, "itemName" | "price" | "category">
 ): Promise<{ comparables: Alternative[]; secondhand: Alternative[] }> {
   const response = await getAnthropicClient().messages.parse({
-    model: ANTHROPIC_MODEL,
+    model: RECOMMENDATIONS_MODEL,
     max_tokens: 1024,
     system: ALTERNATIVES_SYSTEM_PROMPT,
     messages: [
@@ -114,7 +114,7 @@ export async function generateOutfitIdeas(
   }
 
   const response = await getAnthropicClient().messages.parse({
-    model: ANTHROPIC_MODEL,
+    model: RECOMMENDATIONS_MODEL,
     max_tokens: 1024,
     system: OUTFIT_IDEAS_SYSTEM_PROMPT,
     messages: [

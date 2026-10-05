@@ -1,8 +1,8 @@
-import { ANTHROPIC_MODEL } from "@/lib/anthropicModel";
 import { createHash } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import { OUTFIT_MODEL } from "@/lib/anthropicModels";
 import { getAnthropicClient } from "@/lib/anthropicClient";
 import { prisma } from "@/lib/prisma";
 
@@ -14,7 +14,6 @@ const MAX_ITEMS_PER_OUTFIT = 4;
 const MIN_ITEMS_PER_OUTFIT = 2;
 const CACHE_TTL_MS = 60 * 60 * 1000;
 const CACHE_MAX_ENTRIES = 200;
-
 
 // The only fields of an owned piece that ever reach the model. Names,
 // brands, prices and photos stay on our side.
@@ -30,7 +29,8 @@ export type OutfitPiece = {
 // never a valid id in an outfit; it only tells the model what to approximate.
 export type OutfitTarget = Omit<OutfitPiece, "id">;
 
-export type ValidOutfit = { itemIds: string[]; description: string };
+// What the model is allowed to say: which owned pieces go together. No prose.
+export type ValidOutfit = { itemIds: string[] };
 
 export type OutfitItem = {
   id: string;
@@ -40,6 +40,8 @@ export type OutfitItem = {
   colorFamily: string | null;
 };
 
+// The visible description is built here from the chosen items' own names,
+// never taken from model prose.
 export type OutfitWithItems = { description: string; items: OutfitItem[] };
 
 // "unavailable" means the model call failed or came back unparseable. It is
@@ -50,16 +52,16 @@ export type OutfitSuggestions =
   | { status: "unavailable" }
   | { status: "ok"; outfits: OutfitWithItems[] };
 
-// Permissive on purpose: the model's output is checked item by item by
-// validateOutfits below, so one bad outfit drops alone instead of failing
-// the whole response.
+// The model returns ids and nothing else. zod strips any other key it adds,
+// so prose tucked into the response is never read or shown.
 const outfitResponseSchema = z.object({
-  outfits: z.array(
-    z.object({
-      itemIds: z.array(z.string()).describe("Ids of 2-4 owned pieces, taken only from the list provided."),
-      description: z.string().describe("One neutral sentence on how these pieces work together."),
-    })
-  ).describe("Up to 3 outfits. An empty list is acceptable if no sensible outfit is possible."),
+  outfits: z
+    .array(
+      z.object({
+        itemIds: z.array(z.string()).describe("Ids of 2-4 owned pieces, taken only from the list provided."),
+      })
+    )
+    .describe("Up to 3 outfits. An empty list is acceptable if no sensible outfit is possible."),
 });
 
 const OUTFIT_SYSTEM_PROMPT = `You suggest outfits built from a person's own wardrobe, to approximate the look of an item they are considering buying.
@@ -68,8 +70,7 @@ Rules:
 - Use only the owned pieces provided, referenced by their id. Never invent an id.
 - Each outfit uses 2 to 4 pieces and should echo the target's role, colour and style as closely as the owned pieces allow.
 - Never include the target item itself. It is not owned.
-- Each description is one short, neutral sentence about how the pieces work together.
-- Keep the tone neutral. Do not judge whether the person should buy the target. Avoid phrases like "you don't need", "instead", or "skip".
+- Return only the ids. Do not write descriptions or any other text.
 - Return an empty list if no sensible outfit is possible.`;
 
 export function wardrobeVersion(pieces: OutfitPiece[]): string {
@@ -94,6 +95,15 @@ export function buildOutfitPrompt(target: OutfitTarget, pieces: OutfitPiece[]): 
   ].join("\n");
 }
 
+// Builds the visible description from the chosen items' names:
+// "Cream top, black linen trousers and navy coat".
+export function describeOutfit(names: string[]): string {
+  const cleaned = names.map((name) => name.trim()).filter((name) => name.length > 0);
+  if (cleaned.length === 0) return "";
+  if (cleaned.length === 1) return cleaned[0];
+  return `${cleaned.slice(0, -1).join(", ")} and ${cleaned[cleaned.length - 1]}`;
+}
+
 // Validates each model outfit against the user's own owned ids. Any id not in
 // `ownedIds`, any duplicate, or a size outside 2-4 drops that outfit only.
 export function validateOutfits(outfits: unknown[], ownedIds: ReadonlySet<string>): ValidOutfit[] {
@@ -104,18 +114,17 @@ export function validateOutfits(outfits: unknown[], ownedIds: ReadonlySet<string
       .min(MIN_ITEMS_PER_OUTFIT)
       .max(MAX_ITEMS_PER_OUTFIT)
       .refine((ids) => new Set(ids).size === ids.length, { message: "duplicate id" }),
-    description: z.string().trim().min(1).max(160),
   });
 
   return outfits.slice(0, MAX_OUTFITS).flatMap((candidate) => {
     const parsed = outfitSchema.safeParse(candidate);
-    return parsed.success ? [{ itemIds: parsed.data.itemIds, description: parsed.data.description }] : [];
+    return parsed.success ? [{ itemIds: parsed.data.itemIds }] : [];
   });
 }
 
 async function generateValidOutfits(target: OutfitTarget, pieces: OutfitPiece[]): Promise<ValidOutfit[]> {
   const response = await getAnthropicClient().messages.parse({
-    model: ANTHROPIC_MODEL,
+    model: OUTFIT_MODEL,
     max_tokens: 1024,
     system: OUTFIT_SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildOutfitPrompt(target, pieces) }],
@@ -131,7 +140,7 @@ async function generateValidOutfits(target: OutfitTarget, pieces: OutfitPiece[])
 
 // Cache is per process and keyed by user, desired item and wardrobe version,
 // so a change to the wardrobe is a natural miss. The key includes userId, so
-// one user's entry can never be served to another.
+// one user's entry can never be served to another. Entries hold ids only.
 type CacheEntry = { outfits: ValidOutfit[]; expiresAt: number };
 const globalForOutfits = globalThis as unknown as { stillWantItOutfits?: Map<string, CacheEntry> };
 const outfitCache = (globalForOutfits.stillWantItOutfits ??= new Map<string, CacheEntry>());
@@ -209,7 +218,7 @@ export async function getOutfitSuggestions(
       // where there is one, so a bad model ID or auth problem is visible.
       const status = error instanceof Anthropic.APIError ? error.status : undefined;
       console.error(
-        `[still-want-it] outfit model call failed (model=${ANTHROPIC_MODEL}, status=${status ?? "none"}):`,
+        `[still-want-it] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`,
         error
       );
       return { status: "unavailable" };
@@ -227,7 +236,8 @@ export async function getOutfitSuggestions(
     });
     // Defensive: a cached outfit whose pieces have since left the wardrobe
     // would show fewer than 2 items, so it is dropped rather than shown.
-    return items.length >= MIN_ITEMS_PER_OUTFIT ? [{ description: outfit.description, items }] : [];
+    if (items.length < MIN_ITEMS_PER_OUTFIT) return [];
+    return [{ description: describeOutfit(items.map((item) => item.itemName)), items }];
   });
 
   return { status: "ok", outfits: withItems };
