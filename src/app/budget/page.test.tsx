@@ -6,6 +6,7 @@ vi.mock("@/lib/auth", () => ({
 }));
 
 import { auth } from "@/lib/auth";
+import { currentMonthKey } from "@/lib/budget";
 import { prisma } from "@/lib/prisma";
 import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import BudgetPage from "./page";
@@ -24,13 +25,15 @@ describe("BudgetPage", () => {
 
     it("shows this user's own budget, never another user's amount", async () => {
       fixture = await createTwoTenantFixture();
+      // The page shows the current month's budget, so the fixture's budgets
+      // must be for that month too (the fixture's own month is fixed).
       await prisma.budget.update({
         where: { id: fixture.userA.budget.id },
-        data: { amount: "111.11" },
+        data: { amount: "111.11", month: currentMonthKey() },
       });
       await prisma.budget.update({
         where: { id: fixture.userB.budget.id },
-        data: { amount: "999.99" },
+        data: { amount: "999.99", month: currentMonthKey() },
       });
       vi.mocked(auth).mockResolvedValueOnce({ user: { id: fixture.userA.user.id } } as never);
 

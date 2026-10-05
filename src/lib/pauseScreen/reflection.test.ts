@@ -56,8 +56,8 @@ describe("hasAnyReflectionAnswer / parseReflectionFromForm", () => {
   });
 });
 
-describe("saveReflectionAnswer / getReflectionAnswer (pending migration)", () => {
-  it("degrade to a no-op and null rather than throwing, since the migration isn't applied yet", async () => {
+describe("saveReflectionAnswer / getReflectionAnswer (migration 20260925090000 applied)", () => {
+  it("round-trips a saved answer through the reflection columns", async () => {
     const user = await prisma.user.findFirstOrThrow();
     const desired = await prisma.desiredItem.create({
       data: { userId: user.id, sourceType: "typed", itemName: "Test Item" },
@@ -74,7 +74,16 @@ describe("saveReflectionAnswer / getReflectionAnswer (pending migration)", () =>
         })
       ).resolves.toBeUndefined();
 
-      await expect(getReflectionAnswer(desired.id, user.id)).resolves.toBeNull();
+      await expect(getReflectionAnswer(desired.id, user.id)).resolves.toEqual(
+        expect.objectContaining({
+          replacesWardrobeItemId: null,
+          replacesNothing: true,
+          needScore: 4,
+          reasonFor: null,
+          reasonAgainst: null,
+          answeredAt: expect.any(Date),
+        })
+      );
     } finally {
       await prisma.desiredItem.deleteMany({ where: { id: desired.id } });
     }

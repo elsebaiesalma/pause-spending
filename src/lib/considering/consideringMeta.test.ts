@@ -8,8 +8,8 @@ import {
   sweepStaleSavedItems,
 } from "./consideringMeta";
 
-describe("consideringMeta (pending migration 20260925100000)", () => {
-  it("getConsideringMeta returns {} rather than throwing, for a missing migration", async () => {
+describe("consideringMeta (migration 20260925100000 applied)", () => {
+  it("getConsideringMeta returns {} for ids with no row", async () => {
     await expect(getConsideringMeta(["00000000-0000-0000-0000-000000000000"])).resolves.toEqual({});
   });
 
@@ -57,7 +57,7 @@ describe("consideringMeta (pending migration 20260925100000)", () => {
     }
   });
 
-  it("sweepStaleSavedItems degrades to a no-op, leaving saved_for_later items untouched", async () => {
+  it("sweepStaleSavedItems moves a stale saved item to let go, as an automatic drop", async () => {
     const user = await prisma.user.findFirstOrThrow();
     const item = await prisma.desiredItem.create({
       data: {
@@ -71,8 +71,12 @@ describe("consideringMeta (pending migration 20260925100000)", () => {
 
     try {
       await expect(sweepStaleSavedItems(user.id)).resolves.toBeUndefined();
-      const unchanged = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
-      expect(unchanged.pauseStatus).toBe("saved_for_later");
+      const swept = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
+      // Same end state as a user's "Let it go" (pauseStatus proceeded,
+      // decisionOutcome dropped), flagged as automatic.
+      expect(swept.pauseStatus).toBe("proceeded");
+      expect(swept.decisionOutcome).toBe("dropped");
+      expect(swept.letGoAutomatically).toBe(true);
     } finally {
       await prisma.desiredItem.deleteMany({ where: { id: item.id } });
     }
