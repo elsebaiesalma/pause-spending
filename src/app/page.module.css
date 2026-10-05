@@ -1,37 +1,23 @@
 /* Scoped to the home/landing page only - the rest of the app keeps the
-   cream/blush/burgundy system in globals.css untouched.
-
-   Daylight Editorial: same oversized-typography, editorial-brutalist
-   bones as the "Midnight Editorial" reference, base polarity flipped -
-   what was black is now white, what was white is now near-black ink.
-   The pink accent is untouched: same #fecdd3 / #fdb3b9, same roles. */
+   light "Midnight Editorial" app theme in globals.css untouched. This
+   page applies .theme-dark (see globals.css) for the canonical dark
+   landing look and reads color through the same shared tokens, so it
+   never breaks if the theme mapping changes. */
 
 .root {
-  --bg: #ffffff;
-  --bg-alt: #f7f6f6;
-  --ink: #0a0a0a;
-  --ink-muted: rgba(10, 10, 10, 0.6);
-  --ink-faint: rgba(10, 10, 10, 0.4);
-  --line: rgba(10, 10, 10, 0.08);
-  --line-muted: rgba(10, 10, 10, 0.16);
-  --accent: #fecdd3;
-  --accent-dim: #fdb3b9;
-  --invert-bg: #0a0a0a;
-  --invert-ink: #ffffff;
   font-family: var(--font-body);
-  color: var(--ink);
-  background: var(--bg);
+  color: var(--color-ink);
+  background: var(--color-bg);
 }
 
 /* The shared site-main (globals.css) adds top padding to clear the fixed
    header, but paints no background of its own - without this, the app's
-   cream body background shows through that gap above this page's own
-   white content. */
+   own background shows through that gap above this page's content. */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: #ffffff;
+  background: var(--color-bg);
 }
 
 .glow {
@@ -42,11 +28,15 @@
   overflow: hidden;
 }
 
+/* No blend mode: on the near-black page a plain low-opacity rose blob
+   reads as a soft light leak. (Multiply was only right for the old
+   white-background variant, where it needed to darken/tint instead.) */
 .glowBlob {
   position: absolute;
   border-radius: 50%;
-  mix-blend-mode: multiply;
   filter: blur(120px);
+  opacity: 0.12;
+  background: var(--color-fill);
   animation: float 16s ease-in-out infinite alternate;
 }
 
@@ -55,7 +45,6 @@
   right: -10%;
   width: 40rem;
   height: 40rem;
-  background: rgba(253, 179, 185, 0.09);
 }
 
 .glowBlob:nth-child(2) {
@@ -63,7 +52,7 @@
   left: -12%;
   width: 44rem;
   height: 44rem;
-  background: rgba(253, 205, 211, 0.08);
+  opacity: 0.08;
   animation-delay: -6s;
 }
 
@@ -88,17 +77,18 @@
   max-width: 78rem;
   margin: 0 auto;
   padding: 5rem 1.5rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
   font-weight: 700;
   margin-bottom: 1rem;
 }
@@ -107,11 +97,11 @@
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: var(--accent-dim);
+  background: var(--color-accent-dim);
 }
 
 .display {
-  font-family: var(--font-clash), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -132,7 +122,7 @@
   justify-content: space-between;
   padding-bottom: 1rem;
   margin-bottom: 3rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .heroGrid {
@@ -155,7 +145,7 @@
   max-width: 32rem;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
   border-radius: 2px;
 }
 
@@ -170,12 +160,13 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
+  font-family: var(--font-mono);
   font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
   padding: 0.3rem 0.6rem;
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
 }
 
 .heroNarrative {
@@ -187,7 +178,7 @@
 }
 
 .heroNarrative p {
-  color: var(--ink-muted);
+  color: var(--color-ink-soft);
   font-size: 0.95rem;
   line-height: 1.6;
 }
@@ -201,7 +192,7 @@
 
 .heroHeadline em {
   font-style: normal;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
 }
 
 /* ---------- Buttons ---------- */
@@ -217,16 +208,16 @@
   letter-spacing: 0.12em;
   font-weight: 600;
   border-radius: 999px;
-  background: var(--ink);
-  color: var(--bg);
-  border: 1px solid var(--ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
+  border: 1px solid var(--color-ink);
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
 .btnPrimary:hover {
-  background: var(--accent-dim);
-  border-color: var(--accent-dim);
-  color: var(--ink);
+  background: var(--color-accent-dim);
+  border-color: var(--color-accent-dim);
+  color: var(--color-ink);
 }
 
 .btnPrimary:active {
@@ -244,13 +235,13 @@
   font-weight: 600;
   border-radius: 999px;
   background: transparent;
-  color: var(--ink);
-  border: 1px solid var(--line-muted);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line-strong);
   transition: border-color 0.2s ease, transform 0.1s ease;
 }
 
 .btnGhost:hover {
-  border-color: var(--ink);
+  border-color: var(--color-ink);
 }
 
 .btnGhost:active {
@@ -264,7 +255,7 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 @media (min-width: 900px) {
@@ -275,8 +266,8 @@
 
 .stat {
   padding: 2.5rem 2rem;
-  border-top: 1px solid var(--line);
-  border-right: 1px solid var(--line);
+  border-top: 1px solid var(--color-line);
+  border-right: 1px solid var(--color-line);
 }
 
 .stat:nth-child(2n) {
@@ -285,7 +276,7 @@
 
 @media (min-width: 900px) {
   .stat:nth-child(2n) {
-    border-right: 1px solid var(--line);
+    border-right: 1px solid var(--color-line);
   }
   .stat:nth-child(4n) {
     border-right: none;
@@ -294,10 +285,11 @@
 
 .statLabel {
   display: block;
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
   margin-bottom: 0.75rem;
 }
 
@@ -310,7 +302,7 @@
   margin-top: 0.6rem;
   font-size: 0.8rem;
   font-weight: 300;
-  color: var(--ink-faint);
+  color: var(--color-ink-faint);
 }
 
 /* ---------- Editorial content blocks ---------- */
@@ -328,10 +320,11 @@
 }
 
 .moduleLabel {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
   display: block;
   margin-bottom: 0.75rem;
 }
@@ -343,27 +336,28 @@
 
 .moduleHeading em {
   font-style: normal;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
 }
 
 .moduleRule {
   width: 3rem;
   height: 1px;
-  background: var(--accent-dim);
+  background: var(--color-accent-dim);
   margin: 1rem 0;
   border: none;
 }
 
 .moduleSub {
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--ink-faint);
+  color: var(--color-ink-faint);
 }
 
 .lede {
   font-size: clamp(1.15rem, 2vw, 1.6rem);
-  color: rgba(10, 10, 10, 0.85);
+  color: color-mix(in srgb, var(--color-ink) 88%, transparent);
   font-weight: 300;
   line-height: 1.55;
   max-width: 62ch;
@@ -373,7 +367,7 @@
 .twoCol {
   display: grid;
   gap: 2rem;
-  color: var(--ink-muted);
+  color: var(--color-ink-soft);
   font-size: 1.05rem;
   line-height: 1.6;
 }
@@ -388,19 +382,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  border-bottom: 1px solid var(--line-muted);
+  border-bottom: 1px solid var(--color-line-strong);
   padding-bottom: 0.4rem;
   margin-top: 1.5rem;
   transition: border-color 0.2s ease, color 0.2s ease;
 }
 
 .inlineLink:hover {
-  color: var(--accent-dim);
-  border-color: var(--accent-dim);
+  color: var(--color-accent-dim);
+  border-color: var(--color-accent-dim);
 }
 
 /* ---------- Parallax banner ---------- */
@@ -411,7 +406,7 @@
   aspect-ratio: 21 / 9;
   min-height: 22rem;
   overflow: hidden;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .banner img {
@@ -424,7 +419,7 @@
 .bannerOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .bannerCard {
@@ -433,9 +428,9 @@
   right: 1.5rem;
   bottom: 1.5rem;
   max-width: 34rem;
-  background: rgba(255, 255, 255, 0.9);
+  background: color-mix(in srgb, var(--color-bg) 86%, transparent);
   backdrop-filter: blur(6px);
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
   padding: 1.75rem;
 }
 
@@ -447,7 +442,7 @@
 }
 
 .bannerCard h3 {
-  font-family: var(--font-clash), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -457,7 +452,7 @@
 
 .bannerCard p {
   font-size: 0.92rem;
-  color: var(--ink-muted);
+  color: var(--color-ink-soft);
   line-height: 1.5;
   margin-bottom: 1rem;
 }
@@ -469,7 +464,7 @@
   gap: 1rem;
   padding-bottom: 2.5rem;
   margin-bottom: 2.5rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .phase:last-child {
@@ -486,14 +481,15 @@
 }
 
 .phaseLabel {
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
 }
 
 .phase h3 {
-  font-family: var(--font-clash), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -502,7 +498,7 @@
 }
 
 .phase p {
-  color: var(--ink-muted);
+  color: var(--color-ink-soft);
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -515,7 +511,7 @@
   gap: 1rem;
   padding-bottom: 2rem;
   margin-bottom: 3rem;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 
 @media (min-width: 700px) {
@@ -541,7 +537,7 @@
   position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
 }
 
 .galleryItem img {
@@ -555,12 +551,13 @@
   position: absolute;
   top: 1.25rem;
   left: 1.25rem;
+  font-family: var(--font-mono);
   font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  background: rgba(255, 255, 255, 0.85);
+  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
   padding: 0.3rem 0.6rem;
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
 }
 
 .galleryCaption {
@@ -568,9 +565,9 @@
   left: 1.25rem;
   right: 1.25rem;
   bottom: 1.25rem;
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
   backdrop-filter: blur(6px);
-  border: 1px solid var(--line-muted);
+  border: 1px solid var(--color-line-strong);
   padding: 1.25rem;
 }
 
@@ -583,20 +580,21 @@
 }
 
 .galleryCaptionTop strong {
-  font-family: var(--font-clash), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-size: 1.05rem;
 }
 
 .galleryCaptionTop span {
+  font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .galleryCaption p {
   font-size: 0.82rem;
-  color: var(--ink-muted);
+  color: var(--color-ink-soft);
   line-height: 1.5;
 }
 
@@ -616,12 +614,12 @@
 
 .featurePoint {
   padding: 1.5rem;
-  border: 1px solid var(--line);
-  background: var(--bg-alt);
+  border: 1px solid var(--color-line);
+  background: var(--color-bg-alt);
 }
 
 .featurePoint h4 {
-  font-family: var(--font-clash), sans-serif;
+  font-family: var(--font-display), sans-serif;
   font-weight: 600;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -631,15 +629,15 @@
 
 .featurePoint p {
   font-size: 0.85rem;
-  color: var(--ink-faint);
+  color: var(--color-ink-faint);
   line-height: 1.5;
 }
 
 /* ---------- Footer ---------- */
 
 .footer {
-  background: var(--invert-bg);
-  color: var(--invert-ink);
+  background: var(--color-bg-alt);
+  color: var(--color-ink);
   padding: 6rem 1.5rem 3rem;
   position: relative;
   overflow: hidden;
@@ -654,10 +652,11 @@
 }
 
 .footerEyebrow {
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
   font-weight: 700;
   display: block;
   margin-bottom: 0.75rem;
@@ -671,11 +670,11 @@
 
 .footerHeadline em {
   font-style: normal;
-  color: var(--accent-dim);
+  color: var(--color-accent-dim);
 }
 
 .footerSub {
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--color-ink-soft);
   font-size: 0.95rem;
   max-width: 26rem;
   margin: 0 auto 2.5rem;
@@ -685,14 +684,14 @@
   composes: display;
   display: inline-block;
   font-size: clamp(1.75rem, 5vw, 3.5rem);
-  color: #fff;
+  color: var(--color-ink);
   transition: color 0.2s ease;
   position: relative;
   margin-bottom: 2.5rem;
 }
 
 .footerCta:hover {
-  color: var(--accent);
+  color: var(--color-accent);
 }
 
 .footerLinks {
@@ -701,15 +700,16 @@
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-ink-soft);
   margin-bottom: 3rem;
 }
 
 .footerLinks a:hover {
-  color: #fff;
+  color: var(--color-ink);
 }
 
 .footerMeta {
@@ -718,11 +718,12 @@
   gap: 1rem;
   align-items: center;
   padding-top: 2.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--color-line-strong);
+  font-family: var(--font-mono);
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-ink-faint);
 }
 
 @media (min-width: 700px) {
@@ -737,7 +738,7 @@
   font-size: 20vw;
   line-height: 1;
   text-align: center;
-  color: rgba(255, 255, 255, 0.05);
+  color: color-mix(in srgb, var(--color-ink) 5%, transparent);
   white-space: nowrap;
   margin-top: 3rem;
   overflow: hidden;

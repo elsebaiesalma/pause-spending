@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 
 export default function Home() {
   return (
-    <div className={`${styles.root} ${clashDisplay.variable}`}>
+    <div className={`${styles.root} theme-dark ${clashDisplay.variable}`}>
       <ScrollReveal />
       <div className={styles.backdrop} aria-hidden="true" />
       <div className={styles.glow} aria-hidden="true">
@@ -19,7 +19,7 @@ export default function Home() {
             <span className={styles.eyebrowDot} />
             Edition 01 - Architectural Stillness
           </span>
-          <span style={{ fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--ink-faint)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink-faint)" }}>
             Reflection, not restriction
           </span>
         </div>
@@ -44,9 +44,9 @@ export default function Home() {
                 showing you what you already own before you get there.
               </p>
             </div>
-            <div style={{ borderTop: "1px solid var(--line)", paddingTop: "1rem", display: "flex", justifyContent: "space-between", color: "var(--ink-faint)" }}>
+            <div style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1rem", display: "flex", justifyContent: "space-between", color: "var(--color-ink-faint)" }}>
               <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Avg. reflection window</span>
-              <span style={{ fontFamily: "var(--font-clash)", fontSize: "0.8rem", color: "var(--accent-dim)", fontWeight: 700 }}>24H - 7 DAYS</span>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "0.8rem", color: "var(--color-accent-dim)", fontWeight: 700 }}>24H - 7 DAYS</span>
             </div>
             <a href="#philosophy" className={styles.inlineLink} style={{ marginTop: 0 }}>
               Discover the protocol &rarr;
@@ -64,13 +64,13 @@ export default function Home() {
         <div className={`${styles.stat} reveal`} data-reveal>
           <span className={styles.statLabel}>Impulse dissolution</span>
           <div className={styles.statValue}>
-            82.4<em style={{ fontStyle: "normal", color: "var(--accent-dim)" }}>%</em>
+            82.4<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
           </div>
           <p className={styles.statNote}>Illustrative figure - purchases people reconsidered within an 18-hour cooling window.</p>
         </div>
         <div className={`${styles.stat} reveal`} data-reveal>
           <span className={styles.statLabel}>Capital preserved</span>
-          <div className={styles.statValue} style={{ color: "var(--accent-dim)" }}>
+          <div className={styles.statValue} style={{ color: "var(--color-accent-dim)" }}>
             $4,850
           </div>
           <p className={styles.statNote}>Illustrative figure - average annual spend avoided per active wardrobe.</p>
@@ -78,14 +78,14 @@ export default function Home() {
         <div className={`${styles.stat} reveal`} data-reveal>
           <span className={styles.statLabel}>Match accuracy</span>
           <div className={styles.statValue}>
-            99.4<em style={{ fontStyle: "normal", color: "var(--accent-dim)" }}>%</em>
+            99.4<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
           </div>
           <p className={styles.statNote}>Order-confirmation parsing and wardrobe redundancy matching.</p>
         </div>
         <div className={`${styles.stat} reveal`} data-reveal>
           <span className={styles.statLabel}>Notification silence</span>
           <div className={styles.statValue}>
-            100<em style={{ fontStyle: "normal", color: "var(--accent-dim)" }}>%</em>
+            100<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
           </div>
           <p className={styles.statNote}>No push alerts, ever. You check in when you check in.</p>
         </div>
@@ -109,7 +109,7 @@ export default function Home() {
             </p>
             <div className={styles.twoCol}>
               <p>
-                Pause restores it, gently. When an order confirmation lands in your inbox, or you paste
+                PAUSE restores it, gently. When an order confirmation lands in your inbox, or you paste
                 a link to something you&apos;re considering, we show your existing wardrobe alongside
                 it - the coats, the boots, the bags you already reach for.
               </p>
@@ -141,10 +141,10 @@ export default function Home() {
             you&apos;ve worn three times this month. Same category, same weight, similar use.&quot;
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <span style={{ fontSize: "0.7rem", color: "var(--ink-faint)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
               Budget impact
             </span>
-            <span style={{ fontFamily: "var(--font-clash)", fontSize: "1.25rem", color: "var(--accent-dim)" }}>+$1,150.00</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", color: "var(--color-accent-dim)" }}>+$1,150.00</span>
           </div>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default function Home() {
               Sartorial redundancy <em>mappings</em>
             </h2>
           </div>
-          <p style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--ink-faint)", maxWidth: "18rem" }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--color-ink-faint)", maxWidth: "18rem" }}>
             A sample of what a wardrobe match actually looks like.
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function Home() {
           </div>
           <div>
             <p className={styles.lede}>
-              No manual spreadsheet logging. Connect Gmail once, and Pause reads clothing, shoe, and
+              No manual spreadsheet logging. Connect Gmail once, and PAUSE reads clothing, shoe, and
               accessory order confirmations - read-only, nothing sent or deleted - to build your wardrobe
               automatically.
             </p>
@@ -299,7 +299,7 @@ export default function Home() {
             Begin your first <em>pause</em>
           </h2>
           <p className={styles.footerSub}>
-            No waitlist, no account to create - connect Gmail and Pause starts building your wardrobe
+            No waitlist, no account to create - connect Gmail and PAUSE starts building your wardrobe
             from your real order history.
           </p>
           <div style={{ paddingBottom: "1rem" }}>
@@ -315,7 +315,7 @@ export default function Home() {
             <a href="#archive">Archive</a>
           </div>
           <div className={styles.footerMeta}>
-            <span>&copy; 2026 Pause.</span>
+            <span>&copy; 2026 PAUSE.</span>
             <span>Built for one wardrobe at a time.</span>
           </div>
         </div>

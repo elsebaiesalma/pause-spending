@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
 
 // Self-hosted (not linked via <link> at runtime, per the design's own font
-// guidance) - scoped to the home page only via its own CSS variable, so
-// the rest of the app keeps the Cormorant Garamond / Jost pairing.
+// guidance) - Clash Display isn't on Google Fonts, so it's the one typeface
+// in the system pulled in as a local font file rather than next/font/google.
 export const clashDisplay = localFont({
   variable: "--font-clash",
   display: "swap",

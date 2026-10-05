@@ -1,25 +1,36 @@
 /*
-  Design system: "effortless editorial" - a cream/blush/burgundy palette,
-  a romantic serif for display type paired with a geometric sans for
-  everything functional. One theme, locked (no auto dark mode) so the
-  palette never gets overridden by a system preference mid-flow.
+  Design system: "Midnight Editorial" - grayscale, high-contrast, editorial-
+  brutalist bones (hairline borders, sticky module headers, small mono
+  tags) with a single rose accent. Two themes share one token set:
+
+  - .theme-dark (the landing page): near-black bg, white text, white-
+    opacity borders, pale rose for text/numbers.
+  - :root (everywhere else - auth, onboarding, dashboard, wardrobe,
+    budget, wishlist): white bg, near-black text, ink-opacity borders.
+    Pale rose is reserved for FILLS (tags, highlights, selected states)
+    only here - pale-on-white text fails contrast, so text accents and
+    links use a deep rose instead.
+
+  Every component below reads color through these variables so nothing
+  breaks when a subtree switches theme.
 */
 
 :root {
-  --color-cream: #f4ede3;
-  --color-cream-deep: #ece0d2;
-  --color-surface: #fffbf6;
-  --color-ink: #2b211c;
-  --color-ink-soft: #5c4c44;
-  --color-line: #ddccbc;
-  --color-line-soft: #e8dcc9;
-  --color-blush: #e6c6bd;
-  --color-rose: #c68f85;
-  --color-mauve: #9c747a;
-  --color-burgundy: #6d3138;
+  --color-bg: #ffffff;
+  --color-bg-alt: #f7f5f5;
+  --color-ink: #1f1a1a;
+  --color-ink-soft: #524344;
+  --color-ink-faint: rgba(31, 26, 26, 0.45);
+  --color-line: rgba(31, 26, 26, 0.08);
+  --color-line-strong: rgba(31, 26, 26, 0.15);
+  --color-fill: #fecdd3;
+  --color-fill-ink: #1f1a1a;
+  --color-accent: #874e54;
+  --color-accent-dim: #874e54;
 
-  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
-  --font-body: var(--font-jost), "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-clash), "Clash Display", sans-serif;
+  --font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-space-mono), "Courier New", monospace;
 
   --space-1: 0.5rem;
   --space-2: 0.75rem;
@@ -32,6 +43,22 @@
   --width-wide: 46rem;
 
   color-scheme: light;
+}
+
+.theme-dark {
+  --color-bg: #050505;
+  --color-bg-alt: #0a0a0a;
+  --color-ink: #ffffff;
+  --color-ink-soft: rgba(255, 255, 255, 0.6);
+  --color-ink-faint: rgba(255, 255, 255, 0.35);
+  --color-line: rgba(255, 255, 255, 0.05);
+  --color-line-strong: rgba(255, 255, 255, 0.15);
+  --color-fill: #fecdd3;
+  --color-fill-ink: #050505;
+  --color-accent: #fecdd3;
+  --color-accent-dim: #fdb3b9;
+
+  color-scheme: dark;
 }
 
 * {
@@ -53,14 +80,12 @@ body {
 body {
   min-height: 100%;
   color: var(--color-ink);
-  background: var(--color-cream);
+  background: var(--color-bg);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* A faint grain so the flat cream field doesn't read as sterile/digital. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
 }
 
 a {
@@ -72,9 +97,9 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 
 h1 {
@@ -94,9 +119,9 @@ p {
 /* ---------- Site chrome ---------- */
 
 /* Fixed + blended so the same header reads correctly whether the page
-   beneath it is the light cream app or the dark landing page: white
-   difference-blended against light cream resolves near-black, against
-   near-black resolves near-white. */
+   beneath it is the light app or the dark landing page: white
+   difference-blended against a white page resolves to black, against the
+   near-black landing page resolves to near-white. */
 .site-header {
   position: fixed;
   top: 0;
@@ -105,14 +130,54 @@ p {
   z-index: 50;
   padding: var(--space-3) var(--space-4);
   mix-blend-mode: difference;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .site-header__brand {
   font-family: var(--font-display);
   font-size: 1.35rem;
-  font-style: italic;
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: #fff;
+}
+
+/* The header's blend mode composites this whole block as one unit against
+   whatever page sits beneath it, so account-status text/controls need the
+   same plain white the brand link uses, not the ink-toned .btn colors
+   tuned for an opaque background, to read correctly either way. */
+.site-header__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.site-header__email {
+  color: #fff;
+  opacity: 0.8;
+}
+
+.site-header__account.btn-quiet,
+.site-header__account button {
+  color: #fff;
+  border-color: transparent;
+  background: transparent;
+  padding: 0;
+  text-decoration: underline;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+}
+.site-header__account.btn-quiet:hover,
+.site-header__account button:hover {
+  background: transparent;
+  color: #fff;
+  opacity: 0.7;
 }
 
 .site-main {
@@ -129,13 +194,32 @@ p {
   max-width: var(--width-wide);
 }
 
+/* Item-entry flow (desired-items/new): screenshot upload is the reliable
+   path for exactly the retailers search/direct-fetch handle worst (heavy
+   anti-bot blocking), so on mobile - where a screenshot is also just
+   easier to take - it's promoted ahead of URL paste instead of sitting
+   buried below it. Desktop keeps the original order (URL paste first). */
+.item-entry-flow {
+  display: flex;
+  flex-direction: column;
+}
+.item-entry-flow__search { order: 1; }
+.item-entry-flow__url { order: 2; }
+.item-entry-flow__screenshot { order: 3; }
+.item-entry-flow__text { order: 4; }
+
+@media (max-width: 640px) {
+  .item-entry-flow__screenshot { order: 2; }
+  .item-entry-flow__url { order: 3; }
+}
+
 .page__eyebrow {
   display: block;
-  font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--color-mauve);
+  color: var(--color-accent);
   margin-bottom: var(--space-1);
 }
 
@@ -165,7 +249,7 @@ p {
 
 .divider {
   border: none;
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid var(--color-line-strong);
   margin: var(--space-4) 0;
 }
 
@@ -186,7 +270,10 @@ form.row {
 }
 
 label {
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: var(--color-ink-soft);
 }
 
@@ -196,8 +283,8 @@ select {
   font-family: var(--font-body);
   font-size: 0.95rem;
   padding: 0.7rem 0.85rem;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg-alt);
   color: var(--color-ink);
   border-radius: 1px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -213,14 +300,49 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--color-burgundy);
-  box-shadow: 0 0 0 3px rgba(109, 49, 56, 0.12);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
 }
 
 input[type="file"] {
   border: none;
   padding: 0.3rem 0;
   background: none;
+}
+
+/* ---------- Google sign-in ---------- */
+/* Deliberately opts out of the app's own button system (mono/uppercase/
+   ink-bordered) - Google's identity-branding guidelines require this
+   button keep its own approved look (white surface, #747775 hairline,
+   Roboto-style label) verbatim, which matters for OAuth verification. */
+
+.google-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 40px;
+  padding: 0 12px;
+  font-family: "Roboto", var(--font-body), Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #1f1f1f;
+  background: #ffffff;
+  border: 1px solid #747775;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.google-signin-btn:hover {
+  background: #f7f8f8;
+  color: #1f1f1f;
+}
+
+.google-signin-btn:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
 /* ---------- Buttons ---------- */
@@ -231,8 +353,8 @@ button,
   align-items: center;
   justify-content: center;
   justify-self: start;
-  font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 0.75rem 1.5rem;
@@ -247,7 +369,7 @@ button,
 button:hover,
 .btn:hover {
   background: var(--color-ink);
-  color: var(--color-cream);
+  color: var(--color-bg);
 }
 
 button:active,
@@ -258,19 +380,20 @@ button:active,
 button:focus-visible,
 .btn:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--color-mauve);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  border-color: var(--color-burgundy);
-  background: var(--color-burgundy);
-  color: var(--color-surface);
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-bg);
 }
 
 .btn-primary:hover {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
 }
 
 .btn-quiet {
@@ -279,37 +402,38 @@ a:focus-visible {
   padding-right: 0;
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: var(--color-line);
+  text-decoration-color: var(--color-line-strong);
 }
 
 .btn-quiet:hover {
   background: transparent;
-  color: var(--color-burgundy);
-  text-decoration-color: var(--color-burgundy);
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
 }
 
 .btn-danger {
-  border-color: var(--color-burgundy);
-  color: var(--color-burgundy);
+  border-color: var(--color-line-strong);
+  color: var(--color-ink-soft);
 }
 
 .btn-danger:hover {
-  background: var(--color-burgundy);
-  color: var(--color-surface);
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
 }
 
 /* ---------- Links (inline, in prose) ---------- */
 
 .link {
-  color: var(--color-burgundy);
+  color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: var(--color-blush);
+  text-decoration-color: var(--color-fill);
   transition: text-decoration-color 0.2s ease;
 }
 
 .link:hover {
-  text-decoration-color: var(--color-burgundy);
+  text-decoration-color: var(--color-accent);
 }
 
 .nav-links {
@@ -326,7 +450,7 @@ a:focus-visible {
   gap: var(--space-2);
   align-items: center;
   padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--color-line-soft);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .item-row__thumb {
@@ -335,7 +459,7 @@ a:focus-visible {
   object-fit: cover;
   border-radius: 1px;
   flex-shrink: 0;
-  background: var(--color-cream-deep);
+  background: var(--color-bg-alt);
 }
 
 .item-row__body {
@@ -359,39 +483,91 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+/* Search box loading state - a plain pulse, no layout jump since it
+   reserves the same item-row height the real results will occupy. */
+.item-row--skeleton {
+  height: 72px;
+  background: var(--color-bg-alt);
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
 /* ---------- Tags / badges ---------- */
+/* The one place pale rose is used as a fill rather than text, per the
+   design's "pink = fills only" rule - dark ink/near-black text keeps it
+   readable regardless of which theme's --color-fill-ink resolves. */
 
 .tag {
-  display: inline-block;
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-burgundy);
+  color: var(--color-fill-ink);
+  background: var(--color-fill);
+  padding: 0.2rem 0.55rem;
+  border-radius: 1px;
 }
 
 .badge-review {
   display: inline-block;
-  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-mauve);
-  border: 1px solid var(--color-mauve);
-  padding: 0.15rem 0.5rem;
+  color: var(--color-fill-ink);
+  background: var(--color-fill);
+  padding: 0.2rem 0.55rem;
   border-radius: 1px;
+}
+
+/* ---------- Sync progress ---------- */
+/* A slow, steady fill rather than a spinner - it never claims a false
+   percentage (the pipeline has no step-by-step progress to report), just
+   a calm sense of motion while the phase copy above it changes. */
+
+.sync-progress-track {
+  height: 2px;
+  background: var(--color-line-strong);
+  overflow: hidden;
+}
+
+.sync-progress-fill {
+  height: 100%;
+  width: 40%;
+  background: var(--color-accent);
+  animation: sync-progress-slide 2.2s ease-in-out infinite;
+}
+
+@keyframes sync-progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sync-progress-fill {
+    animation: none;
+    width: 100%;
+  }
 }
 
 /* ---------- Callout / note block ---------- */
 
 .note {
-  border-left: 2px solid var(--color-blush);
+  border-left: 2px solid var(--color-fill);
   padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
+  background: var(--color-bg-alt);
   color: var(--color-ink-soft);
   font-size: 0.92rem;
 }
 
 .note--quiet {
-  border-left-color: var(--color-line);
+  border-left-color: var(--color-line-strong);
   background: transparent;
   padding-left: var(--space-2);
 }

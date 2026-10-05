@@ -1,0 +1,150 @@
+/* Midnight Editorial — Rose Accent Edition
+   Dark design system, extracted from the corrected Superdesign draft
+   (project a034d257-1b99-42bd-834f-63c311963312, draft ccf538d0 "Conscious Consumption").
+   Scoped to mockups/midnight/*.html only — do not mix with System A (globals.css) or
+   System B (page.module.css / mockups/design-system.css). See .superdesign/init/theme.md. */
+
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Clash Display";
+  src: url("../fonts/ClashDisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --black: #050505;
+  --footer-black: #0a0a0a;
+  --white: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-soft: rgba(255, 255, 255, 0.05);
+  --muted: rgba(255, 255, 255, 0.4);
+  --muted-soft: rgba(255, 255, 255, 0.6);
+  --rose: #fecdd3;
+  --rose-dim: #fdb3b9;
+  --rose-glow: rgba(254, 205, 211, 0.12);
+
+  --clash: "Clash Display", sans-serif;
+  --inter: "Inter", sans-serif;
+
+  --width: 72rem;
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1.25rem;
+  --space-4: 2rem;
+  --space-5: 3rem;
+  --space-6: 5rem;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--inter);
+  line-height: 1.5;
+}
+
+.font-display { font-family: var(--clash); }
+
+.container { max-width: var(--width); margin: 0 auto; padding: 0 var(--space-4); }
+
+/* Nav — mix-blend-mode trick lets one header sit over any section */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  height: 88px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 var(--space-4); mix-blend-mode: difference; color: #fff;
+}
+.nav__brand { font-family: var(--clash); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.03em; color: #fff; text-decoration: none; }
+.nav__links { display: flex; align-items: center; gap: var(--space-4); }
+.nav__link { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: #fff; text-decoration: none; opacity: 0.7; }
+.nav__link:hover { opacity: 1; }
+
+/* Light-leak decoration */
+.glow {
+  position: absolute; pointer-events: none; border-radius: 9999px;
+  background: var(--rose); filter: blur(120px); opacity: 0.1;
+  width: 40vw; height: 40vw;
+}
+
+.page { padding: 140px var(--space-4) var(--space-6); max-width: var(--width); margin: 0 auto; position: relative; }
+.eyebrow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--rose); }
+h1.display { font-family: var(--clash); font-weight: 700; letter-spacing: -0.03em; font-size: clamp(2rem, 5vw, 3.5rem); margin: var(--space-2) 0 0; }
+h2.section-title { font-family: var(--clash); font-weight: 600; letter-spacing: -0.02em; font-size: 1.5rem; margin: 0 0 var(--space-3); }
+p.lede { color: var(--muted-soft); max-width: 40rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 0.9rem 1.75rem; border-radius: 2px; border: 1px solid var(--border);
+  background: transparent; color: #fff; text-decoration: none; cursor: pointer;
+}
+.btn:hover { border-color: var(--rose); color: var(--rose); }
+.btn-primary { background: var(--rose); border-color: var(--rose); color: #050505; font-weight: 600; }
+.btn-primary:hover { background: var(--rose-dim); border-color: var(--rose-dim); color: #050505; }
+.btn-ghost { border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
+.row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.stack { display: flex; flex-direction: column; gap: var(--space-3); }
+
+/* Cards / surfaces */
+.card {
+  border: 1px solid var(--border); border-radius: 2px; background: rgba(255,255,255,0.02);
+  padding: var(--space-4);
+}
+.divider { border: none; border-top: 1px solid var(--border-soft); margin: var(--space-5) 0; }
+
+/* Note / pull-quote — the emotional centerpiece of the pause screen */
+.note {
+  border-left: 2px solid var(--rose); padding: var(--space-3) var(--space-4);
+  background: var(--rose-glow); color: var(--white);
+}
+.note--quote {
+  font-family: var(--clash); font-style: italic; font-weight: 500;
+  font-size: 1.35rem; line-height: 1.5;
+}
+.note--disclaimer { font-style: italic; color: var(--muted-soft); font-size: 0.85rem; }
+
+/* Stat grid */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--space-4); }
+.stat__label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); display: block; margin-bottom: var(--space-1); }
+.stat__value { font-family: var(--clash); font-size: 1.5rem; font-weight: 600; }
+
+/* Item rows (wardrobe / purchase / wishlist / alternatives — same primitive everywhere) */
+.item-row { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-soft); }
+.item-row__thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+.item-row__title { font-weight: 500; }
+.item-row__meta { font-size: 0.85rem; color: var(--muted-soft); }
+.item-row__price { font-family: var(--clash); font-size: 1.1rem; margin-left: auto; padding-left: var(--space-3); white-space: nowrap; }
+
+.badge { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--rose); border: 1px solid var(--rose); border-radius: 2px; padding: 0.2rem 0.5rem; }
+
+/* Forms */
+label { display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: var(--space-1); }
+input, select, textarea {
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 2px; padding: 0.85rem 1rem; color: #fff; font-family: var(--inter); font-size: 0.95rem;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--rose); }
+.field { margin-bottom: var(--space-3); }
+.input-group { display: flex; gap: var(--space-2); align-items: flex-end; }
+.input-group .field { flex: 1; margin-bottom: 0; }
+
+.empty-state { color: var(--muted); font-style: italic; padding: var(--space-3) 0; }
+
+/* Footer watermark */
+.ghost-mark { font-family: var(--clash); font-weight: 700; font-size: 14vw; line-height: 0.8; opacity: 0.03; letter-spacing: -0.03em; pointer-events: none; text-align: center; }

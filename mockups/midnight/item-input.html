@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item Input — Midnight Editorial [Placeholder]</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="design-system.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="dashboard.html" class="nav__brand">Pause.</a>
+    <div class="nav__links">
+      <a href="dashboard.html" class="nav__link">Dashboard</a>
+      <a href="item-input.html" class="nav__link">Add Item</a>
+      <a href="pause-decision.html" class="nav__link">Pause Screen</a>
+      <a href="still-want-it.html" class="nav__link">Still Want It</a>
+    </div>
+  </nav>
+
+  <div class="glow" style="top:20vh; left:-15vw; opacity:0.08;"></div>
+
+  <main class="page" style="max-width: 40rem;">
+    <span class="eyebrow">[Placeholder] Step 1 of 3</span>
+    <h1 class="display">I want to buy this</h1>
+    <p class="lede">Tell us about it however is easiest — a link, a screenshot, or just describe it.</p>
+
+    <hr class="divider">
+
+    <h2 class="section-title">Paste a product URL</h2>
+    <form class="input-group" style="margin-bottom: 2.5rem;">
+      <div class="field">
+        <label for="url">Product link</label>
+        <input type="url" id="url" placeholder="https://[Placeholder-store].com/product/...">
+      </div>
+      <button type="submit" class="btn btn-primary">Look it up</button>
+    </form>
+
+    <h2 class="section-title">Upload a screenshot</h2>
+    <form class="input-group" style="margin-bottom: 2.5rem;">
+      <div class="field">
+        <label for="shot">Screenshot</label>
+        <input type="file" id="shot">
+      </div>
+      <button type="submit" class="btn btn-primary">Identify item</button>
+    </form>
+
+    <h2 class="section-title">Or just type it</h2>
+    <form class="input-group">
+      <div class="field">
+        <label for="text">Description</label>
+        <input type="text" id="text" placeholder="[Placeholder] e.g. black leather ankle boots, $180">
+      </div>
+      <button type="submit" class="btn btn-primary">Continue</button>
+    </form>
+  </main>
+
+  <div class="ghost-mark" style="margin-top: -4rem;">PAUSE</div>
+</body>
+</html>
