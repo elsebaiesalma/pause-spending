@@ -7,7 +7,7 @@ async function main() {
     return;
   }
 
-  const user = await prisma.user.create({ data: {} });
+  const user = await prisma.user.create({ data: { email: "seed-user@pause-spending.test" } });
   console.log("Seeded user:", user.id);
 }
 
