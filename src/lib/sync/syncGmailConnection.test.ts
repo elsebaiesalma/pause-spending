@@ -40,7 +40,7 @@ import { classifyEmail } from "@/lib/emailClassification/classifyEmail";
 import { extractAndPersistPurchase } from "@/lib/emailExtraction/extractReceipt";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
-import { syncGmailConnection } from "./syncGmailConnection";
+import { syncGmailConnection, GmailSyncPausedError } from "./syncGmailConnection";
 
 const FIXTURE_MESSAGE = {
   id: "msg-1",
@@ -76,6 +76,16 @@ describe("syncGmailConnection", () => {
     vi.mocked(classifyEmail).mockReset();
     vi.mocked(extractAndPersistPurchase).mockReset();
     await prisma.emailConnection.deleteMany({ where: { id: connectionId } });
+  });
+
+  it("refuses to run, without touching the connection or fetching anything, when GMAIL_SYNC_PAUSED is set", async () => {
+    process.env.GMAIL_SYNC_PAUSED = "true";
+    try {
+      await expect(syncGmailConnection(connectionId)).rejects.toThrow(GmailSyncPausedError);
+      expect(getValidGmailAccessToken).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.GMAIL_SYNC_PAUSED;
+    }
   });
 
   it("runs a backfill (date-based fetch) when there is no stored cursor, and stores the new cursor", async () => {
@@ -157,8 +167,9 @@ describe("syncGmailConnection", () => {
     vi.mocked(getValidGmailAccessToken).mockResolvedValue("fake-token");
     vi.mocked(fetchRecentMessages).mockResolvedValueOnce(messages);
     vi.mocked(classifyEmail).mockImplementation(async (m) => {
-      if (m.id === "a") return "in_scope";
-      if (m.id === "b") return "out_of_scope";
+      const id = (m as { id?: string }).id;
+      if (id === "a") return "in_scope";
+      if (id === "b") return "out_of_scope";
       return "needs_review";
     });
     vi.mocked(extractAndPersistPurchase).mockResolvedValue(undefined);

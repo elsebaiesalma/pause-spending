@@ -7,9 +7,11 @@ import type { DesiredItem } from "@prisma/client";
 // match against. `desired_items` has no dedicated "tagged" flag - a
 // non-null category is the signal that extraction already ran, mirroring
 // how `wardrobe_items.tagsExtractedAt` is used, so a call against an
-// already-tagged item is a no-op rather than a re-computation.
+// already-tagged item is a no-op rather than a re-computation. Also skips
+// entirely once the user has confirmed the item - even an intentionally
+// blank category is a human choice the auto-tagger must never overwrite.
 export async function ensureDesiredItemTagged(item: DesiredItem): Promise<DesiredItem> {
-  if (item.category) {
+  if (item.category || item.userEdited) {
     return item;
   }
 
@@ -20,10 +22,11 @@ export async function ensureDesiredItemTagged(item: DesiredItem): Promise<Desire
   });
 
   return prisma.desiredItem.update({
-    where: { id: item.id },
+    where: { id: item.id, userId: item.userId },
     data: {
       category: tags.category,
-      primaryColor: tags.primaryColor,
+      colorName: tags.colorName,
+      colorFamily: tags.colorFamily,
       styleTags: tags.styleTags,
     },
   });

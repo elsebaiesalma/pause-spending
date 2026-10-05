@@ -47,6 +47,7 @@ describe("confirmReviewPurchase", () => {
     expect(confirmed.status).toBe("active");
     expect(confirmed.itemName).toBe("Navy Wool Coat");
     expect(Number(confirmed.price)).toBeCloseTo(189.99);
+    expect(confirmed.userEdited).toBe(true);
 
     const wardrobeItem = await prisma.wardrobeItem.findFirst({
       where: { sourcePurchaseId: purchase.id },

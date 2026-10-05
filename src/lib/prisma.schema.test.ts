@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { afterAll, describe, expect, it } from "vitest";
 import { prisma } from "./prisma";
 
@@ -12,7 +13,7 @@ describe("data schema (integration, real database)", () => {
   });
 
   it("creates and reads a linked row in every table for a single user", async () => {
-    const user = await prisma.user.create({ data: {} });
+    const user = await prisma.user.create({ data: { email: `test-${crypto.randomUUID()}@pause-spending.test` } });
     testUserIds.push(user.id);
 
     const emailConnection = await prisma.emailConnection.create({
@@ -43,7 +44,8 @@ describe("data schema (integration, real database)", () => {
         sourcePurchaseId: purchase.id,
         itemName: "Navy Blazer",
         category: "clothing",
-        primaryColor: "navy",
+        colorName: "navy",
+        colorFamily: "navy",
         styleTags: ["business-casual"],
         useCaseTags: ["work"],
         status: "active",
@@ -97,7 +99,7 @@ describe("data schema (integration, real database)", () => {
   });
 
   it("cascade-deletes a user's rows when the user is deleted", async () => {
-    const user = await prisma.user.create({ data: {} });
+    const user = await prisma.user.create({ data: { email: `test-${crypto.randomUUID()}@pause-spending.test` } });
 
     const wardrobeItem = await prisma.wardrobeItem.create({
       data: { userId: user.id, itemName: "Test Item", status: "active" },

@@ -14,7 +14,7 @@ describe("findSimilarWardrobeItems", () => {
   async function makeItem(overrides: {
     itemName: string;
     category: string | null;
-    primaryColor?: string | null;
+    colorFamily?: string | null;
     styleTags?: string[];
     useCaseTags?: string[];
     status?: string;
@@ -24,7 +24,7 @@ describe("findSimilarWardrobeItems", () => {
         userId,
         itemName: overrides.itemName,
         category: overrides.category,
-        primaryColor: overrides.primaryColor ?? null,
+        colorFamily: overrides.colorFamily ?? null,
         styleTags: overrides.styleTags ?? [],
         useCaseTags: overrides.useCaseTags ?? [],
         status: overrides.status ?? "active",
@@ -52,14 +52,14 @@ describe("findSimilarWardrobeItems", () => {
     expect(results.map((r) => r.id)).toEqual([match.id]);
   });
 
-  it("returns items in the same category with a matching primary color", async () => {
+  it("returns items in the same category with a matching color family", async () => {
     userId = (await prisma.user.findFirstOrThrow()).id;
-    const match = await makeItem({ itemName: "Navy Sweater", category: "tops", primaryColor: "navy" });
-    await makeItem({ itemName: "Red Sweater", category: "tops", primaryColor: "red" });
+    const match = await makeItem({ itemName: "Navy Sweater", category: "tops", colorFamily: "navy" });
+    await makeItem({ itemName: "Red Sweater", category: "tops", colorFamily: "red" });
 
     const results = await findSimilarWardrobeItems(userId, {
       category: "tops",
-      primaryColor: "navy",
+      colorFamily: "navy",
     });
 
     expect(results.map((r) => r.id)).toEqual([match.id]);
@@ -82,14 +82,14 @@ describe("findSimilarWardrobeItems", () => {
     await makeItem({
       itemName: "Formal Silk Blouse",
       category: "tops",
-      primaryColor: "cream",
+      colorFamily: "cream",
       styleTags: ["formal"],
       useCaseTags: ["formal-event"],
     });
 
     const results = await findSimilarWardrobeItems(userId, {
       category: "tops",
-      primaryColor: "black",
+      colorFamily: "black",
       styleTags: ["athletic"],
       useCaseTags: ["gym"],
     });
@@ -120,5 +120,85 @@ describe("findSimilarWardrobeItems", () => {
     const results = await findSimilarWardrobeItems(userId, { category: null });
 
     expect(results).toEqual([]);
+  });
+
+  describe("null colorFamily - unknown, skip this dimension, never a match, never a non-match", () => {
+    // Every un-backfilled historical row takes this path: colorFamily is
+    // null until the backfill script (or an old auto-tag) resolves it.
+
+    it("both sides null: a null probe and a null candidate still match through another overlapping dimension", async () => {
+      userId = (await prisma.user.findFirstOrThrow()).id;
+      const match = await makeItem({
+        itemName: "Untagged Blazer",
+        category: "outerwear",
+        colorFamily: null,
+        styleTags: ["business-casual"],
+      });
+
+      const results = await findSimilarWardrobeItems(userId, {
+        category: "outerwear",
+        colorFamily: null,
+        styleTags: ["business-casual"],
+      });
+
+      expect(results.map((r) => r.id)).toEqual([match.id]);
+    });
+
+    it("both sides null and no other overlap: excluded, not included - null is never itself a match", async () => {
+      userId = (await prisma.user.findFirstOrThrow()).id;
+      await makeItem({ itemName: "Untagged Sweater", category: "tops", colorFamily: null, styleTags: [] });
+
+      const results = await findSimilarWardrobeItems(userId, {
+        category: "tops",
+        colorFamily: null,
+        styleTags: ["business-casual"],
+      });
+
+      expect(results).toHaveLength(0);
+    });
+
+    it("candidate side null: a probe with a real colorFamily still matches a null-colorFamily candidate through style overlap", async () => {
+      userId = (await prisma.user.findFirstOrThrow()).id;
+      const match = await makeItem({
+        itemName: "Untagged Blazer",
+        category: "outerwear",
+        colorFamily: null,
+        styleTags: ["business-casual"],
+      });
+
+      const results = await findSimilarWardrobeItems(userId, {
+        category: "outerwear",
+        colorFamily: "navy",
+        styleTags: ["business-casual"],
+      });
+
+      expect(results.map((r) => r.id)).toEqual([match.id]);
+    });
+
+    it("candidate side null with no other overlap: excluded - a null candidate colorFamily never satisfies a non-null probe", async () => {
+      userId = (await prisma.user.findFirstOrThrow()).id;
+      await makeItem({ itemName: "Untagged Sweater", category: "tops", colorFamily: null, styleTags: [] });
+
+      const results = await findSimilarWardrobeItems(userId, {
+        category: "tops",
+        colorFamily: "navy",
+        styleTags: ["athletic"],
+      });
+
+      expect(results).toHaveLength(0);
+    });
+
+    it("probe side null: a null probe colorFamily never bridges a match on a candidate's own colorFamily value", async () => {
+      userId = (await prisma.user.findFirstOrThrow()).id;
+      await makeItem({ itemName: "Navy Sweater", category: "tops", colorFamily: "navy", styleTags: [] });
+
+      const results = await findSimilarWardrobeItems(userId, {
+        category: "tops",
+        colorFamily: null,
+        styleTags: ["athletic"],
+      });
+
+      expect(results).toHaveLength(0);
+    });
   });
 });

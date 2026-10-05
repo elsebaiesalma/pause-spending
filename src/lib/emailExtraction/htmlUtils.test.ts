@@ -19,8 +19,30 @@ describe("cleanHtmlForExtraction", () => {
   });
 
   it("truncates very long input", () => {
-    const html = "a".repeat(20000);
-    expect(cleanHtmlForExtraction(html).length).toBeLessThanOrEqual(15000);
+    const html = "a".repeat(50000);
+    expect(cleanHtmlForExtraction(html).length).toBeLessThanOrEqual(40000);
+  });
+
+  it("keeps a table row's item, qty, and price on lines close together instead of one flattened line", () => {
+    const html = `
+      <table><tr><td>Wool Coat</td><td>Qty: 1</td><td>$199.00</td></tr>
+      <tr><td>Silk Scarf</td><td>Qty: 2</td><td>$39.00</td></tr></table>
+    `;
+
+    const cleaned = cleanHtmlForExtraction(html);
+    const lines = cleaned.split("\n").map((l) => l.trim());
+
+    // Each cell lands on its own line, so "Wool Coat" and its own price
+    // are never on the same flattened line as "Silk Scarf" and its price.
+    const coatLineIndex = lines.findIndex((l) => l.includes("Wool Coat"));
+    const scarfLineIndex = lines.findIndex((l) => l.includes("Silk Scarf"));
+    expect(lines[coatLineIndex]).not.toContain("$39.00");
+    expect(lines[scarfLineIndex]).not.toContain("$199.00");
+    // The coat's own price line falls between the coat's row and the
+    // scarf's row starting - never after the scarf's row has begun.
+    const coatPriceLineIndex = lines.findIndex((l) => l.includes("$199.00"));
+    expect(coatPriceLineIndex).toBeGreaterThan(coatLineIndex);
+    expect(coatPriceLineIndex).toBeLessThan(scarfLineIndex);
   });
 });
 
@@ -85,5 +107,48 @@ describe("extractImageCandidates", () => {
       <img src="https://cdn.retailer.com/products/blazer.jpg">
     `;
     expect(extractImageCandidates(html)).toHaveLength(1);
+  });
+
+  // Real gaps found diagnosing an actual synced mailbox: none of these had
+  // a telling filename, so the old filename-only filter let them through.
+
+  it("skips a spacer/divider gif by its dimensions even when its filename gives no hint (real example: 'trans.gif')", () => {
+    const html = `
+      <img src="https://parcel-cdn.delivery.hm.com/img/mail/hm/trans.gif" width="1" height="100%">
+      <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
+    `;
+    expect(extractImageCandidates(html).map((c) => c.imageUrl)).toEqual([
+      "https://cdn.retailer.com/products/navy-blazer.jpg",
+    ]);
+  });
+
+  it("skips a social-platform icon by its alt text even when its filename doesn't say 'social' or 'icon'", () => {
+    const html = `
+      <img src="https://cdn.retailer.com/vce/Instagram_dmo.png" alt="Instagram" width="24">
+      <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
+    `;
+    expect(extractImageCandidates(html).map((c) => c.imageUrl)).toEqual([
+      "https://cdn.retailer.com/products/navy-blazer.jpg",
+    ]);
+  });
+
+  it("skips a bare department-nav banner by its alt text (real example: H&M's 'Women'/'Men'/'Kids' footer banners)", () => {
+    const html = `
+      <img src="https://cdn.retailer.com/img/mail/hm/WOMEN_AW25_400x400px.jpg" alt="Women">
+      <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
+    `;
+    expect(extractImageCandidates(html).map((c) => c.imageUrl)).toEqual([
+      "https://cdn.retailer.com/products/navy-blazer.jpg",
+    ]);
+  });
+
+  it("skips an image whose alt text says 'logo' even when the filename doesn't", () => {
+    const html = `
+      <img src="https://cdn.retailer.com/assets/wordmark.png" alt="Retailer logo">
+      <img src="https://cdn.retailer.com/products/navy-blazer.jpg">
+    `;
+    expect(extractImageCandidates(html).map((c) => c.imageUrl)).toEqual([
+      "https://cdn.retailer.com/products/navy-blazer.jpg",
+    ]);
   });
 });

@@ -27,6 +27,7 @@ export async function confirmReviewPurchase(
       price: input.price.toString(),
       category: input.category,
       status: "active",
+      userEdited: true,
     },
   });
 

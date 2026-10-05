@@ -17,13 +17,14 @@ function makeWardrobeItem(overrides: Partial<WardrobeItem>): WardrobeItem {
     itemName: "Navy Blazer",
     imageUrl: null,
     category: "outerwear",
-    primaryColor: "navy",
-    secondaryColor: null,
+    colorName: "navy",
+    colorFamily: "navy",
     styleTags: ["business-casual"],
     useCaseTags: ["work"],
     ownedSince: new Date("2026-01-15"),
     status: "active",
     tagsExtractedAt: new Date("2026-01-15"),
+    source: null,
     ...overrides,
   };
 }
@@ -35,7 +36,7 @@ describe("generateRedundancyExplanation", () => {
 
   it("returns null without calling the LLM when the shortlist is empty", async () => {
     const result = await generateRedundancyExplanation(
-      { itemName: "Navy Sweater", category: "tops", primaryColor: "navy", styleTags: [] },
+      { itemName: "Navy Sweater", category: "tops", colorName: "navy", colorFamily: "navy", styleTags: [] },
       []
     );
 
@@ -49,7 +50,13 @@ describe("generateRedundancyExplanation", () => {
     });
 
     const result = await generateRedundancyExplanation(
-      { itemName: "Navy Wool Coat", category: "outerwear", primaryColor: "navy", styleTags: ["business-casual"] },
+      {
+        itemName: "Navy Wool Coat",
+        category: "outerwear",
+        colorName: "navy",
+        colorFamily: "navy",
+        styleTags: ["business-casual"],
+      },
       [makeWardrobeItem({})]
     );
 
@@ -64,10 +71,24 @@ describe("generateRedundancyExplanation", () => {
     });
 
     const result = await generateRedundancyExplanation(
-      { itemName: "Navy Wool Coat", category: "outerwear", primaryColor: "navy", styleTags: [] },
+      { itemName: "Navy Wool Coat", category: "outerwear", colorName: "navy", colorFamily: "navy", styleTags: [] },
       [makeWardrobeItem({})]
     );
 
     expect(result).toBe("You already own something similar — a navy blazer.");
+  });
+
+  it("prefers colorName over colorFamily in the prompt, falling back to colorFamily when colorName is unset", async () => {
+    parseMock.mockResolvedValueOnce({ parsed_output: { explanation: "ok" } });
+
+    await generateRedundancyExplanation(
+      { itemName: "Wool Coat", category: "outerwear", colorName: "Espresso", colorFamily: "brown", styleTags: [] },
+      [makeWardrobeItem({ colorName: null, colorFamily: "black" })]
+    );
+
+    const content = parseMock.mock.calls[0][0].messages[0].content as string;
+    expect(content).toContain("Espresso");
+    expect(content).not.toContain("Color: brown");
+    expect(content).toContain("color: black");
   });
 });

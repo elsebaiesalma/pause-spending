@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("./syncGmailConnection", () => ({
@@ -41,7 +42,7 @@ describe("runScheduledSyncForAllConnections", () => {
     // which the schema's multi-tenant-ready design supports even though
     // this app only has one real user today.
     const user = await prisma.user.findFirstOrThrow();
-    const otherUser = await prisma.user.create({ data: {} });
+    const otherUser = await prisma.user.create({ data: { email: `test-${crypto.randomUUID()}@pause-spending.test` } });
     createdUserIds.push(otherUser.id);
 
     const connected = await prisma.emailConnection.create({
@@ -96,9 +97,9 @@ describe("runScheduledSyncForAllConnections", () => {
     expect(syncGmailConnection).toHaveBeenCalledTimes(1);
   });
 
-  it("skips a connection whose token expired without aborting the batch for the rest", async () => {
+  it("records a degraded result for a connection whose token expired, without aborting the batch for the rest", async () => {
     const user = await prisma.user.findFirstOrThrow();
-    const otherUser = await prisma.user.create({ data: {} });
+    const otherUser = await prisma.user.create({ data: { email: `test-${crypto.randomUUID()}@pause-spending.test` } });
     createdUserIds.push(otherUser.id);
 
     const expiring = await prisma.emailConnection.create({
@@ -118,6 +119,37 @@ describe("runScheduledSyncForAllConnections", () => {
 
     const results = await runScheduledSyncForAllConnections();
 
-    expect(results.map((r) => r.connectionId)).toEqual([healthy.id]);
+    expect(results).toContainEqual({ connectionId: expiring.id, report: null, error: "token_expired" });
+    expect(results).toContainEqual({ connectionId: healthy.id, report: FAKE_REPORT });
+  });
+
+  it("records a degraded result for any other error surviving retries, without aborting the batch for the rest", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const otherUser = await prisma.user.create({ data: { email: `test-${crypto.randomUUID()}@pause-spending.test` } });
+    createdUserIds.push(otherUser.id);
+
+    const failing = await prisma.emailConnection.create({
+      data: { userId: user.id, provider: "gmail", encryptedToken: encrypt("{}"), status: "connected" },
+    });
+    const healthy = await prisma.emailConnection.create({
+      data: { userId: otherUser.id, provider: "gmail", encryptedToken: encrypt("{}"), status: "connected" },
+    });
+    createdConnectionIds.push(failing.id, healthy.id);
+
+    vi.mocked(syncGmailConnection).mockImplementation(async (connectionId: string) => {
+      if (connectionId === failing.id) {
+        throw new Error("Gmail API request failed (503): backend unavailable");
+      }
+      return FAKE_REPORT;
+    });
+
+    const results = await runScheduledSyncForAllConnections();
+
+    expect(results).toContainEqual({
+      connectionId: failing.id,
+      report: null,
+      error: "Gmail API request failed (503): backend unavailable",
+    });
+    expect(results).toContainEqual({ connectionId: healthy.id, report: FAKE_REPORT });
   });
 });

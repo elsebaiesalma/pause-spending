@@ -26,8 +26,8 @@ describe("ensureDesiredItemTagged", () => {
 
     vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce({
       category: "outerwear",
-      primaryColor: "navy",
-      secondaryColor: null,
+      colorName: "navy",
+      colorFamily: "navy",
       styleTags: ["business-casual"],
       useCaseTags: ["work"],
     });
@@ -35,7 +35,8 @@ describe("ensureDesiredItemTagged", () => {
     const tagged = await ensureDesiredItemTagged(item);
 
     expect(tagged.category).toBe("outerwear");
-    expect(tagged.primaryColor).toBe("navy");
+    expect(tagged.colorName).toBe("navy");
+    expect(tagged.colorFamily).toBe("navy");
     expect(tagged.styleTags).toEqual(["business-casual"]);
   });
 
@@ -47,7 +48,7 @@ describe("ensureDesiredItemTagged", () => {
         sourceType: "typed",
         itemName: "Navy Blazer",
         category: "outerwear",
-        primaryColor: "navy",
+        colorFamily: "navy",
       },
     });
     createdItemIds.push(item.id);
@@ -55,6 +56,25 @@ describe("ensureDesiredItemTagged", () => {
     const result = await ensureDesiredItemTagged(item);
 
     expect(extractWardrobeItemTags).not.toHaveBeenCalled();
-    expect(result.primaryColor).toBe("navy");
+    expect(result.colorFamily).toBe("navy");
+  });
+
+  it("never overwrites a user-confirmed item's blank category, even though category looks untagged", async () => {
+    const userId = (await prisma.user.findFirstOrThrow()).id;
+    const item = await prisma.desiredItem.create({
+      data: {
+        userId,
+        sourceType: "typed",
+        itemName: "Navy Blazer",
+        category: null,
+        userEdited: true,
+      },
+    });
+    createdItemIds.push(item.id);
+
+    const result = await ensureDesiredItemTagged(item);
+
+    expect(extractWardrobeItemTags).not.toHaveBeenCalled();
+    expect(result.category).toBeNull();
   });
 });

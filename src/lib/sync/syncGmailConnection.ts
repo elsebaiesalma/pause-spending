@@ -16,6 +16,16 @@ const BACKFILL_WINDOW_MONTHS = 6;
 const CLASSIFICATION_CONCURRENCY = 5;
 const EXTRACTION_CONCURRENCY = 5;
 
+// Thrown when GMAIL_SYNC_PAUSED=true - a deliberate, manually-set operator
+// pause (e.g. while mock/seed data is loaded for UI work and new real
+// emails must not mix in), distinct from a token/connection failure.
+export class GmailSyncPausedError extends Error {
+  constructor() {
+    super("Gmail sync is paused (GMAIL_SYNC_PAUSED=true)");
+    this.name = "GmailSyncPausedError";
+  }
+}
+
 export type SyncMode = "backfill" | "incremental";
 
 export type SyncReport = {
@@ -66,6 +76,10 @@ async function fetchMessagesForSync(
 // fetch when one exists; otherwise runs the initial 6-month backfill. The
 // cursor is always refreshed at the end, whichever path ran.
 export async function syncGmailConnection(connectionId: string): Promise<SyncReport> {
+  if (process.env.GMAIL_SYNC_PAUSED === "true") {
+    throw new GmailSyncPausedError();
+  }
+
   const connection = await prisma.emailConnection.findUniqueOrThrow({
     where: { id: connectionId },
   });

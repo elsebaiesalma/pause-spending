@@ -11,7 +11,7 @@ export function currentMonthKey(): string {
   return monthKeyForDate(new Date());
 }
 
-function monthKeyToRange(monthKey: string): { start: Date; end: Date } {
+export function monthKeyToRange(monthKey: string): { start: Date; end: Date } {
   const [year, month] = monthKey.split("-").map(Number);
   return {
     start: new Date(Date.UTC(year, month - 1, 1)),

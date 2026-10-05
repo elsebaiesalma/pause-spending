@@ -10,8 +10,8 @@ import { extractWardrobeItemTags } from "./llmTagger";
 
 const FAKE_TAGS = {
   category: "outerwear",
-  primaryColor: "navy",
-  secondaryColor: null,
+  colorName: "navy",
+  colorFamily: "navy",
   styleTags: ["business-casual"],
   useCaseTags: ["work"],
 };

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { getAnthropicClient } from "@/lib/anthropicClient";
+import { COLOR_FAMILIES } from "@/lib/colorFamily";
 import type Anthropic from "@anthropic-ai/sdk";
 
 const TagSchema = z.object({
@@ -8,11 +9,15 @@ const TagSchema = z.object({
     .string()
     .min(1)
     .describe("A short category label, e.g. 'tops', 'shoes', 'bags', 'outerwear', 'dresses'."),
-  primaryColor: z.string().nullable().describe("The item's dominant color, or null if unclear."),
-  secondaryColor: z
-    .string()
+  // Free text for display only (e.g. "Espresso") - never used in redundancy
+  // matching. See colorFamily.
+  colorName: z.string().nullable().describe("The item's dominant color as a natural, specific name, or null if unclear."),
+  // Redundancy matching (similarity.ts) uses only this field, never
+  // colorName. A two-tone/patterned item is "multi", not two separate colors.
+  colorFamily: z
+    .enum(COLOR_FAMILIES)
     .nullable()
-    .describe("A secondary color if the item clearly has one, else null."),
+    .describe("The item's color family - the single closest match, or 'multi' for two-tone/patterned, or null if unclear."),
   styleTags: z
     .array(z.string())
     .describe("1-4 short style descriptors, e.g. 'business-casual', 'athletic', 'vintage'."),
@@ -23,7 +28,7 @@ const TagSchema = z.object({
 
 export type WardrobeItemTags = z.infer<typeof TagSchema>;
 
-const SYSTEM_PROMPT = `You tag clothing, shoe, and accessory items for a personal wardrobe app. Given an item's name and category (and a photo, if provided), determine its category, primary/secondary color, and short style and use-case tags. Base color on the photo when one is provided; otherwise make your best inference from the name.`;
+const SYSTEM_PROMPT = `You tag clothing, shoe, and accessory items for a personal wardrobe app. Given an item's name and category (and a photo, if provided), determine its category, a natural display color name, which fixed color family that name belongs to (${COLOR_FAMILIES.join(", ")} - use "multi" for two-tone/patterned items), and short style and use-case tags. Base color on the photo when one is provided; otherwise make your best inference from the name.`;
 
 async function requestTags(
   textContent: string,

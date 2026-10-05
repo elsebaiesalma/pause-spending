@@ -26,15 +26,16 @@ describe("ensureWardrobeItemTagged", () => {
 
     vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce({
       category: "outerwear",
-      primaryColor: "navy",
-      secondaryColor: null,
+      colorName: "navy",
+      colorFamily: "navy",
       styleTags: ["business-casual"],
       useCaseTags: ["work"],
     });
 
     const tagged = await ensureWardrobeItemTagged(item);
 
-    expect(tagged.primaryColor).toBe("navy");
+    expect(tagged.colorName).toBe("navy");
+    expect(tagged.colorFamily).toBe("navy");
     expect(tagged.styleTags).toEqual(["business-casual"]);
     expect(tagged.useCaseTags).toEqual(["work"]);
     expect(tagged.tagsExtractedAt).not.toBeNull();
@@ -47,7 +48,7 @@ describe("ensureWardrobeItemTagged", () => {
         userId,
         itemName: "Navy Blazer",
         category: "outerwear",
-        primaryColor: "navy",
+        colorFamily: "navy",
         tagsExtractedAt: new Date("2026-01-01"),
       },
     });
@@ -56,7 +57,7 @@ describe("ensureWardrobeItemTagged", () => {
     const result = await ensureWardrobeItemTagged(item);
 
     expect(extractWardrobeItemTags).not.toHaveBeenCalled();
-    expect(result.primaryColor).toBe("navy");
+    expect(result.colorFamily).toBe("navy");
   });
 
   it("calling it twice for the same newly-tagged item only extracts once", async () => {
@@ -68,8 +69,8 @@ describe("ensureWardrobeItemTagged", () => {
 
     vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce({
       category: "accessories",
-      primaryColor: "burgundy",
-      secondaryColor: null,
+      colorName: "burgundy",
+      colorFamily: "red",
       styleTags: ["winter"],
       useCaseTags: ["everyday"],
     });
@@ -78,6 +79,7 @@ describe("ensureWardrobeItemTagged", () => {
     const secondResult = await ensureWardrobeItemTagged(firstResult);
 
     expect(extractWardrobeItemTags).toHaveBeenCalledTimes(1);
-    expect(secondResult.primaryColor).toBe("burgundy");
+    expect(secondResult.colorName).toBe("burgundy");
+    expect(secondResult.colorFamily).toBe("red");
   });
 });

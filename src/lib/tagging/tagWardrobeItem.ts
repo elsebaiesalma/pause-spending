@@ -18,11 +18,11 @@ export async function ensureWardrobeItemTagged(item: WardrobeItem): Promise<Ward
   });
 
   return prisma.wardrobeItem.update({
-    where: { id: item.id },
+    where: { id: item.id, userId: item.userId },
     data: {
       category: tags.category,
-      primaryColor: tags.primaryColor,
-      secondaryColor: tags.secondaryColor,
+      colorName: tags.colorName,
+      colorFamily: tags.colorFamily,
       styleTags: tags.styleTags,
       useCaseTags: tags.useCaseTags,
       tagsExtractedAt: new Date(),

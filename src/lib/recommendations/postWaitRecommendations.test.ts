@@ -17,13 +17,14 @@ function makeWardrobeItem(overrides: Partial<WardrobeItem>): WardrobeItem {
     itemName: "Navy Blazer",
     imageUrl: null,
     category: "outerwear",
-    primaryColor: "navy",
-    secondaryColor: null,
+    colorName: "navy",
+    colorFamily: "navy",
     styleTags: [],
     useCaseTags: [],
     ownedSince: null,
     status: "active",
     tagsExtractedAt: new Date(),
+    source: null,
     ...overrides,
   };
 }

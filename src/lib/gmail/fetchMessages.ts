@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "@/lib/retry";
+
 const GMAIL_API_BASE = "https://gmail.googleapis.com/gmail/v1/users/me";
 
 // Bounds how many messages a single backfill run will fetch details for,
@@ -40,7 +42,7 @@ function formatGmailDate(date: Date): string {
 export class HistoryTooOldError extends Error {}
 
 async function gmailFetch(accessToken: string, path: string): Promise<Response> {
-  const response = await fetch(`${GMAIL_API_BASE}${path}`, {
+  const response = await fetchWithRetry(`${GMAIL_API_BASE}${path}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
 

@@ -96,7 +96,8 @@ describe("wardrobe service", () => {
       userId,
       itemName: "Grandma's Scarf",
       category: "accessories",
-      primaryColor: "red",
+      colorName: "red",
+      colorFamily: "red",
     });
     createdWardrobeItemIds.push(item.id);
 
@@ -112,12 +113,14 @@ describe("wardrobe service", () => {
 
     const updated = await updateWardrobeItem(item.id, userId, {
       itemName: "Navy Wool Sweater",
-      primaryColor: "navy",
+      colorName: "navy",
+      colorFamily: "navy",
       styleTags: ["business-casual"],
     });
 
     expect(updated.itemName).toBe("Navy Wool Sweater");
-    expect(updated.primaryColor).toBe("navy");
+    expect(updated.colorName).toBe("navy");
+    expect(updated.colorFamily).toBe("navy");
     expect(updated.styleTags).toEqual(["business-casual"]);
   });
 

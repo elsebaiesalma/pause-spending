@@ -39,8 +39,8 @@ export type ManualWardrobeItemInput = {
   userId: string;
   itemName: string;
   category?: string | null;
-  primaryColor?: string | null;
-  secondaryColor?: string | null;
+  colorName?: string | null;
+  colorFamily?: string | null;
   styleTags?: string[];
   useCaseTags?: string[];
   imageUrl?: string | null;
@@ -56,7 +56,7 @@ export async function createManualWardrobeItem(
   input: ManualWardrobeItemInput
 ): Promise<WardrobeItem> {
   const userProvidedTags = Boolean(
-    input.primaryColor || input.styleTags?.length || input.useCaseTags?.length
+    input.colorName || input.colorFamily || input.styleTags?.length || input.useCaseTags?.length
   );
 
   const item = await prisma.wardrobeItem.create({
@@ -64,8 +64,8 @@ export async function createManualWardrobeItem(
       userId: input.userId,
       itemName: input.itemName,
       category: input.category ?? null,
-      primaryColor: input.primaryColor ?? null,
-      secondaryColor: input.secondaryColor ?? null,
+      colorName: input.colorName ?? null,
+      colorFamily: input.colorFamily ?? null,
       styleTags: input.styleTags ?? [],
       useCaseTags: input.useCaseTags ?? [],
       imageUrl: input.imageUrl ?? null,
@@ -85,8 +85,8 @@ export async function createManualWardrobeItem(
 export type WardrobeItemEditInput = {
   itemName?: string;
   category?: string | null;
-  primaryColor?: string | null;
-  secondaryColor?: string | null;
+  colorName?: string | null;
+  colorFamily?: string | null;
   styleTags?: string[];
   useCaseTags?: string[];
   imageUrl?: string | null;

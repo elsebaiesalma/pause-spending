@@ -1,13 +1,25 @@
 import { extractImageCandidates } from "@/lib/emailExtraction/htmlUtils";
 import { extractWardrobeItemTags } from "@/lib/tagging/llmTagger";
+import { fetchWithRetry } from "@/lib/retry";
+import { decodeHtmlEntities } from "@/lib/text";
+import { fetchViaBrowserWorker } from "./browserWorkerClient";
+
+export type FieldConfidence = "high" | "medium" | "low";
 
 export type UrlExtraction = {
   itemName: string;
   price: number | null;
   imageUrl: string | null;
   category: string | null;
-  primaryColor: string | null;
+  colorName: string | null;
+  colorFamily: string | null;
   styleTags: string[];
+  // Only set by the search path (see searchProduct.ts) - URL paste doesn't
+  // need it, since the user already knows which single page they pasted.
+  // "high" = structured Product schema; "medium" = Open Graph tags; "low" =
+  // bare <title>/scraped fallback. Absent field (price/imageUrl not found)
+  // has no confidence entry at all - the UI shows "not found", not a guess.
+  confidence?: Partial<Record<"itemName" | "price" | "imageUrl", FieldConfidence>>;
 };
 
 function extractMetaContent(html: string, property: string): string | null {
@@ -23,14 +35,14 @@ function extractMetaContent(html: string, property: string): string | null {
   ];
   for (const pattern of patterns) {
     const match = html.match(pattern);
-    if (match) return match[1];
+    if (match) return decodeHtmlEntities(match[1]);
   }
   return null;
 }
 
 function extractTitleTag(html: string): string | null {
   const match = html.match(/<title>([^<]*)<\/title>/i);
-  return match ? match[1].trim() : null;
+  return match ? decodeHtmlEntities(match[1].trim()) : null;
 }
 
 type JsonLdProduct = { name?: string; image?: string | string[]; price?: number };
@@ -60,7 +72,7 @@ function extractJsonLdProduct(html: string): JsonLdProduct | null {
       const price = offer?.price !== undefined ? Number(offer.price) : undefined;
 
       return {
-        name: typeof node.name === "string" ? node.name : undefined,
+        name: typeof node.name === "string" ? decodeHtmlEntities(node.name) : undefined,
         image: node.image as string | string[] | undefined,
         price: price !== undefined && !Number.isNaN(price) ? price : undefined,
       };
@@ -84,18 +96,75 @@ function parsePriceFromMeta(html: string): number | null {
   return Number.isNaN(parsed) ? null : parsed;
 }
 
-// Fetches a product page and scrapes structured metadata (JSON-LD Product
-// schema, then Open Graph tags, then a bare <title> as a last resort; the
-// image specifically also falls back to a scan of plausible <img>
-// candidates in the page body, reusing the same heuristic the email
-// pipeline uses to skip site chrome like logos/nav banners). Returns null
-// on any failure - fetch error, non-2xx response, or no identifiable item
-// name - so the caller can fall back to manual entry rather than blocking,
-// per the design's error handling.
-export async function extractFromUrl(url: string): Promise<UrlExtraction | null> {
-  let html: string;
+type ParsedProductPage = {
+  itemName: string;
+  price: number | null;
+  imageUrl: string | null;
+  confidence: NonNullable<UrlExtraction["confidence"]>;
+};
+
+// The one parser both the cheap fetch path and the browser-worker fallback
+// feed through, so whichever path supplied the HTML produces the exact same
+// shape (JSON-LD Product schema, then Open Graph tags, then a bare <title>
+// as a last resort; the image specifically also falls back to a scan of
+// plausible <img> candidates in the page body, reusing the same heuristic
+// the email pipeline uses to skip site chrome like logos/nav banners).
+// Each field's confidence reflects which of those layers actually supplied
+// it - a field that isn't found at all gets no confidence entry, since
+// "not found" and "found with low confidence" mean different things to the
+// UI (a quiet "price not found" vs. an explicit low-confidence flag).
+// Returns null when no identifiable item name is present.
+function parseProductHtml(html: string): ParsedProductPage | null {
+  const jsonLd = extractJsonLdProduct(html);
+  const confidence: NonNullable<UrlExtraction["confidence"]> = {};
+
+  let itemName = jsonLd?.name;
+  if (itemName) {
+    confidence.itemName = "high";
+  } else {
+    itemName = extractMetaContent(html, "og:title") ?? undefined;
+    if (itemName) {
+      confidence.itemName = "medium";
+    } else {
+      itemName = extractTitleTag(html) ?? undefined;
+      if (itemName) confidence.itemName = "low";
+    }
+  }
+  if (!itemName) {
+    return null;
+  }
+
+  let imageUrl = firstImage(jsonLd?.image);
+  if (imageUrl) {
+    confidence.imageUrl = "high";
+  } else {
+    imageUrl = extractMetaContent(html, "og:image");
+    if (imageUrl) {
+      confidence.imageUrl = "medium";
+    } else {
+      imageUrl = extractImageCandidates(html)[0]?.imageUrl ?? null;
+      if (imageUrl) confidence.imageUrl = "low";
+    }
+  }
+
+  let price = jsonLd?.price;
+  if (price !== undefined) {
+    confidence.price = "high";
+  } else {
+    price = parsePriceFromMeta(html) ?? undefined;
+    if (price !== undefined) confidence.price = "medium";
+  }
+
+  return { itemName: itemName.trim(), price: price ?? null, imageUrl, confidence };
+}
+
+// Cheap path: a plain fetch with a realistic User-Agent. Returns null on
+// any failure - network error, non-2xx response (bot-blocking retailers
+// typically return 403/429 here) - so the caller can fall back to the
+// browser-worker path rather than giving up immediately.
+async function fetchProductHtml(url: string): Promise<string | null> {
   try {
-    const response = await fetch(url, {
+    const response = await fetchWithRetry(url, {
       headers: {
         "User-Agent":
           "Mozilla/5.0 (compatible; PauseBeforePurchaseBot/1.0; +https://github.com)",
@@ -105,31 +174,40 @@ export async function extractFromUrl(url: string): Promise<UrlExtraction | null>
     if (!response.ok) {
       return null;
     }
-    html = await response.text();
+    return await response.text();
   } catch {
     return null;
   }
+}
 
-  const jsonLd = extractJsonLdProduct(html);
-  const itemName = jsonLd?.name ?? extractMetaContent(html, "og:title") ?? extractTitleTag(html);
-  if (!itemName) {
+// Fetches a product page and scrapes structured metadata. Tries the cheap
+// plain-fetch path first; when that fails outright (network error, non-2xx
+// - the shape of a bot-blocking retailer's response) or succeeds but the
+// page has no identifiable product data (a retailer that serves a
+// JS-rendered shell to non-browser requests), falls back to the Playwright
+// browser-worker for a real rendered page. Returns null when neither path
+// finds an item name, so the caller falls back to manual entry rather than
+// blocking or fabricating data, per the design's error handling.
+export async function extractFromUrl(url: string): Promise<UrlExtraction | null> {
+  const html = await fetchProductHtml(url);
+  let parsed = html ? parseProductHtml(html) : null;
+
+  if (!parsed) {
+    const renderedHtml = await fetchViaBrowserWorker(url);
+    parsed = renderedHtml ? parseProductHtml(renderedHtml) : null;
+  }
+
+  if (!parsed) {
     return null;
   }
 
-  const imageUrl =
-    firstImage(jsonLd?.image) ??
-    extractMetaContent(html, "og:image") ??
-    extractImageCandidates(html)[0]?.imageUrl ??
-    null;
-  const price = jsonLd?.price ?? parsePriceFromMeta(html);
-  const trimmedName = itemName.trim();
-
-  const tags = await extractItemTags(trimmedName, imageUrl);
+  const tags = await extractItemTags(parsed.itemName, parsed.imageUrl);
 
   return {
-    itemName: trimmedName,
-    price: price ?? null,
-    imageUrl,
+    itemName: parsed.itemName,
+    price: parsed.price,
+    imageUrl: parsed.imageUrl,
+    confidence: parsed.confidence,
     ...tags,
   };
 }
@@ -144,12 +222,17 @@ export async function extractFromUrl(url: string): Promise<UrlExtraction | null>
 async function extractItemTags(
   itemName: string,
   imageUrl: string | null
-): Promise<Pick<UrlExtraction, "category" | "primaryColor" | "styleTags">> {
+): Promise<Pick<UrlExtraction, "category" | "colorName" | "colorFamily" | "styleTags">> {
   try {
     const tags = await extractWardrobeItemTags({ itemName, category: null, imageUrl });
-    return { category: tags.category, primaryColor: tags.primaryColor, styleTags: tags.styleTags };
+    return {
+      category: tags.category,
+      colorName: tags.colorName,
+      colorFamily: tags.colorFamily,
+      styleTags: tags.styleTags,
+    };
   } catch (error) {
     console.warn(`Tag extraction failed for URL-sourced item "${itemName}":`, error instanceof Error ? error.message : error);
-    return { category: null, primaryColor: null, styleTags: [] };
+    return { category: null, colorName: null, colorFamily: null, styleTags: [] };
   }
 }

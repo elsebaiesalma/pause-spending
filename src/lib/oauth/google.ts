@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "@/lib/retry";
+
 const AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 const REVOKE_ENDPOINT = "https://oauth2.googleapis.com/revoke";
@@ -32,7 +34,7 @@ export function buildGoogleAuthorizationUrl(state: string): string {
     response_type: "code",
     scope: GMAIL_READONLY_SCOPE,
     access_type: "offline",
-    prompt: "consent",
+    prompt: "consent select_account",
     state,
   });
 
@@ -40,7 +42,7 @@ export function buildGoogleAuthorizationUrl(state: string): string {
 }
 
 export async function exchangeCodeForTokens(code: string): Promise<GoogleTokenResponse> {
-  const response = await fetch(TOKEN_ENDPOINT, {
+  const response = await fetchWithRetry(TOKEN_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -81,7 +83,7 @@ export class GoogleTokenExpiredError extends Error {
 export async function refreshGoogleAccessToken(
   refreshToken: string
 ): Promise<RefreshedGoogleToken> {
-  const response = await fetch(TOKEN_ENDPOINT, {
+  const response = await fetchWithRetry(TOKEN_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
@@ -104,7 +106,7 @@ export async function refreshGoogleAccessToken(
 }
 
 export async function revokeGoogleToken(token: string): Promise<void> {
-  const response = await fetch(REVOKE_ENDPOINT, {
+  const response = await fetchWithRetry(REVOKE_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ token }),

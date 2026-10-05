@@ -36,7 +36,7 @@ describe("assemblePauseScreen", () => {
         userId,
         itemName: "Navy Blazer",
         category: "outerwear",
-        primaryColor: "navy",
+        colorFamily: "navy",
         styleTags: ["business-casual"],
         useCaseTags: ["work"],
         tagsExtractedAt: new Date(),
@@ -59,8 +59,8 @@ describe("assemblePauseScreen", () => {
 
     vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce({
       category: "outerwear",
-      primaryColor: "navy",
-      secondaryColor: null,
+      colorName: "navy",
+      colorFamily: "navy",
       styleTags: ["business-casual"],
       useCaseTags: ["work"],
     });
@@ -71,6 +71,11 @@ describe("assemblePauseScreen", () => {
     const payload = await assemblePauseScreen(userId, desired.id);
 
     expect(payload.similarItems.map((i) => i.id)).toEqual([owned.id]);
+    expect(payload.similarItemReasons[owned.id]).toBe("same color · same category · shared style");
+    // The reflection migration isn't applied yet (prisma/migrations/
+    // 20260925090000_add_desired_item_reflection) - reads against it must
+    // degrade to null, not throw, so the pause screen still loads.
+    expect(payload.reflection).toBeNull();
     expect(payload.redundancyExplanation).toBe("You already own a similar navy business-casual blazer.");
     expect(payload.budget).toMatchObject({
       hasBudget: true,
@@ -98,8 +103,8 @@ describe("assemblePauseScreen", () => {
 
     vi.mocked(extractWardrobeItemTags).mockResolvedValueOnce({
       category: "outerwear",
-      primaryColor: "orange",
-      secondaryColor: null,
+      colorName: "orange",
+      colorFamily: "orange",
       styleTags: ["rainwear"],
       useCaseTags: ["outdoor"],
     });
@@ -122,7 +127,7 @@ describe("assemblePauseScreen", () => {
         price: "50.00",
         userConfirmed: true,
         category: "outerwear",
-        primaryColor: "orange",
+        colorFamily: "orange",
         styleTags: ["rainwear"],
       },
     });
@@ -132,5 +137,28 @@ describe("assemblePauseScreen", () => {
 
     expect(payload.budget).toMatchObject({ hasBudget: false });
     expect(extractWardrobeItemTags).not.toHaveBeenCalled();
+  });
+
+  it("reports priceKnown: false rather than treating a missing price as $0 spend, when a budget is set", async () => {
+    const userId = (await prisma.user.findFirstOrThrow()).id;
+    await setBudgetForMonth(userId, currentMonthKey(), 200);
+
+    const desired = await prisma.desiredItem.create({
+      data: {
+        userId,
+        sourceType: "typed",
+        itemName: "Bright Orange Raincoat",
+        userConfirmed: true,
+        category: "outerwear",
+        colorFamily: "orange",
+        styleTags: ["rainwear"],
+      },
+    });
+    desiredItemIds.push(desired.id);
+
+    const payload = await assemblePauseScreen(userId, desired.id);
+
+    expect(payload.budget).toMatchObject({ hasBudget: true, priceKnown: false, budgetAmount: 200, spend: 0 });
+    expect(payload.budget).not.toHaveProperty("spendAfterPurchase");
   });
 });

@@ -20,17 +20,25 @@ const SYSTEM_PROMPT = `You help someone pause and reflect before a clothing/shoe
 // itself comes from the cheap tag-matching stage in similarity.ts) - the
 // AI pass runs only over this bounded shortlist, never the whole wardrobe.
 export async function generateRedundancyExplanation(
-  desiredItem: Pick<DesiredItem, "itemName" | "category" | "primaryColor" | "styleTags">,
+  desiredItem: Pick<DesiredItem, "itemName" | "category" | "colorName" | "colorFamily" | "styleTags">,
   shortlist: WardrobeItem[]
 ): Promise<string | null> {
   if (shortlist.length === 0) {
     return null;
   }
 
+  // The explanation is prose for a human, so prefer the richer free-text
+  // colorName (e.g. "Espresso") when there is one, falling back to the
+  // coarser colorFamily (e.g. "brown") only when colorName is unset - this
+  // is the one place the single colorFamily value alone would read as a
+  // flatter, less specific explanation than the old primaryColor free text did.
+  const colorFor = (item: Pick<DesiredItem, "colorName" | "colorFamily">) =>
+    item.colorName ?? item.colorFamily ?? "unknown";
+
   const textContent = [
     `Desired item: ${desiredItem.itemName ?? "unnamed item"}`,
     `Category: ${desiredItem.category ?? "unknown"}`,
-    `Color: ${desiredItem.primaryColor ?? "unknown"}`,
+    `Color: ${colorFor(desiredItem)}`,
     `Style tags: ${desiredItem.styleTags.join(", ") || "none"}`,
     "",
     "Already-owned similar items:",
@@ -38,7 +46,7 @@ export async function generateRedundancyExplanation(
       [
         `${i + 1}. ${item.itemName}`,
         `   category: ${item.category ?? "unknown"}`,
-        `   color: ${item.primaryColor ?? "unknown"}`,
+        `   color: ${colorFor(item)}`,
         `   style tags: ${item.styleTags.join(", ") || "none"}`,
         `   owned since: ${item.ownedSince ? item.ownedSince.toISOString().slice(0, 10) : "unknown"}`,
       ].join("\n")
