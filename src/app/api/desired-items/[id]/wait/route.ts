@@ -34,6 +34,9 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
       data: {
         pauseStatus: "waiting",
         waitUntil: new Date(pausedAt.getTime() + waitMs),
+        // Pausing again after "Buy anyway" must not leave a stale "proceeded"
+        // outcome behind on an item that is waiting again.
+        decisionOutcome: null,
       },
     });
   } catch (error) {

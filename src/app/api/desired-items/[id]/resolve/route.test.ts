@@ -102,12 +102,12 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     expect(updated.decisionOutcome).toBe("saved_for_later");
   });
 
-  it("redirects to the recommendations page on 'proceeded'", async () => {
+  it("redirects to the Still want it page on 'proceeded' (Buy anyway)", async () => {
     const item = await makeWaitingItem();
 
     const response = await POST(buildRequest({ outcome: "proceeded" }), await ctxFor(item.id));
 
-    expect(response.headers.get("location")).toContain(`/desired-items/${item.id}/recommendations`);
+    expect(response.headers.get("location")).toContain(`/desired-items/${item.id}/still-want-it`);
   });
 
   it("still resolves the outcome when a reflection answer is included, even though its migration isn't applied yet", async () => {

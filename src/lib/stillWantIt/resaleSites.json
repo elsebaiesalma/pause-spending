@@ -1,0 +1,7 @@
+[
+  { "name": "Poshmark", "searchUrl": "https://poshmark.com/search?query={query}" },
+  { "name": "eBay", "searchUrl": "https://www.ebay.com/sch/i.html?_nkw={query}" },
+  { "name": "Depop", "searchUrl": "https://www.depop.com/search/?q={query}" },
+  { "name": "The RealReal", "searchUrl": "https://www.therealreal.com/search?keywords={query}" },
+  { "name": "Vestiaire Collective", "searchUrl": "https://www.vestiairecollective.com/search/?q={query}" }
+]

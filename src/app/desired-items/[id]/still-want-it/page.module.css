@@ -1,0 +1,239 @@
+/* Light, tight editorial. Tokens come from globals.css (:root). No hover
+   zoom and no reveal animation: the page is meant to be read, not shown off. */
+
+.header {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.image {
+  aspect-ratio: 4 / 5;
+  max-width: 14rem;
+  background: var(--color-bg-alt);
+  overflow: hidden;
+}
+
+.image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.headerText h1 {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.brand {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
+.metaLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+}
+
+.sectionLabel {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  margin: 0 0 var(--space-2);
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-line-strong);
+}
+
+.note {
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Prompt after a store visit. Sits above the sections so it's the first
+   thing read on return, without taking over the page. */
+.visitPrompt {
+  border: 1px solid var(--color-line-strong);
+  padding: var(--space-3);
+  margin: var(--space-3) 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.visitPrompt h2 {
+  margin: 0;
+}
+
+.visitYes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.priceField {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.priceField input {
+  font: inherit;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  width: 9rem;
+}
+
+.visitOther {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.visitOther form {
+  margin: 0;
+}
+
+/* Outfits: a 2x2 collage of owned pieces, with a line under each. */
+.outfits {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.outfit {
+  margin: 0;
+}
+
+.collage {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px;
+  background: var(--color-line);
+}
+
+.collage[data-count="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.collageCell {
+  aspect-ratio: 4 / 5;
+  background: var(--color-bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.collageCell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.collageCell svg {
+  width: 70%;
+  height: auto;
+}
+
+.placeholderLabel {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.outfitNote {
+  margin-top: var(--space-1);
+  font-size: 0.95rem;
+  color: var(--color-ink-soft);
+}
+
+.skeletonOutfit {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.skeletonCollage {
+  aspect-ratio: 2 / 1;
+  background: var(--color-bg-alt);
+}
+
+.skeletonLine {
+  height: 0.9rem;
+  width: 70%;
+  background: var(--color-bg-alt);
+}
+
+.textRows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.textRows li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.textRows a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reflection {
+  font-size: 1rem;
+  color: var(--color-ink);
+  margin: 0 0 var(--space-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.actions form {
+  margin: 0;
+}
+
+.storeLink {
+  margin: var(--space-3) 0 0;
+  font-size: 0.9rem;
+}
+
+.storeLink a {
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 720px) {
+  .header {
+    grid-template-columns: auto 1fr;
+    align-items: end;
+  }
+
+  .image {
+    max-width: 12rem;
+  }
+}
