@@ -4,6 +4,28 @@
 
 Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmail `gmail.readonly` sync. The full parked-item detail lives in `BACKLOG.md`; this file is the summary a new session needs first.
 
+## Resume here
+
+**Done**
+- Still want it: the page, outfit suggestions (validated, ids only, description built from names), secondhand links, go-to-store with the once-per-visit prompt, and undecided items on Considering.
+- One model constant per feature, each with an env override. Commits `ffc221c` (one model), `53a5684` (Still want it), `cb9c3d7` (undecided on Considering), `2784230` (notes), `45abe0e` (per-feature models, server-side outfit descriptions), and this notes commit.
+- Full suite passing: 81 files, 446 tests. Type check and lint clean.
+
+**Waiting on the user**
+- Run `prisma/manual/still-want-it-store-visit.sql` on BOTH Neon branches (main and test), then run its verification query. Both branches must show `went_to_store_at` and `store_visit_answer` present.
+- Once confirmed, step 3 of the plan, all in one pass: add the two columns to `schema.prisma`, record a migration with matching checksums on both branches, run `prisma generate`, add the database tests for undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit), and run the full suite. Nothing in step 3 has started.
+
+**Design queue (decide before building)**
+- Outfit cache must become durable before deploy. Options: a `DesiredItem` column holding the outfit JSON plus its wardrobe version, or a small table. Decide which.
+- Lower-priced options (section 02) stay hidden until intake stores other-retailer results. Decide what intake stores, and where.
+- Email sync must dedupe against a "proceeded" desired item when a matching order arrives. "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window) before email sync can create one.
+- Model outfit descriptions can refer to the target item even though it is never in the outfit. Decide whether the prompt should forbid that.
+- Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
+- Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. No browser session has been used yet.
+- Proceeded items with no list to show them: "Buy anyway" now lands on Still want it, and undecided ones appear on Considering. Decide whether any other proceeded items need a home.
+- The older recommendations page (`src/app/desired-items/[id]/recommendations`) is no longer linked from the resolve route. Decide whether to keep or remove it.
+- Parked items are in the "Parked items" section below and in `BACKLOG.md`.
+
 ## Environment and branches
 
 - The git repo has one local branch, `master`, and no remote. "Main" and "test" in our notes mean the two **Neon database branches**, not git branches. `DATABASE_URL` is main, `TEST_DATABASE_URL` is test.
@@ -43,11 +65,25 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 - Destructive or hard-to-reverse migrations (renames, drops, anything with real data behind it) are not applied through `scripts/apply-migration-via-http.mjs`. Hand-write the SQL, show it for review, and let the user run `prisma migrate deploy` themselves.
 - A migration that must run only after a verified backfill is kept outside `prisma/migrations/` until the backfill is checked.
 
-## Model IDs
+## Model IDs (one constant per feature, in `src/lib/anthropicModels.ts`)
 
-- Every Claude call uses `ANTHROPIC_MODEL` from `src/lib/anthropicModel.ts`. It defaults to `claude-sonnet-5-5` and can be overridden with the `ANTHROPIC_MODEL` environment variable.
-- Checked live on 2026-10-05 with a one-off call (`stop_reason: end_turn`, reply "ok"): `claude-sonnet-5-5`, `claude-sonnet-5` and `claude-opus-5` all succeeded. The change from `claude-opus-5` was a deliberate move to one model, not a fix for a bad ID. Every LLM feature now runs on Sonnet, so check tagging and extraction quality after this change.
-- Mocked tests cannot catch a bad model ID. Re-run a real call after changing the model.
+Each feature has its own constant and environment override. Defaults:
+
+| Feature | Constant | Env override | Model before 2026-10-05 | Model now |
+| --- | --- | --- | --- | --- |
+| Still want it outfits | `OUTFIT_MODEL` | `ANTHROPIC_MODEL_OUTFITS` | (new feature, none) | `claude-sonnet-5-5` |
+| Wardrobe tagging, colour family | `TAGGING_MODEL` | `ANTHROPIC_MODEL_TAGGING` | `claude-opus-5` | `claude-opus-5` |
+| Receipt pipeline (email classification and extraction) | `RECEIPT_EXTRACTION_MODEL` | `ANTHROPIC_MODEL_RECEIPT_EXTRACTION` | `claude-opus-5` | `claude-opus-5` |
+| Screenshot reading | `SCREENSHOT_MODEL` | `ANTHROPIC_MODEL_SCREENSHOT` | `claude-opus-5` | `claude-opus-5` |
+| Pause-screen redundancy explanation | `REDUNDANCY_MODEL` | `ANTHROPIC_MODEL_REDUNDANCY` | `claude-opus-5` | `claude-opus-5` |
+| Post-wait recommendations | `RECOMMENDATIONS_MODEL` | `ANTHROPIC_MODEL_RECOMMENDATIONS` | `claude-opus-5` | `claude-opus-5` |
+
+- The "before" column is read from commit `d3974a1`. All nine call sites used `claude-opus-5`, so no previous model is missing.
+- URL and search extraction (`urlExtractor.ts`, `searchProduct.ts`) makes no Claude call, so it has no constant.
+- Redundancy and recommendations were not on the original feature list. Each has its own constant so that its model setting is not lost.
+- `claude-opus-5`, `claude-sonnet-5` and `claude-sonnet-5-5` all returned successful live responses on 2026-10-05. The live structured-output path (`messages.parse` with a zod schema) also returned valid output on `claude-sonnet-5-5`.
+- Mocked tests cannot catch a bad model ID. Re-run a real call after changing any model.
+- Outfit descriptions are built server-side from the chosen items' names. The model returns item ids only, and any extra prose it adds is ignored.
 
 ## Still want it (built 2026-10-05; SQL not yet applied)
 
