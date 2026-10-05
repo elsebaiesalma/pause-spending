@@ -9,7 +9,8 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - The git repo has one local branch, `master`, and no remote. "Main" and "test" in our notes mean the two **Neon database branches**, not git branches. `DATABASE_URL` is main, `TEST_DATABASE_URL` is test.
 - Raw Postgres TCP (5432) is blocked from the sandbox, so `prisma migrate dev` fails with P1001. Read-only SQL over Neon's HTTP adapter works. Migrations that add or change columns are run by the user with `npx prisma migrate deploy` from their own terminal.
 - `GMAIL_SYNC_PAUSED=true` is set in `.env` while mock wardrobe data is loaded for UI work. Set it back to `false` after `scripts/deleteSeededMockWardrobe.ts` removes the seeded rows.
-- Nothing is committed since `9c072f3`. About 180 files are modified or untracked, including all the Pause, Considering and Wardrobe work.
+- Work is committed on `master` (`a573821` to `13d295a`), not pushed. The working tree is clean.
+- Vendored skill packs (`.agents/`, `.claude/skills/`, `skills-lock.json`) are gitignored.
 
 ## Brand casing
 
@@ -25,17 +26,17 @@ The product name is always written **PAUSE** in all caps when it is used as a pr
 - **Considering tab** (`src/app/considering`, `let-go`): functional, with CSS module. Untracked. The lifecycle timestamps are written by code that relies on the unapplied migration.
 - Mockups: `mockups/*.html` (cream/white set) and `mockups/midnight/*.html` (Midnight Editorial, 4 pages). Not wired to the app.
 
-## Pending SQL: apply before anything relies on it
+## Schema state: applied on both branches (as of 2026-10-05)
 
-Verified on 2026-10-04 with a read-only `information_schema` query against both Neon branches:
+The user ran `prisma/manual/pending-desired-items.sql` in Neon's SQL editor on main and test, and all 10 columns verified present. The three migrations are recorded in `_prisma_migrations` on both branches, with checksums computed from the files on disk. `prisma generate` has run. The full suite passes (75 files, 404 tests).
 
-1. **`prisma/migrations/20260925090000_add_desired_item_reflection`**: adds 6 reflection columns to `desired_items`. Missing on **both** main and test.
-2. **`prisma/migrations/20260925100000_add_desired_item_considering_lifecycle`**: adds `paused_at`, `saved_at`, `let_go_automatically`, `let_go_at`. Missing on **both** main and test. Apply together with item 1.
-3. **`prisma/migrations/20260924060000_make_purchase_price_nullable`**: not recorded in `_prisma_migrations` on either branch. The column nullability was not checked. Confirm it before deploying.
+- `20260925090000_add_desired_item_reflection`: applied on both.
+- `20260925100000_add_desired_item_considering_lifecycle`: applied on both.
+- `20260924060000_make_purchase_price_nullable`: already nullable on both branches, so it was only recorded.
 
-Order for the user, on each branch: `npx prisma migrate deploy`. Then, once, `npx prisma generate`. Do not run `prisma generate` until both branches have the desired_items columns, because the generated client would select columns that do not exist yet.
+The migration files' header comments still say "NOT YET APPLIED". Those headers are stale, but do not edit the `.sql` files: a change to any byte changes its checksum, and Prisma would then flag the recorded migration as modified.
 
-The two new SQL files each say "NOT YET APPLIED" in their headers. Keep that until the user confirms it has run.
+Future schema changes still go through `npx prisma migrate deploy`, run by the user from a terminal with port access. Use the same by-hand SQL pattern if the HTTP route is needed.
 
 ## Migration rules
 
