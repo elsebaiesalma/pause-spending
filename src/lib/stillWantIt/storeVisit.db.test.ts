@@ -92,3 +92,20 @@ describe("undecided store visits ('Not sure yet')", () => {
     expect(row.storeVisitAnswer).toBe("not_sure");
   });
 });
+
+describe("store-visit queries are scoped by userId", () => {
+  const otherUser = "00000000-0000-0000-0000-000000000000";
+
+  it("another user's id can neither read, record, nor answer a visit", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const item = await makeUndecidedItem(user.id);
+
+    await expect(getStoreVisitState(item.id, otherUser)).resolves.toBeNull();
+
+    await recordStoreVisit(item.id, otherUser, new Date());
+    await setStoreVisitAnswer(item.id, otherUser, "bought");
+
+    const row = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(row.storeVisitAnswer).toBe("not_sure");
+  });
+});
