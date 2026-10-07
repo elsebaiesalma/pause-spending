@@ -280,6 +280,15 @@ model DesiredItem {
   // was actually let go.
   letGoAt             DateTime? @map("let_go_at")
 
+  // --- Still want it store-visit state (migration
+  // 20260926090000_add_desired_item_store_visit).
+  // When the user last clicked "Go to [retailer]". Reset on every click.
+  wentToStoreAt       DateTime? @map("went_to_store_at")
+  // Answer to "Did you buy it?" for that visit: "bought" | "not_bought" |
+  // "not_sure", or null while still unanswered. App-validated string, like
+  // pauseStatus. Cleared by the next "Go to" click so the prompt re-asks.
+  storeVisitAnswer    String?   @map("store_visit_answer")
+
   user                          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reflectionReplacesWardrobeItem WardrobeItem? @relation(fields: [reflectionReplacesWardrobeItemId], references: [id], onDelete: SetNull)
 
