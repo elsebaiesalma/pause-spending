@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
-import Link from "next/link";
 import { clashDisplay } from "./fonts";
-import { auth, signOut } from "@/lib/auth";
+import { auth } from "@/lib/auth";
+import { initialsFor } from "@/lib/initials";
+import { SiteHeader, SiteMain, SiteTabBar } from "@/components/SiteNav";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await auth();
+  const initials = session?.user ? initialsFor(session.user.name, session.user.email) : null;
 
   return (
     <html lang="en" className={`${clashDisplay.variable} ${inter.variable} ${spaceMono.variable}`}>
@@ -33,30 +35,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           caused by anything in this app. Scoped to this one element only;
           it does not suppress mismatches in children. */}
       <body style={{ display: "flex", flexDirection: "column" }} suppressHydrationWarning>
-        <header className="site-header">
-          <Link href="/" className="site-header__brand">
-            PAUSE.
-          </Link>
-          {session?.user ? (
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/" });
-              }}
-              className="site-header__account"
-            >
-              <span className="site-header__email">{session.user.email}</span>
-              <button type="submit" className="btn-quiet">
-                Sign out
-              </button>
-            </form>
-          ) : (
-            <a href="/login" className="site-header__account btn-quiet">
-              Sign in
-            </a>
-          )}
-        </header>
-        <main className="site-main">{children}</main>
+        <SiteHeader initials={initials} />
+        <SiteMain signedIn={initials !== null}>{children}</SiteMain>
+        <SiteTabBar signedIn={initials !== null} />
       </body>
     </html>
   );

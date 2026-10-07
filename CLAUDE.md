@@ -10,21 +10,24 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Still want it: the page, outfit suggestions (validated, ids only, description built from names), secondhand links, go-to-store with the once-per-visit prompt, and undecided items on Considering.
 - Store-visit columns (`went_to_store_at`, `store_visit_answer`) are applied and recorded on BOTH Neon branches (migration `20260926090000_add_desired_item_store_visit`, checksums match the file). They are in `schema.prisma`, `prisma generate` has run, and `src/lib/stillWantIt/storeVisit.ts` now uses the generated client, every query scoped by `userId`. Database tests cover undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit) and cross-tenant access. Commits `44f0b53`, `0877fba`, `5e20fcc`.
 - One model constant per feature, each with an env override.
-- Full suite passing: 82 files, 453 tests. Type check clean. Lint has 3 errors left (see below).
+- Feedback pass (2026-10-06): global spacing about 28% tighter vertically, body 16px, no text under 12px; one shared header and tab bar in the root layout (`src/components/SiteNav.tsx`) for every signed-in route, with the nav, initials circle and one centered container (`--width-container`) shared by header and pages; new Account page (`/account`, `/settings` redirects to it); Wardrobe seed placeholders, brand stripped from displayed names, add-to-wardrobe in the header with a 15-colour dropdown; landing copy, sourced stats, image slots, and a first-visit Welcome intro on Connect Gmail.
+- Full suite passing: 85 files, 477 tests. Type check clean. Lint has 3 errors left (see below).
 
 **Waiting on the user**
 - Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. No browser session has been used yet.
 - Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
 - Create a private GitHub repo. The git repo has no remote, so nothing is pushed.
+- Supply the landing images in `public/images/`: `hero`, `pause-screen` (a real screenshot of our Pause screen), `sample-1`, `sample-2`, as .jpg, .jpeg, .png, .webp or .avif. Until a file exists the slot shows a neutral placeholder naming the expected file (`src/components/ImageSlot.tsx`).
+- Check the Welcome intro on Connect Gmail in a real browser (first visit only, tap to skip, none with reduced motion), and the phone layout of the new tab bar.
 
 **Lint: 3 errors left, all behavior-changing, so not touched**
-- `src/app/connect/gmail/page.tsx:34`: `<a>` to `/api/auth/gmail/start`. `<Link>` can prefetch, and prefetching an OAuth start route is not safe.
+- `src/app/connect/gmail/page.tsx:37`: `<a>` to `/api/auth/gmail/start`. `<Link>` can prefetch, and prefetching an OAuth start route is not safe.
 - `src/app/dashboard/KeptToggle.tsx:37` and `src/app/desired-items/new/SearchBox.tsx:76`: `react-hooks/set-state-in-effect`. Fixing either changes render timing.
 
 **Design queue (screens to design)**
 - Add item
 - Receipts review
-- Settings (also where the saved-item retention setting would live)
+- Settings: the Account page now has "Coming later" placeholders for Tone and Auto-move timing; the saved-item retention setting would live there
 - Item detail
 - The pause-ended moment (see "Locked pause state" in Parked items)
 

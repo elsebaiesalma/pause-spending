@@ -39,10 +39,16 @@
   --space-5: 3rem;
   --space-6: 5rem;
 
-  --width-narrow: 32rem;
-  --width-wide: 46rem;
+  --width-container: 72rem;
+  --gutter: 1.5rem;
 
   color-scheme: light;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --gutter: 1rem;
+  }
 }
 
 .theme-dark {
@@ -103,13 +109,13 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2.25rem, 4vw, 3.25rem);
+  font-size: clamp(2.43rem, 4vw, 3.51rem);
 }
 
 h2 {
-  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
-  margin-top: var(--space-5);
-  margin-bottom: var(--space-2);
+  font-size: clamp(1.62rem, 2.5vw, 1.998rem);
+  margin-top: calc(var(--space-5) * 0.72);
+  margin-bottom: calc(var(--space-2) * 0.72);
 }
 
 p {
@@ -118,80 +124,210 @@ p {
 
 /* ---------- Site chrome ---------- */
 
-/* Fixed + blended so the same header reads correctly whether the page
-   beneath it is the light app or the dark landing page: white
-   difference-blended against a white page resolves to black, against the
-   near-black landing page resolves to near-white. */
+/* One container for the header's contents and every page's content, so the
+   brand, nav, and page edges all line up. The header's own background runs
+   the full viewport width; only what's inside it is constrained. */
 .site-header {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 50;
-  padding: var(--space-3) var(--space-4);
-  mix-blend-mode: difference;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.site-header__inner {
+  max-width: var(--width-container);
+  margin: 0 auto;
+  padding: 0.7rem var(--gutter);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-4);
 }
 
 .site-header__brand {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.458rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #fff;
 }
 
-/* The header's blend mode composites this whole block as one unit against
-   whatever page sits beneath it, so account-status text/controls need the
-   same plain white the brand link uses, not the ink-toned .btn colors
-   tuned for an opaque background, to read correctly either way. */
+.site-nav {
+  display: none;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.site-nav__link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-soft);
+}
+
+.site-nav__link:hover {
+  color: var(--color-ink);
+}
+
+.site-nav__link[aria-current="page"] {
+  color: var(--color-accent);
+}
+
 .site-header__account {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+}
+
+.site-header__cta {
+  display: none;
+}
+
+.site-header__link {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-.site-header__email {
-  color: #fff;
-  opacity: 0.8;
-}
-
-.site-header__account.btn-quiet,
-.site-header__account button {
-  color: #fff;
-  border-color: transparent;
-  background: transparent;
-  padding: 0;
+  letter-spacing: 0.12em;
   text-decoration: underline;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.15em;
+  text-underline-offset: 3px;
 }
-.site-header__account.btn-quiet:hover,
-.site-header__account button:hover {
+
+/* Initials circle, linking to the Account page. */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-fill);
+  color: var(--color-fill-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+
+.avatar:hover,
+.avatar[aria-current="page"] {
+  border-color: var(--color-accent);
+}
+
+@media (min-width: 900px) {
+  .site-nav,
+  .site-header__cta {
+    display: flex;
+  }
+}
+
+/* The landing page keeps its transparent, fixed header: white text
+   difference-blended against whatever sits beneath it, so it reads on the
+   near-black page. Its contents still sit in the shared container. */
+.site-header--overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-bottom: none;
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+.site-header--overlay .site-header__brand,
+.site-header--overlay .site-header__link {
+  color: #fff;
+}
+
+.site-header--overlay .avatar {
   background: transparent;
   color: #fff;
-  opacity: 0.7;
+  border-color: #fff;
 }
 
 .site-main {
   flex: 1;
-  padding: calc(var(--space-6) + 2.5rem) var(--space-4) var(--space-6);
+  width: 100%;
+  max-width: var(--width-container);
+  margin: 0 auto;
+  padding: calc(var(--space-4) * 0.9) var(--gutter) calc(var(--space-6) * 0.72);
+}
+
+.site-main--bleed {
+  max-width: none;
+  padding: 5.4rem 0 0;
+}
+
+/* Clears the fixed bottom tab bar on phones. */
+.site-main--tabs {
+  padding-bottom: 6rem;
+}
+
+@media (min-width: 900px) {
+  .site-main--tabs {
+    padding-bottom: calc(var(--space-6) * 0.72);
+  }
+}
+
+/* Phone navigation: Home · Wardrobe · (+) Pause a purchase · Considering */
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-line-strong);
+  padding: 0.3rem 0.25rem calc(0.3rem + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 900px) {
+  .tab-bar {
+    display: none;
+  }
+}
+
+.tab-bar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.15;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+.tab-bar__item[aria-current="page"] {
+  color: var(--color-accent);
+}
+
+.tab-bar__plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font-size: 1.4rem;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .page {
-  max-width: var(--width-narrow);
-  margin: 0 auto;
-}
-
-.page--wide {
-  max-width: var(--width-wide);
+  width: 100%;
 }
 
 /* Item-entry flow (desired-items/new): screenshot upload is the reliable
@@ -216,52 +352,52 @@ p {
 .page__eyebrow {
   display: block;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--color-accent);
-  margin-bottom: var(--space-1);
+  margin-bottom: calc(var(--space-1) * 0.72);
 }
 
 .page__lede {
   color: var(--color-ink-soft);
-  margin-top: var(--space-2);
+  margin-top: calc(var(--space-2) * 0.72);
 }
 
 /* ---------- Layout helpers ---------- */
 
 .stack {
   display: grid;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 .stack--tight {
   display: grid;
-  gap: var(--space-1);
+  gap: calc(var(--space-1) * 0.72) var(--space-1);
 }
 
 .row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
   flex-wrap: wrap;
 }
 
 .divider {
   border: none;
   border-top: 1px solid var(--color-line-strong);
-  margin: var(--space-4) 0;
+  margin: calc(var(--space-4) * 0.72) 0;
 }
 
 .section {
-  margin-top: var(--space-5);
+  margin-top: calc(var(--space-5) * 0.72);
 }
 
 /* ---------- Forms ---------- */
 
 form {
   display: grid;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
   max-width: 26rem;
 }
 
@@ -271,7 +407,7 @@ form.row {
 
 label {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-soft);
@@ -281,7 +417,7 @@ input,
 textarea,
 select {
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 1rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--color-line-strong);
   background: var(--color-bg-alt);
@@ -354,7 +490,7 @@ button,
   justify-content: center;
   justify-self: start;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   padding: 0.75rem 1.5rem;
@@ -439,17 +575,17 @@ a:focus-visible {
 .nav-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-1) var(--space-3);
-  font-size: 0.85rem;
+  gap: calc(var(--space-1) * 0.72) var(--space-3);
+  font-size: 1rem;
 }
 
 /* ---------- Item rows (purchases, wardrobe, wishlist, waiting) ---------- */
 
 .item-row {
   display: flex;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
   align-items: center;
-  padding: var(--space-2) 0;
+  padding: calc(var(--space-2) * 0.72) 0;
   border-bottom: 1px solid var(--color-line);
 }
 
@@ -472,14 +608,14 @@ a:focus-visible {
 }
 
 .item-row__meta {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--color-ink-soft);
-  margin-top: 0.15rem;
+  margin-top: 0.108rem;
 }
 
 .item-row__price {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.188rem;
   white-space: nowrap;
 }
 
@@ -505,7 +641,7 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-fill-ink);
@@ -517,7 +653,7 @@ a:focus-visible {
 .badge-review {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-fill-ink);
@@ -563,7 +699,7 @@ a:focus-visible {
   padding: var(--space-2) var(--space-3);
   background: var(--color-bg-alt);
   color: var(--color-ink-soft);
-  font-size: 0.92rem;
+  font-size: 1rem;
 }
 
 .note--quiet {

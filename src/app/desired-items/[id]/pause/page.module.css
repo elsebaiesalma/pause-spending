@@ -4,11 +4,11 @@
 .sectionLabel {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--color-ink-soft);
-  margin-bottom: var(--space-2);
+  margin-bottom: calc(var(--space-2) * 0.72);
 }
 
 .emptyNote {
@@ -20,8 +20,8 @@
 .wantedItem {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-2);
+  gap: calc(var(--space-3) * 0.72) var(--space-3);
+  margin-top: calc(var(--space-2) * 0.72);
 }
 
 .wantedImage {
@@ -53,7 +53,7 @@
   justify-content: center;
   background: var(--color-fill);
   text-align: center;
-  padding: var(--space-2);
+  padding: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 .wantedPlaceholderLabel {
@@ -72,17 +72,17 @@
 
 .brand {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-faint);
 }
 
 .metaLine {
-  margin-top: 0.5rem;
+  margin-top: 0.36rem;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.252rem 0.35rem;
   flex-wrap: wrap;
   color: var(--color-ink-soft);
 }
@@ -91,10 +91,10 @@
 
 .similarTrack {
   display: flex;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
   overflow-x: auto;
   scroll-snap-type: x proximity;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.36rem;
   margin: 0 calc(var(--space-4) * -1);
   padding-left: var(--space-4);
   padding-right: var(--space-4);
@@ -137,21 +137,21 @@
 }
 
 .similarName {
-  margin-top: 0.4rem;
-  font-size: 0.85rem;
+  margin-top: 0.288rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.3;
 }
 
 .similarMeta {
-  margin-top: 0.15rem;
-  font-size: 0.72rem;
+  margin-top: 0.108rem;
+  font-size: 0.75rem;
   color: var(--color-ink-faint);
 }
 
 .similarReason {
-  margin-top: 0.2rem;
-  font-size: 0.72rem;
+  margin-top: 0.144rem;
+  font-size: 0.75rem;
   color: var(--color-ink-soft);
 }
 
@@ -163,7 +163,7 @@
 }
 
 .question {
-  margin-top: var(--space-4);
+  margin-top: calc(var(--space-4) * 0.72);
 }
 
 .question:first-child {
@@ -199,7 +199,7 @@
   padding: 0 0.9rem;
   border: 1px solid var(--color-line-strong);
   border-radius: 999px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--color-ink-soft);
   cursor: pointer;
 }
@@ -216,9 +216,9 @@
 }
 
 .scaleRow {
-  margin-top: var(--space-2);
+  margin-top: calc(var(--space-2) * 0.72);
   display: flex;
-  gap: 0.4rem;
+  gap: 0.288rem 0.4rem;
 }
 
 .scaleOption {
@@ -241,7 +241,7 @@
   border: 1px solid var(--color-line-strong);
   border-radius: 2px;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--color-ink-soft);
   cursor: pointer;
 }
@@ -258,17 +258,17 @@
 }
 
 .scaleCaption {
-  margin-top: 0.35rem;
+  margin-top: 0.252rem;
   display: flex;
   justify-content: space-between;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--color-ink-faint);
 }
 
 .reasonGrid {
-  margin-top: var(--space-2);
+  margin-top: calc(var(--space-2) * 0.72);
   display: grid;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 @media (min-width: 640px) {
@@ -279,7 +279,7 @@
 
 .reasonField {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.252rem 0.35rem;
 }
 
 .reasonField input {
@@ -289,7 +289,7 @@
 /* ---------- 4. This month ---------- */
 
 .budgetSection {
-  margin-top: var(--space-5);
+  margin-top: calc(var(--space-5) * 0.72);
 }
 
 .budgetBar {
@@ -317,19 +317,19 @@
 }
 
 .budgetLine {
-  margin-top: 0.6rem;
-  font-size: 0.95rem;
+  margin-top: 0.432rem;
+  font-size: 1rem;
 }
 
 .budgetPercent {
-  margin-top: 0.2rem;
-  font-size: 0.82rem;
+  margin-top: 0.144rem;
+  font-size: 1rem;
   color: var(--color-ink-soft);
 }
 
 .overPlan {
-  margin-top: 0.3rem;
-  font-size: 0.82rem;
+  margin-top: 0.216rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--color-accent);
 }
@@ -337,9 +337,9 @@
 /* ---------- 5. Actions ---------- */
 
 .actions {
-  margin-top: var(--space-5);
+  margin-top: calc(var(--space-5) * 0.72);
   display: grid;
-  gap: 0.6rem;
+  gap: 0.432rem 0.6rem;
   max-width: 24rem;
 }
 
@@ -357,19 +357,19 @@
 }
 
 .buyAnywayWrap {
-  margin-top: 0.4rem;
+  margin-top: 0.288rem;
   justify-self: center;
 }
 
 .buyAnywayLink {
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1rem;
   text-transform: none;
   letter-spacing: normal;
 }
 
 .buyAnywayWarning {
-  margin-top: 0.4rem;
+  margin-top: 0.288rem;
   font-size: 0.8rem;
   color: var(--color-accent);
   text-align: center;
@@ -385,7 +385,7 @@
 
 .skelWantedItem {
   display: flex;
-  gap: var(--space-3);
+  gap: calc(var(--space-3) * 0.72) var(--space-3);
 }
 
 .skelImage {
@@ -398,20 +398,20 @@
   composes: skel;
   height: 0.9rem;
   width: 60%;
-  margin-top: 0.75rem;
+  margin-top: 0.54rem;
 }
 
 .skelLineShort {
   composes: skel;
   height: 0.9rem;
   width: 35%;
-  margin-top: 0.5rem;
+  margin-top: 0.36rem;
 }
 
 .skelTrack {
-  margin-top: var(--space-2);
+  margin-top: calc(var(--space-2) * 0.72);
   display: flex;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 .skelCard {

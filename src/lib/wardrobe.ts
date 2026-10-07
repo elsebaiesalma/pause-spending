@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ensureWardrobeItemTagged } from "@/lib/tagging/tagWardrobeItem";
+import { capitalizeFirst, stripBrandPrefix } from "@/lib/wardrobeDisplay";
 import type { Purchase, WardrobeItem } from "@prisma/client";
 
 // Auto-seeds a wardrobe item from a confidently-extracted purchase. Only
@@ -24,7 +25,10 @@ export async function seedWardrobeItemFromPurchase(purchase: Purchase): Promise<
     data: {
       userId: purchase.userId,
       sourcePurchaseId: purchase.id,
-      itemName: purchase.itemName,
+      // The merchant is the brand, and the card shows it on its own line, so
+      // a name that starts with it is stored without it. The original text
+      // stays on the linked Purchase row (purchase.itemName).
+      itemName: stripBrandPrefix(purchase.itemName, purchase.merchant),
       imageUrl: purchase.imageUrl,
       category: purchase.category,
       ownedSince: purchase.orderDate,
@@ -64,7 +68,7 @@ export async function createManualWardrobeItem(
       userId: input.userId,
       itemName: input.itemName,
       category: input.category ?? null,
-      colorName: input.colorName ?? null,
+      colorName: input.colorName ? capitalizeFirst(input.colorName) : null,
       colorFamily: input.colorFamily ?? null,
       styleTags: input.styleTags ?? [],
       useCaseTags: input.useCaseTags ?? [],
@@ -103,7 +107,7 @@ export async function updateWardrobeItem(
 ): Promise<WardrobeItem> {
   return prisma.wardrobeItem.update({
     where: { id, userId },
-    data: input,
+    data: input.colorName ? { ...input, colorName: capitalizeFirst(input.colorName) } : input,
   });
 }
 

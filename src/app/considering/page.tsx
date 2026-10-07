@@ -1,7 +1,6 @@
 import { assembleConsidering } from "@/lib/considering/assembleConsidering";
 import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
 import { requireUserIdOrRedirect } from "@/lib/session";
-import { DashboardTopNav, DashboardBottomTabBar } from "@/app/dashboard/DashboardNav";
 import styles from "./page.module.css";
 
 const PAUSED_DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
@@ -17,9 +16,7 @@ export default async function ConsideringPage() {
   const { onPause, undecided, saved, letGo } = await assembleConsidering(userId);
 
   return (
-    <div className="page page--wide">
-      <DashboardTopNav active="considering" />
-
+    <div className="page">
       <span className="page__eyebrow">Considering</span>
       <h1>What you&apos;re thinking about</h1>
 
@@ -135,8 +132,6 @@ export default async function ConsideringPage() {
           See what you let go
         </a>
       </section>
-
-      <DashboardBottomTabBar active="considering" />
     </div>
   );
 }

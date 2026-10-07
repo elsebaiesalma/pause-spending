@@ -1,5 +1,6 @@
 import { clashDisplay } from "./fonts";
 import { ScrollReveal } from "./ScrollReveal";
+import { ImageSlot } from "@/components/ImageSlot";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -17,20 +18,16 @@ export default function Home() {
         <div className={styles.heroTopBar}>
           <span className={styles.eyebrow}>
             <span className={styles.eyebrowDot} />
-            Edition 01 - Architectural Stillness
+            FOR THE MOMENT BEFORE CHECKOUT
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink-faint)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink-faint)" }}>
             Reflection, not restriction
           </span>
         </div>
 
         <div className={styles.heroGrid}>
           <div className={styles.heroImage}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://picsum.photos/seed/pause-archive-hero/900/1125"
-              alt="Editorial flatlay of archival outerwear and accessories"
-            />
+            <ImageSlot name="hero" alt="Hero image" />
             <span className={styles.heroImageTag}>Fig. 001 / Redundancy Vector</span>
           </div>
           <div className={styles.heroNarrative}>
@@ -45,7 +42,7 @@ export default function Home() {
               </p>
             </div>
             <div style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1rem", display: "flex", justifyContent: "space-between", color: "var(--color-ink-faint)" }}>
-              <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Avg. reflection window</span>
+              <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Avg. reflection window</span>
               <span style={{ fontFamily: "var(--font-display)", fontSize: "0.8rem", color: "var(--color-accent-dim)", fontWeight: 700 }}>24H - 7 DAYS</span>
             </div>
             <a href="#philosophy" className={styles.inlineLink} style={{ marginTop: 0 }}>
@@ -55,39 +52,45 @@ export default function Home() {
         </div>
 
         <h1 className={styles.heroHeadline}>
-          CALIB<em>R</em>ATE
+          PA<em>U</em>SE
         </h1>
       </section>
 
       {/* STATS */}
       <div className={styles.statGrid}>
         <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Impulse dissolution</span>
+          <span className={styles.statLabel}>Impulse buying</span>
           <div className={styles.statValue}>
-            82.4<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
+            60<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
           </div>
-          <p className={styles.statNote}>Illustrative figure - purchases people reconsidered within an 18-hour cooling window.</p>
+          <p className={styles.statNote}>
+            60% of Gen Z social media users have impulse-bought something they saw on social
+          </p>
+          <span className={styles.statSource}>Bankrate/YouGov, 2023</span>
         </div>
         <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Capital preserved</span>
+          <span className={styles.statLabel}>Planned purchases</span>
+          <div className={styles.statValue}>
+            9<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
+          </div>
+          <p className={styles.statNote}>Only 9% of Gen Z say their social media purchases are planned</p>
+          <span className={styles.statSource}>GoDaddy, 2024</span>
+        </div>
+        <div className={`${styles.stat} reveal`} data-reveal>
+          <span className={styles.statLabel}>Buy now, pay later</span>
+          <div className={styles.statValue}>
+            62<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
+          </div>
+          <p className={styles.statNote}>62% of Gen Z BNPL users regret a BNPL purchase</p>
+          <span className={styles.statSource}>LendingTree</span>
+        </div>
+        <div className={`${styles.stat} reveal`} data-reveal>
+          <span className={styles.statLabel}>The wait</span>
           <div className={styles.statValue} style={{ color: "var(--color-accent-dim)" }}>
-            $4,850
+            ~25h
           </div>
-          <p className={styles.statNote}>Illustrative figure - average annual spend avoided per active wardrobe.</p>
-        </div>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Match accuracy</span>
-          <div className={styles.statValue}>
-            99.4<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
-          </div>
-          <p className={styles.statNote}>Order-confirmation parsing and wardrobe redundancy matching.</p>
-        </div>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Notification silence</span>
-          <div className={styles.statValue}>
-            100<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
-          </div>
-          <p className={styles.statNote}>No push alerts, ever. You check in when you check in.</p>
+          <p className={styles.statNote}>A ~25-hour wait lowered both the urge to buy and purchase intent</p>
+          <span className={styles.statSource}>Moser, U. Michigan, 2020</span>
         </div>
       </div>
 
@@ -126,11 +129,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PARALLAX BANNER */}
+      {/* PAUSE SCREEN PREVIEW - a slot for a real screenshot of our Pause screen */}
       <div className={styles.banner}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="https://picsum.photos/seed/pause-overcoat/1920/800" alt="Tailored wool coat draped in studio light" />
-        <div className={styles.bannerOverlay} />
         <div className={`${styles.bannerCard} reveal`} data-reveal>
           <span className={styles.footerEyebrow} style={{ marginBottom: 0 }}>
             Pause screen preview
@@ -141,11 +141,14 @@ export default function Home() {
             you&apos;ve worn three times this month. Same category, same weight, similar use.&quot;
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.7rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
               Budget impact
             </span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", color: "var(--color-accent-dim)" }}>+$1,150.00</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", color: "var(--color-accent-dim)" }}>+$1,150.00</span>
           </div>
+        </div>
+        <div className={styles.bannerShot}>
+          <ImageSlot name="pause-screen" alt="Screenshot of the PAUSE pause screen" fit="contain" />
         </div>
       </div>
 
@@ -218,8 +221,7 @@ export default function Home() {
         </div>
         <div className={styles.galleryGrid}>
           <div className={`${styles.galleryItem} reveal`} data-reveal>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://picsum.photos/seed/pause-belted-coat/900/675" alt="Belted coat against raw plaster" />
+            <ImageSlot name="sample-1" alt="Sample image: belted coat" />
             <span className={styles.galleryTag}>Archive // 01</span>
             <div className={styles.galleryCaption}>
               <div className={styles.galleryCaptionTop}>
@@ -230,8 +232,7 @@ export default function Home() {
             </div>
           </div>
           <div className={`${styles.galleryItem} reveal`} data-reveal>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="https://picsum.photos/seed/pause-high-collar/900/675" alt="High-collar trench styling" />
+            <ImageSlot name="sample-2" alt="Sample image: high-collar styling" />
             <span className={styles.galleryTag}>Styling // 02</span>
             <div className={styles.galleryCaption}>
               <div className={styles.galleryCaptionTop}>

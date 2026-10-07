@@ -17,7 +17,6 @@ vi.mock("@/lib/dashboard/kept", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    emailConnection: { findUnique: vi.fn().mockResolvedValue(null) },
     desiredItem: { count: vi.fn().mockResolvedValue(0) },
     purchase: {
       count: vi.fn().mockResolvedValue(0),
@@ -44,7 +43,6 @@ describe("DashboardPage", () => {
     vi.mocked(getBudgetForMonth).mockResolvedValue(null);
     vi.mocked(getMonthSpend).mockResolvedValue(0);
     vi.mocked(getKeptSummary).mockResolvedValue({ totalKept: 0, itemsLetGo: 0 });
-    vi.mocked(prisma.emailConnection.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
     vi.mocked(prisma.purchase.count).mockResolvedValue(0);
     vi.mocked(prisma.purchase.findMany).mockResolvedValue([]);
@@ -61,14 +59,14 @@ describe("DashboardPage", () => {
     await expect(DashboardPage()).rejects.toThrow();
   });
 
-  it("shows a clear reconnect prompt, not an error, when the Gmail connection has expired", async () => {
+  it("carries no account or Gmail connection section - that lives on the Account page", async () => {
     vi.mocked(auth).mockResolvedValueOnce({ user: { id: "u1" } } as never);
-    vi.mocked(prisma.emailConnection.findUnique).mockResolvedValueOnce({ status: "expired" } as never);
 
     const html = await render();
 
-    expect(html).toContain("expired");
-    expect(html).toContain('href="/connect/gmail"');
+    expect(html).not.toContain("Gmail");
+    expect(html).not.toContain("Permanently delete my data");
+    expect(html).not.toContain("Sign out");
   });
 
   describe("Kept top band", () => {

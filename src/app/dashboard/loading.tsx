@@ -6,7 +6,7 @@ import styles from "./page.module.css";
 // real content swaps in.
 export default function DashboardLoading() {
   return (
-    <div className={`page page--wide ${styles.dashboardPage}`}>
+    <div className="page">
       <div className={styles.skelTopBand}>
         <div className={styles.skelTopHalf}>
           <div className={styles.skelLine} />

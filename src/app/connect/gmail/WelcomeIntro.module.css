@@ -1,0 +1,55 @@
+/* Total run time is 1.4s (DURATION_MS in WelcomeIntro.tsx): the word slides
+   and fades in over the first 0.5s, holds, and the whole overlay fades out
+   from 0.9s to 1.4s. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  cursor: pointer;
+  animation: overlayOut 1.4s linear forwards;
+}
+
+.overlay[data-skip] {
+  display: none;
+}
+
+.word {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 14vw, 9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  animation: wordIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes wordIn {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes overlayOut {
+  0%,
+  64% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    display: none;
+  }
+}

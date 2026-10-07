@@ -1,11 +1,14 @@
+import { WelcomeIntro } from "./WelcomeIntro";
+
 export default function ConnectGmailPage() {
   return (
     <div className="page">
+      <WelcomeIntro />
       <span className="page__eyebrow">Connect your wardrobe</span>
       <h1>Build it from what you&apos;ve already bought</h1>
       <p className="page__lede">
         Instead of logging every item by hand, PAUSE reads your Gmail order confirmations and turns
-        them into a wardrobe automatically. Here is exactly what that means, in plain terms:
+        them into a wardrobe automatically. Here is exactly what that means:
       </p>
 
       <div className="section stack">
@@ -27,7 +30,7 @@ export default function ConnectGmailPage() {
         </div>
         <div className="note">
           <strong>You&apos;re always in control.</strong> Disconnect Gmail, or permanently delete
-          everything PAUSE has stored, at any time from your dashboard.
+          everything PAUSE has stored, at any time from your Account page.
         </div>
       </div>
 

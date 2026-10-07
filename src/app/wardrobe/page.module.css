@@ -3,24 +3,63 @@
 
 .header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
+}
+
+.headerTitle {
+  display: flex;
   align-items: baseline;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
+  min-width: 0;
+}
+
+/* Outlined, so it never reads as the filled "Pause a purchase" action in
+   the nav and tab bar. */
+.addButton {
+  flex-shrink: 0;
+  background: var(--color-fill);
+  border-color: var(--color-fill);
+  color: var(--color-fill-ink);
+}
+
+.addButton:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+/* Hidden until the header button targets it. */
+.addPanel {
+  display: none;
+  margin-top: calc(var(--space-3) * 0.72);
+  padding: calc(var(--space-3) * 0.72) var(--space-3);
+  border: 1px solid var(--color-line-strong);
+  scroll-margin-top: 5rem;
+}
+
+.addPanel:target {
+  display: block;
+}
+
+.addPanel h2 {
+  margin-top: 0;
 }
 
 .count {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 1.188rem;
   color: var(--color-ink-faint);
 }
 
 /* ---------- Filters ---------- */
 
 .filters {
-  margin-top: var(--space-3);
+  margin-top: calc(var(--space-3) * 0.72);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 .chipRow {
@@ -43,7 +82,7 @@
   min-height: 44px;
   padding: 0 0.9rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border: 1px solid var(--color-line-strong);
@@ -66,9 +105,9 @@
 .sortRow {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-faint);
@@ -98,10 +137,10 @@
 /* ---------- Grid ---------- */
 
 .grid {
-  margin-top: var(--space-3);
+  margin-top: calc(var(--space-3) * 0.72);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-2);
+  gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
 @media (min-width: 640px) {
@@ -113,12 +152,12 @@
 @media (min-width: 1024px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-3);
+    gap: calc(var(--space-3) * 0.72) var(--space-3);
   }
 }
 
 .emptyState {
-  margin-top: var(--space-3);
+  margin-top: calc(var(--space-3) * 0.72);
   color: var(--color-ink-soft);
 }
 
@@ -166,7 +205,7 @@
 
 .imagePlaceholderLabel {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -181,20 +220,20 @@
 }
 
 .cardBody {
-  padding: 0.65rem 0.75rem 0.85rem;
+  padding: 0.468rem 0.75rem 0.612rem 0.75rem;
 }
 
 .cardBrand {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-faint);
 }
 
 .cardName {
-  margin-top: 0.2rem;
-  font-size: 0.92rem;
+  margin-top: 0.144rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.3;
   display: -webkit-box;
@@ -204,13 +243,18 @@
 }
 
 .cardMeta {
-  margin-top: 0.4rem;
+  margin-top: 0.288rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 1rem;
+  color: var(--color-ink-soft);
+}
+
+.cardColor {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  flex-wrap: wrap;
-  font-size: 0.78rem;
-  color: var(--color-ink-soft);
 }
 
 
@@ -242,7 +286,7 @@
   border: 1px solid var(--color-line-strong);
   color: var(--color-ink);
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: 1.188rem;
   line-height: 1;
 }
 
@@ -280,7 +324,7 @@
   background: none;
   color: var(--color-ink);
   font-family: var(--font-body);
-  font-size: 0.85rem;
+  font-size: 1rem;
   text-transform: none;
   letter-spacing: normal;
   text-align: left;

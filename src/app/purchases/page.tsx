@@ -9,7 +9,7 @@ export default async function PurchasesPage() {
   });
 
   return (
-    <div className="page page--wide">
+    <div className="page">
       <span className="page__eyebrow">History</span>
       <h1>Purchase history</h1>
 
@@ -35,7 +35,7 @@ export default async function PurchasesPage() {
                 </div>
                 {purchase.status === "needs_review" && (
                   <div className="stack" style={{ marginTop: "0.6rem" }}>
-                    <p className="page__lede" style={{ fontSize: "0.85rem" }}>
+                    <p className="page__lede" style={{ fontSize: "1rem" }}>
                       {purchase.price === null
                         ? "We couldn't confidently read this one's price - enter it to confirm, or discard it."
                         : "We couldn't confidently read this one - confirm the details or discard it."}

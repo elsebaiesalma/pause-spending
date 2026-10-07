@@ -28,13 +28,13 @@ describe("wardrobe service", () => {
     createdWardrobeItemIds.length = 0;
   });
 
-  async function makePurchase(overrides: Partial<{ status: string }> = {}) {
+  async function makePurchase(overrides: Partial<{ status: string; itemName: string }> = {}) {
     const purchase = await prisma.purchase.create({
       data: {
         userId,
         merchant: "Nike",
         orderDate: new Date("2026-03-01"),
-        itemName: "Air Max 90",
+        itemName: overrides.itemName ?? "Air Max 90",
         price: "129.99",
         category: "shoes",
         imageUrl: "https://cdn.nike.com/shoe.jpg",
@@ -61,6 +61,26 @@ describe("wardrobe service", () => {
     expect(item.category).toBe("shoes");
     expect(item.status).toBe("active");
     expect(item.ownedSince?.toISOString().slice(0, 10)).toBe("2026-03-01");
+  });
+
+  it("stores the item name without the merchant's name, keeping the original on the purchase", async () => {
+    userId = (await prisma.user.findFirstOrThrow()).id;
+    const purchase = await makePurchase({ itemName: "Nike Air Max 90" });
+
+    await seedWardrobeItemFromPurchase(purchase);
+
+    const item = await prisma.wardrobeItem.findFirstOrThrow({ where: { sourcePurchaseId: purchase.id } });
+    createdWardrobeItemIds.push(item.id);
+    expect(item.itemName).toBe("Air Max 90");
+    const stored = await prisma.purchase.findUniqueOrThrow({ where: { id: purchase.id } });
+    expect(stored.itemName).toBe("Nike Air Max 90");
+  });
+
+  it("capitalizes the first letter of a manually entered color name", async () => {
+    userId = (await prisma.user.findFirstOrThrow()).id;
+    const item = await createManualWardrobeItem({ userId, itemName: "Test tee", colorName: "espresso", colorFamily: "brown" });
+    createdWardrobeItemIds.push(item.id);
+    expect(item.colorName).toBe("Espresso");
   });
 
   it("does not seed a wardrobe item from a needs_review purchase", async () => {
@@ -119,7 +139,7 @@ describe("wardrobe service", () => {
     });
 
     expect(updated.itemName).toBe("Navy Wool Sweater");
-    expect(updated.colorName).toBe("navy");
+    expect(updated.colorName).toBe("Navy"); // first letter capitalized on save
     expect(updated.colorFamily).toBe("navy");
     expect(updated.styleTags).toEqual(["business-casual"]);
   });

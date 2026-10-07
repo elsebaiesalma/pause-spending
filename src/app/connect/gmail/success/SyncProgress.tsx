@@ -33,7 +33,7 @@ export function SyncProgress() {
           throw new Error(
             body.error === "token_expired"
               ? "Your Gmail connection expired before this finished. Reconnect to try again."
-              : "The sync couldn't finish. You can try again from your dashboard."
+              : "The sync couldn't finish. You can try again from your Account page."
           );
         }
         router.push("/connect/gmail/done");

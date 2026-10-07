@@ -1,6 +1,5 @@
 import { listLetGoItems } from "@/lib/considering/letGoList";
 import { requireUserIdOrRedirect } from "@/lib/session";
-import { DashboardTopNav, DashboardBottomTabBar } from "@/app/dashboard/DashboardNav";
 import styles from "../page.module.css";
 
 export default async function LetGoListPage() {
@@ -8,9 +7,7 @@ export default async function LetGoListPage() {
   const rows = await listLetGoItems(userId);
 
   return (
-    <div className="page page--wide">
-      <DashboardTopNav active="considering" />
-
+    <div className="page">
       <span className="page__eyebrow">Considering</span>
       <h1>What you let go</h1>
 
@@ -43,8 +40,6 @@ export default async function LetGoListPage() {
           })}
         </div>
       )}
-
-      <DashboardBottomTabBar active="considering" />
     </div>
   );
 }

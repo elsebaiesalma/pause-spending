@@ -4,9 +4,7 @@ import { currentMonthKey, getBudgetForMonth, getMonthSpend } from "@/lib/budget"
 import { getKeptSummary, type KeptSummary } from "@/lib/dashboard/kept";
 import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
 import { requireUserIdOrRedirect } from "@/lib/session";
-import { csrfTokenForUser } from "@/lib/csrf";
 import { KeptToggle } from "./KeptToggle";
-import { DashboardTopNav, DashboardBottomTabBar } from "./DashboardNav";
 import styles from "./page.module.css";
 
 const EMPTY_KEPT: KeptSummary = { totalKept: 0, itemsLetGo: 0 };
@@ -15,9 +13,8 @@ export default async function DashboardPage() {
   const userId = await requireUserIdOrRedirect();
   const monthKey = currentMonthKey();
 
-  const [gmailConnection, waitingQueue, totalDesiredItemsCount, releasedCount, budget, spend, needsReviewCount, recentPurchases] =
+  const [waitingQueue, totalDesiredItemsCount, releasedCount, budget, spend, needsReviewCount, recentPurchases] =
     await Promise.all([
-      prisma.emailConnection.findUnique({ where: { userId_provider: { userId, provider: "gmail" } } }),
       listWaitingQueue(userId),
       prisma.desiredItem.count({ where: { userId } }),
       prisma.desiredItem.count({ where: { userId, decisionOutcome: "dropped" } }),
@@ -39,9 +36,7 @@ export default async function DashboardPage() {
   const isOverBudget = spendRemaining !== null && spendRemaining < 0;
 
   return (
-    <div className={`page page--wide ${styles.dashboardPage}`}>
-      <DashboardTopNav active="home" />
-
+    <div className="page">
       <div className={styles.topBand}>
         <div className={styles.topHalf}>
           <span className="page__eyebrow">Kept</span>
@@ -49,7 +44,7 @@ export default async function DashboardPage() {
             <KeptToggle thisMonth={keptThisMonth} allTime={keptAllTime} />
           ) : totalDesiredItemsCount === 0 ? (
             <>
-              <p className={styles.statValue} style={{ fontSize: "1.35rem" }}>
+              <p className={styles.statValue} style={{ fontSize: "1.45rem" }}>
                 Pause your first item
               </p>
               <p className={styles.statNote}>See what you&apos;d keep by giving one purchase a moment first.</p>
@@ -161,67 +156,6 @@ export default async function DashboardPage() {
           See all in wardrobe &rarr;
         </a>
       </section>
-
-      {/* Account / Gmail connection - unobtrusive, below the prescribed
-          layout so it doesn't compete with it, but disconnect/delete stay
-          reachable since they're real, data-affecting actions. */}
-      <section className={styles.section}>
-        <span className="page__eyebrow">Account</span>
-        {gmailConnection?.status === "connected" ? (
-          <div className="stack" style={{ marginTop: "0.5rem" }}>
-            <p className="page__lede">Gmail connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
-            <div className="row">
-              <form action="/api/sync/gmail/run" method="POST">
-                <button type="submit">Sync now</button>
-              </form>
-              <form action="/api/auth/gmail/disconnect" method="POST">
-                <input type="hidden" name="csrfToken" value={csrfTokenForUser(userId)} />
-                <button type="submit">Disconnect</button>
-              </form>
-              <a href="/connect/gmail/delete" className="btn btn-danger">
-                Permanently delete my data
-              </a>
-              <a href="/purchases" className="btn-quiet">
-                Purchase history
-              </a>
-            </div>
-          </div>
-        ) : gmailConnection?.status === "expired" ? (
-          <div className="stack" style={{ marginTop: "0.5rem" }}>
-            <p className="page__lede">
-              Your Gmail connection has expired and needs to be reconnected before syncing can continue.
-            </p>
-            <div className="row">
-              <a href="/connect/gmail" className="btn btn-primary">
-                Reconnect Gmail
-              </a>
-              <a href="/connect/gmail/delete" className="btn-quiet">
-                Permanently delete my data
-              </a>
-            </div>
-          </div>
-        ) : gmailConnection?.status === "disconnected" ? (
-          <div className="stack" style={{ marginTop: "0.5rem" }}>
-            <p className="page__lede">Gmail is disconnected. Previously parsed data is kept.</p>
-            <div className="row">
-              <a href="/connect/gmail" className="btn btn-primary">
-                Reconnect Gmail
-              </a>
-              <a href="/connect/gmail/delete" className="btn-quiet">
-                Permanently delete my data
-              </a>
-            </div>
-          </div>
-        ) : (
-          <p style={{ marginTop: "0.5rem" }}>
-            <a href="/connect/gmail" className="btn">
-              Connect Gmail
-            </a>
-          </p>
-        )}
-      </section>
-
-      <DashboardBottomTabBar active="home" />
     </div>
   );
 }

@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
-import { GarmentSilhouette, silhouetteForItem } from "./GarmentSilhouette";
 import { ColorDot } from "@/components/ColorDot";
+import { capitalizeFirst, stripBrandPrefix } from "@/lib/wardrobeDisplay";
 import styles from "./page.module.css";
 
 const CATEGORY_FILTERS = [
@@ -25,26 +24,12 @@ const SORT_OPTIONS = [
 
 type Sort = (typeof SORT_OPTIONS)[number]["value"];
 
-const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
+// ownedSince is a date-only column stored at UTC midnight, so it must be
+// formatted in UTC or it shows the previous month west of Greenwich.
+const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
-}
-
-// Renders a list of nodes on one meta line, separated by " · " - keeps the
-// "no price" / "no color" / "no date" cases from producing a stray leading
-// or doubled separator, since each part is only added when it has content.
-function MetaLine({ parts }: { parts: ReactNode[] }) {
-  return (
-    <>
-      {parts.map((part, index) => (
-        <span key={index}>
-          {index > 0 && " · "}
-          {part}
-        </span>
-      ))}
-    </>
-  );
 }
 
 export default async function WardrobePage({ searchParams }: PageProps<"/wardrobe">) {
@@ -111,12 +96,49 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   }
 
   return (
-    <div className="page page--wide">
+    <div className="page">
       <span className="page__eyebrow">What you own</span>
       <div className={styles.header}>
-        <h1>Wardrobe</h1>
-        <span className={styles.count}>{items.length}</span>
+        <div className={styles.headerTitle}>
+          <h1>Wardrobe</h1>
+          <span className={styles.count}>{items.length}</span>
+        </div>
+        <a href="#add-to-wardrobe" className={`btn ${styles.addButton}`}>
+          Add to wardrobe
+        </a>
       </div>
+
+      {/* Opens with the header button (:target), so the form is at the top of
+          the page instead of buried below a long grid. */}
+      <section id="add-to-wardrobe" className={styles.addPanel}>
+        <h2>Add to wardrobe</h2>
+        <form action="/api/wardrobe" method="POST">
+          <input name="itemName" placeholder="Item name (required)" required />
+          <input name="category" placeholder="Category, e.g. tops" />
+          <label htmlFor="colorFamily">Color</label>
+          <select id="colorFamily" name="colorFamily" defaultValue="">
+            <option value="">Choose a color</option>
+            {COLOR_FAMILIES.map((family) => (
+              <option key={family} value={family}>
+                {capitalizeFirst(family)}
+              </option>
+            ))}
+          </select>
+          <input name="colorName" placeholder="Color name (optional), e.g. Espresso" />
+          <input name="styleTags" placeholder="Style tags (comma separated)" />
+          <input name="useCaseTags" placeholder="Use-case tags (comma separated)" />
+          <label htmlFor="ownedSince">Owned since</label>
+          <input id="ownedSince" name="ownedSince" type="date" />
+          <div className="row">
+            <button type="submit" className="btn-primary">
+              Add to wardrobe
+            </button>
+            <a href="#" className="btn-quiet">
+              Cancel
+            </a>
+          </div>
+        </form>
+      </section>
 
       <div className={styles.filters}>
         <div className={styles.chipRow} role="group" aria-label="Filter by category">
@@ -154,39 +176,27 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
       ) : (
         <div className={styles.grid}>
           {sorted.map((item) => {
+            // Seeded mock rows get the designed placeholder (category on a
+            // rose tile) instead of an image; real items keep their photo.
             const isSeed = item.source === "seed";
-            const shape = isSeed ? silhouetteForItem(item.category, item.itemName) : null;
-            const showSilhouette = isSeed && Boolean(item.imageUrl) && shape !== null;
             const showRealImage = !isSeed && Boolean(item.imageUrl);
             const brand = item.sourcePurchase?.merchant ?? null;
+            const displayName = stripBrandPrefix(item.itemName, brand);
             const price = item.sourcePurchase?.price != null ? Number(item.sourcePurchase.price) : null;
             const ownedSince = item.ownedSince ? MONTH_YEAR_FORMAT.format(item.ownedSince) : null;
-
-            const metaParts: ReactNode[] = [];
-            if (item.colorName) metaParts.push(item.colorName);
-            metaParts.push(
-              price !== null ? (
-                `$${price.toFixed(0)}`
-              ) : (
-                <span className={styles.priceNotSet}>Price not set</span>
-              )
-            );
-            if (ownedSince) metaParts.push(ownedSince);
 
             return (
               <article key={item.id} className={styles.card}>
                 <a
                   href={`/wardrobe/${item.id}/edit`}
                   className={styles.cardLink}
-                  aria-label={`Edit ${item.itemName}`}
+                  aria-label={`Edit ${displayName}`}
                 />
 
                 <div className={styles.cardImage}>
                   {showRealImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.imageUrl!} alt={item.itemName} />
-                  ) : showSilhouette ? (
-                    <GarmentSilhouette shape={shape!} colorFamily={item.colorFamily} />
+                    <img src={item.imageUrl!} alt={displayName} />
                   ) : (
                     <div className={styles.imagePlaceholder}>
                       <span className={styles.imagePlaceholderLabel}>{item.category || "No category"}</span>
@@ -199,15 +209,23 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
 
                 <div className={styles.cardBody}>
                   {brand && <p className={styles.cardBrand}>{brand}</p>}
-                  <h3 className={styles.cardName}>{item.itemName}</h3>
+                  <h3 className={styles.cardName}>{displayName}</h3>
                   <div className={styles.cardMeta}>
-                    <ColorDot colorFamily={item.colorFamily} />
-                    <MetaLine parts={metaParts} />
+                    {(item.colorName || item.colorFamily) && (
+                      <p className={styles.cardColor}>
+                        <ColorDot colorFamily={item.colorFamily} />
+                        {capitalizeFirst(item.colorName ?? item.colorFamily ?? "")}
+                      </p>
+                    )}
+                    <p className={price === null ? styles.priceNotSet : undefined}>
+                      {price !== null ? `$${price.toFixed(0)}` : "Price not set"}
+                    </p>
+                    {ownedSince && <p>{ownedSince}</p>}
                   </div>
                 </div>
 
                 <details className={styles.menu}>
-                  <summary className={styles.menuToggle} aria-label={`More actions for ${item.itemName}`}>
+                  <summary className={styles.menuToggle} aria-label={`More actions for ${displayName}`}>
                     ⋯
                   </summary>
                   <div className={styles.menuPanel}>
@@ -222,28 +240,6 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
           })}
         </div>
       )}
-
-      <section className="section">
-        <h2>Add an item</h2>
-        <form action="/api/wardrobe" method="POST">
-          <input name="itemName" placeholder="Item name (required)" required />
-          <input name="category" placeholder="Category, e.g. tops" />
-          <input name="colorName" placeholder="Color, e.g. Espresso" />
-          <select name="colorFamily" defaultValue="">
-            <option value="">Color family (unset)</option>
-            {COLOR_FAMILIES.map((family) => (
-              <option key={family} value={family}>
-                {family}
-              </option>
-            ))}
-          </select>
-          <input name="styleTags" placeholder="Style tags (comma separated)" />
-          <input name="useCaseTags" placeholder="Use-case tags (comma separated)" />
-          <label htmlFor="ownedSince">Owned since</label>
-          <input id="ownedSince" name="ownedSince" type="date" />
-          <button type="submit">Add to wardrobe</button>
-        </form>
-      </section>
     </div>
   );
 }

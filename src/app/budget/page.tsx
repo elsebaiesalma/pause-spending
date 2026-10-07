@@ -43,7 +43,7 @@ export default async function BudgetPage() {
         </div>
       ) : (
         <div className="section stack">
-          <p className="item-row__price" style={{ fontSize: "2rem" }}>
+          <p className="item-row__price" style={{ fontSize: "2.15rem" }}>
             ${Number(budget.amount).toFixed(2)}
           </p>
           <p className="page__lede">budget for {monthKey}</p>

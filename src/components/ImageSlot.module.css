@@ -1,0 +1,51 @@
+.slot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  color: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-align: center;
+  padding: 1rem;
+}
+
+.caption {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.path {
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.image[data-loaded="true"] {
+  opacity: 1;
+}
+
+.slot[data-fit="contain"] .image {
+  object-fit: contain;
+}
