@@ -8,22 +8,33 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 **Done**
 - Still want it: the page, outfit suggestions (validated, ids only, description built from names), secondhand links, go-to-store with the once-per-visit prompt, and undecided items on Considering.
-- One model constant per feature, each with an env override. Commits `ffc221c` (one model), `53a5684` (Still want it), `cb9c3d7` (undecided on Considering), `2784230` (notes), `45abe0e` (per-feature models, server-side outfit descriptions), and this notes commit.
-- Full suite passing: 81 files, 446 tests. Type check and lint clean.
+- Store-visit columns (`went_to_store_at`, `store_visit_answer`) are applied and recorded on BOTH Neon branches (migration `20260926090000_add_desired_item_store_visit`, checksums match the file). They are in `schema.prisma`, `prisma generate` has run, and `src/lib/stillWantIt/storeVisit.ts` now uses the generated client, every query scoped by `userId`. Database tests cover undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit) and cross-tenant access. Commits `44f0b53`, `0877fba`, `5e20fcc`.
+- One model constant per feature, each with an env override.
+- Full suite passing: 82 files, 453 tests. Type check clean. Lint has 3 errors left (see below).
 
 **Waiting on the user**
-- Run `prisma/manual/still-want-it-store-visit.sql` on BOTH Neon branches (main and test), then run its verification query. Both branches must show `went_to_store_at` and `store_visit_answer` present.
-- Once confirmed, step 3 of the plan, all in one pass: add the two columns to `schema.prisma`, record a migration with matching checksums on both branches, run `prisma generate`, add the database tests for undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit), and run the full suite. Nothing in step 3 has started.
-
-**Design queue (decide before building)**
-- Outfit cache must become durable before deploy. Options: a `DesiredItem` column holding the outfit JSON plus its wardrobe version, or a small table. Decide which.
-- Lower-priced options (section 02) stay hidden until intake stores other-retailer results. Decide what intake stores, and where.
-- Email sync must dedupe against a "proceeded" desired item when a matching order arrives. "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window) before email sync can create one.
-- Model outfit descriptions can refer to the target item even though it is never in the outfit. Decide whether the prompt should forbid that.
-- Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
 - Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. No browser session has been used yet.
-- Proceeded items with no list to show them: "Buy anyway" now lands on Still want it, and undecided ones appear on Considering. Decide whether any other proceeded items need a home.
-- The older recommendations page (`src/app/desired-items/[id]/recommendations`) is no longer linked from the resolve route. Decide whether to keep or remove it.
+- Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
+- Create a private GitHub repo. The git repo has no remote, so nothing is pushed.
+
+**Lint: 3 errors left, all behavior-changing, so not touched**
+- `src/app/connect/gmail/page.tsx:34`: `<a>` to `/api/auth/gmail/start`. `<Link>` can prefetch, and prefetching an OAuth start route is not safe.
+- `src/app/dashboard/KeptToggle.tsx:37` and `src/app/desired-items/new/SearchBox.tsx:76`: `react-hooks/set-state-in-effect`. Fixing either changes render timing.
+
+**Design queue (screens to design)**
+- Add item
+- Receipts review
+- Settings (also where the saved-item retention setting would live)
+- Item detail
+- The pause-ended moment (see "Locked pause state" in Parked items)
+
+**Open decisions (before building)**
+- Outfit cache must become durable before deploy. Options: a `DesiredItem` column holding the outfit JSON plus its wardrobe version, or a small table.
+- Lower-priced options (section 02) stay hidden until intake stores other-retailer results. Decide what intake stores, and where.
+- Email sync must dedupe against a "proceeded" desired item when a matching order arrives. "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
+- Model outfit descriptions can refer to the target item even though it is never in the outfit. Decide whether the prompt should forbid that.
+- Proceeded items with no list to show them. Decide whether any other proceeded items need a home.
+- The older recommendations page (`src/app/desired-items/[id]/recommendations`) is no longer linked from the resolve route. Keep or remove.
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
 ## Environment and branches
@@ -85,9 +96,9 @@ Each feature has its own constant and environment override. Defaults:
 - Mocked tests cannot catch a bad model ID. Re-run a real call after changing any model.
 - Outfit descriptions are built server-side from the chosen items' names. The model returns item ids only, and any extra prose it adds is ignored.
 
-## Still want it (built 2026-10-05; SQL not yet applied)
+## Still want it (built 2026-10-05)
 
-- The page is at `src/app/desired-items/[id]/still-want-it`, reached from "Buy anyway". Its state is in two columns, `went_to_store_at` and `store_visit_answer`, described in `prisma/manual/still-want-it-store-visit.sql`. They are read and written with raw SQL until that SQL is confirmed on both branches. After that, move them into `schema.prisma` with a recorded migration and run `prisma generate`.
+- The page is at `src/app/desired-items/[id]/still-want-it`, reached from "Buy anyway". Its state is in two columns, `went_to_store_at` and `store_visit_answer`, read and written through the generated client in `src/lib/stillWantIt/storeVisit.ts`. The hand-run SQL is kept in `prisma/manual/still-want-it-store-visit.sql` for reference.
 - **Section 02 (lower-priced options) is hidden until alternatives are stored at intake.** Nothing at intake persists other-retailer results yet. `getStoredRetailerAlternatives()` returns nothing, and no price is ever estimated. Before this section can show anything, intake must store the results, and this function must read them.
 - **The outfit cache is in-memory and must be made durable before deploy.** It lives in `globalThis` per process, so each cold start re-calls the model. It is keyed by user, desired item and wardrobe version. Move it to a table or column first.
 - **"Yes" creates no `Purchase` row.** It only sets the desired item to `proceeded` with a price. Email sync must dedupe against that proceeded item, or it will create a second record for the same purchase.
