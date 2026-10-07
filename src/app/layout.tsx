@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
+import Link from "next/link";
 import { clashDisplay } from "./fonts";
 import { auth, signOut } from "@/lib/auth";
 import "./globals.css";
@@ -33,9 +34,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           it does not suppress mismatches in children. */}
       <body style={{ display: "flex", flexDirection: "column" }} suppressHydrationWarning>
         <header className="site-header">
-          <a href="/" className="site-header__brand">
+          <Link href="/" className="site-header__brand">
             PAUSE.
-          </a>
+          </Link>
           {session?.user ? (
             <form
               action={async () => {

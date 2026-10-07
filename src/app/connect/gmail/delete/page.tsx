@@ -1,5 +1,6 @@
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { csrfTokenForUser } from "@/lib/csrf";
+import Link from "next/link";
 
 export default async function DeleteGmailDataPage() {
   const userId = await requireUserIdOrRedirect();
@@ -25,9 +26,9 @@ export default async function DeleteGmailDataPage() {
         </button>
       </form>
       <p className="section">
-        <a href="/" className="btn-quiet">
+        <Link href="/" className="btn-quiet">
           Cancel, go back
-        </a>
+        </Link>
       </p>
     </div>
   );
