@@ -330,6 +330,15 @@ p {
   width: 100%;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 /* Item-entry flow (desired-items/new): screenshot upload is the reliable
    path for exactly the retailers search/direct-fetch handle worst (heavy
    anti-bot blocking), so on mobile - where a screenshot is also just

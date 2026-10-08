@@ -1,247 +1,165 @@
-/* Dashboard-scoped. Mirrors the landing page's stat-grid visual language
-   (mono label, big display-font value, faint note, hairline borders) but
-   reads it through the same shared tokens in the light/app theme instead
-   of duplicating the landing's own dark-scoped CSS module. */
+/* Home. The shared pieces (hero, numerals, receipt, quote, stripe) live in
+   src/components/kit; this file only lays them out. */
 
-/* ---------- Top band ---------- */
-
-.topBand {
+.home {
   display: grid;
-  gap: 1px 1px;
-  background: var(--color-line);
-  border: 1px solid var(--color-line);
+  gap: var(--space-4);
+}
+
+/* ---------- Smart add ---------- */
+
+.smartAdd {
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (min-width: 641px) {
+  .smartAdd {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+}
+
+.smartAddForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1);
+}
+
+.smartAddInput {
+  min-height: 3rem;
+  min-width: 0;
+}
+
+.smartAddForm button,
+.screenshotBtn {
+  min-height: 3rem;
+}
+
+/* The screenshot button is the quick route on a phone, so there it spans the
+   full width on its own row, above the keyboard-heavy paste box. */
+.screenshotBtn {
+  cursor: pointer;
+}
+
+.screenshotBtn:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .smartAdd {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .smartAdd > form:last-child {
+    order: -1;
+  }
+  .screenshotBtn {
+    width: 100%;
+    background: var(--color-fill);
+    border-color: var(--color-fill);
+    color: var(--color-fill-ink);
+  }
+}
+
+/* ---------- Status lines ---------- */
+
+.statusLines {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.statusLine {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-strong);
+  text-underline-offset: 3px;
+}
+
+.statusLine:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+/* ---------- Numerals ---------- */
+
+.numerals {
+  display: grid;
+  gap: var(--space-3);
+  align-items: start;
 }
 
 @media (min-width: 900px) {
-  .topBand {
+  .numerals {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.topHalf {
-  background: var(--color-bg);
-  padding: calc(var(--space-3) * 0.72) var(--space-3);
-  min-height: 9rem;
+.column {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
-.statValue {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(1.89rem, 4vw, 2.7rem);
-  letter-spacing: -0.02em;
-  margin-top: 0.36rem;
-}
-
-/* The KEPT figure is the one .statValue usage that's a real link (to the
-   let-go list) - the tag+class selector keeps this hover affordance from
-   also applying to the other, non-link .statValue usages on this page. */
-a.statValue:hover {
-  color: var(--color-accent);
-}
-
-.statValueMuted {
-  font-size: 1.188rem;
-  color: var(--color-ink-soft);
-}
-
-.statNote {
-  margin-top: 0.288rem;
+.keptLine {
   font-size: 1rem;
   color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-strong);
+  text-underline-offset: 3px;
 }
 
-.segmented {
-  display: inline-flex;
-  margin-top: calc(var(--space-2) * 0.72);
-  border: 1px solid var(--color-line-strong);
-  border-radius: 999px;
-  padding: 2px 2px;
-}
-
-.segmentedBtn {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0.4rem 0.85rem;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--color-ink-soft);
-}
-
-.segmentedBtn:hover {
-  background: transparent;
-  color: var(--color-ink);
-}
-
-.segmentedBtn[data-active="true"] {
-  background: var(--color-ink);
-  color: var(--color-bg);
+.keptLine:hover {
+  color: var(--color-accent);
 }
 
 .inlineBudgetForm {
   display: flex;
-  flex-direction: row;
-  gap: 0.36rem 0.5rem;
-  max-width: none;
-  margin-top: calc(var(--space-2) * 0.72);
+  gap: var(--space-1);
+  margin-top: 0.4rem;
 }
 
 .inlineBudgetForm input {
-  max-width: 7rem;
+  width: 8rem;
+  min-width: 0;
 }
 
-/* ---------- Receipts banner ---------- */
-
-.receiptsBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1px;
-  padding: calc(var(--space-2) * 0.72) var(--space-3);
-  background: var(--color-fill);
-  color: var(--color-fill-ink);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-/* ---------- Section headings ---------- */
-
-.section {
-  margin-top: calc(var(--space-5) * 0.72);
-}
-
-.sectionHeading {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--color-ink-soft);
-  margin-bottom: calc(var(--space-2) * 0.72);
-}
-
-/* ---------- On pause ---------- */
-
-.onPauseTrack {
-  display: flex;
-  gap: calc(var(--space-2) * 0.72) var(--space-2);
-  overflow-x: auto;
-  scroll-snap-type: x proximity;
-  padding-bottom: 0.36rem;
-  margin: 0 calc(var(--space-4) * -1);
-  padding-left: var(--space-4);
-  padding-right: var(--space-4);
-}
-
-@media (min-width: 900px) {
-  .onPauseTrack {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    overflow-x: visible;
-    margin: 0;
-    padding: 0;
-  }
-}
-
-.onPauseCard {
-  flex: 0 0 auto;
-  width: 200px;
-  scroll-snap-align: start;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
-  overflow: hidden;
-  color: var(--color-ink);
-}
-
-@media (min-width: 900px) {
-  .onPauseCard {
-    width: auto;
-  }
-}
-
-.onPauseImage {
-  aspect-ratio: 4 / 3;
-  background: var(--color-bg-alt);
-}
-
-.onPauseImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.onPauseBody {
-  padding: calc(var(--space-2) * 0.72) var(--space-2);
-}
-
-.onPauseUnlock {
-  margin-top: 0.36rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-accent);
-}
-
-/* ---------- Skeletons (loading.tsx) ---------- */
+/* ---------- Loading skeleton ---------- */
 
 .skel {
   background: var(--color-bg-alt);
-  animation: skeleton-pulse 1.2s ease-in-out infinite;
-  border-radius: 1px;
+  animation: skelPulse 1.4s ease-in-out infinite;
 }
 
-.skelTopBand {
+@keyframes skelPulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skelHero {
+  height: 4.5rem;
+  width: min(22rem, 100%);
+}
+
+.skelAdd {
+  height: 3rem;
+}
+
+.skelNumerals {
   display: grid;
-  gap: 1px 1px;
-  background: var(--color-line);
-  border: 1px solid var(--color-line);
+  gap: var(--space-3);
 }
 
 @media (min-width: 900px) {
-  .skelTopBand {
+  .skelNumerals {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.skelTopHalf {
-  composes: skel;
-  background: var(--color-bg);
-  padding: calc(var(--space-3) * 0.72) var(--space-3);
-  min-height: 9rem;
+.skelBlock {
+  height: 9rem;
 }
 
-.skelLine {
-  composes: skel;
-  height: 0.9rem;
-  width: 60%;
-}
-
-.skelValue {
-  composes: skel;
-  height: 2.2rem;
-  width: 45%;
-  margin-top: 0.432rem;
-}
-
-.skelTrack {
-  display: flex;
-  gap: calc(var(--space-2) * 0.72) var(--space-2);
-}
-
-.skelCard {
-  composes: skel;
-  width: 200px;
-  height: 10rem;
-  flex: 0 0 auto;
-}
-
-.skelRow {
-  composes: skel;
-  height: 56px;
-  margin-bottom: calc(var(--space-2) * 0.72);
+.skelReceipt {
+  height: 11rem;
 }

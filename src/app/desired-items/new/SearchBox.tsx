@@ -17,8 +17,8 @@ function fieldValue(value: string | number | null): string {
   return value === null ? "" : String(value);
 }
 
-export default function SearchBox() {
-  const [query, setQuery] = useState("");
+export default function SearchBox({ initialQuery = "" }: { initialQuery?: string }) {
+  const [query, setQuery] = useState(initialQuery);
   const [state, setState] = useState<SearchState>({ status: "idle" });
   const [activeIndex, setActiveIndex] = useState(-1);
 

@@ -1,8 +1,11 @@
 import { requireUserIdOrRedirect } from "@/lib/session";
 import SearchBox from "./SearchBox";
 
-export default async function NewDesiredItemPage() {
+export default async function NewDesiredItemPage({ searchParams }: PageProps<"/desired-items/new">) {
   await requireUserIdOrRedirect();
+  // Home's smart add hands typed text over here, so the matches list opens already searching.
+  const { q } = await searchParams;
+  const initialQuery = typeof q === "string" ? q : "";
   const searchAvailable = Boolean(process.env.BRAVE_SEARCH_API_KEY);
 
   return (
@@ -13,7 +16,7 @@ export default async function NewDesiredItemPage() {
       <div className="item-entry-flow">
         {searchAvailable && (
           <div className="item-entry-flow__search">
-            <SearchBox />
+            <SearchBox initialQuery={initialQuery} />
           </div>
         )}
 

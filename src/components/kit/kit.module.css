@@ -1,0 +1,174 @@
+/* Element kit: PageHero, BigNumeral, ReceiptBlock, QuoteBand, ColorStripe.
+   Reads only the shared tokens, so it follows the app theme. Every label is
+   0.75rem (12px) or larger; body copy is 1rem. */
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-accent);
+}
+
+.hero {
+  display: grid;
+  gap: calc(var(--space-1) * 0.72);
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+/* ---------- BigNumeral ---------- */
+
+.numeral {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding: calc(var(--space-3) * 0.72) var(--space-3);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg);
+  min-width: 0;
+}
+
+a.numeral:hover .numeralValue {
+  color: var(--color-accent);
+}
+
+.numeralLabel {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-ink-soft);
+}
+
+.numeralValue {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 8vw, 3.8rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.numeralNote {
+  font-size: 1rem;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- ReceiptBlock ---------- */
+
+.receipt {
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg-alt);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+}
+
+.receiptLine {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  font-size: 0.875rem;
+}
+
+.receiptDate {
+  color: var(--color-ink-soft);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.receiptName {
+  overflow-wrap: anywhere;
+}
+
+.receiptBrand {
+  color: var(--color-ink-soft);
+}
+
+.receiptPrice {
+  font-variant-numeric: tabular-nums;
+}
+
+.receiptMore,
+.receiptEmpty {
+  padding: 0.35rem 0;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.receiptRule {
+  border: 0;
+  border-top: 1px dashed var(--color-ink-faint);
+  margin: 0.75rem 0;
+}
+
+.receiptTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.receiptTotalOver {
+  color: var(--color-accent);
+}
+
+@media (max-width: 480px) {
+  .receiptLine {
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+}
+
+/* ---------- QuoteBand ---------- */
+
+.quote {
+  padding: var(--space-4) var(--space-3);
+  background: var(--color-fill);
+  color: var(--color-fill-ink);
+  text-align: center;
+}
+
+.quoteText {
+  max-width: 40ch;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.quoteSource {
+  display: block;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* ---------- ColorStripe ---------- */
+
+.stripe {
+  display: flex;
+  height: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-line-strong);
+  overflow: hidden;
+}
+
+.stripeSegment {
+  min-width: 2px;
+}
