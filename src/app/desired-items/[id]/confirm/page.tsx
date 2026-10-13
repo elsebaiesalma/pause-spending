@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
@@ -24,7 +25,7 @@ const DEFAULT_CATEGORY_OPTIONS = [
 async function categoryOptionsFor(userId: string, currentCategory: string | null): Promise<string[]> {
   const [desired, wardrobe, purchases] = await Promise.all([
     prisma.desiredItem.findMany({ where: { userId, category: { not: null } }, select: { category: true } }),
-    prisma.wardrobeItem.findMany({ where: { userId, category: { not: null } }, select: { category: true } }),
+    prisma.wardrobeItem.findMany({ where: { userId, category: { not: null }, ...devWardrobeWhere() }, select: { category: true } }),
     prisma.purchase.findMany({ where: { userId }, select: { category: true } }),
   ]);
 

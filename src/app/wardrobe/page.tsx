@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
 import { capitalizeFirst } from "@/lib/wardrobeDisplay";
 import { toWardrobeEntry } from "@/lib/wardrobeEntries";
@@ -33,7 +34,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   // only ones excluded, matching what this page has always considered "in the
   // wardrobe".
   const rows = await prisma.wardrobeItem.findMany({
-    where: { userId, status: { not: "returned" } },
+    where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
     include: { sourcePurchase: { select: { merchant: true, price: true } } },
   });
 

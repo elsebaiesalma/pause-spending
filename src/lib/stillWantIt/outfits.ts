@@ -5,6 +5,7 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { OUTFIT_MODEL } from "@/lib/anthropicModels";
 import { getAnthropicClient } from "@/lib/anthropicClient";
 import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 
 // Below this many owned pieces, a 2-4 item outfit would mostly repeat the
 // same few things, so we say so instead of guessing.
@@ -187,7 +188,7 @@ export async function getOutfitSuggestions(
   if (!desired) return null;
 
   const rows = await prisma.wardrobeItem.findMany({
-    where: { userId, status: "active" },
+    where: { userId, status: "active", ...devWardrobeWhere() },
     select: {
       id: true,
       itemName: true,
@@ -276,7 +277,7 @@ export async function getBoardSuggestion(
   }
 
   const rows = await prisma.wardrobeItem.findMany({
-    where: { userId, status: "active" },
+    where: { userId, status: "active", ...devWardrobeWhere() },
     select: { id: true, category: true, colorFamily: true, colorName: true, styleTags: true, useCaseTags: true },
     orderBy: { id: "asc" },
   });

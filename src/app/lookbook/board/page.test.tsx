@@ -18,6 +18,7 @@ vi.mock("next/navigation", async (importOriginal) => ({
 }));
 
 import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { getBoardSuggestion } from "@/lib/stillWantIt/outfits";
 import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import { saveLook } from "@/lib/looks/looks";
@@ -29,6 +30,7 @@ describe("BoardPage", () => {
   let fixture: TwoTenantFixture | undefined;
 
   afterEach(async () => {
+    vi.unstubAllEnvs();
     vi.mocked(auth).mockReset();
     vi.mocked(getBoardSuggestion).mockReset();
     await fixture?.cleanup();
@@ -141,6 +143,36 @@ describe("BoardPage", () => {
       const { userA } = fixture;
       await render(userA.user.id, { blank: "1" });
       expect(getBoardSuggestion).not.toHaveBeenCalled();
+    },
+    SLOW
+  );
+
+  it(
+    "follows DEV_WARDROBE_VIEW for the drawer, but a saved look keeps every piece it has",
+    async () => {
+      fixture = await createTwoTenantFixture();
+      const { userA } = fixture;
+      await prisma.wardrobeItem.create({ data: { userId: userA.user.id, itemName: "Seed Drawer Piece", category: "tops", source: "seed" } });
+      await prisma.wardrobeItem.create({ data: { userId: userA.user.id, itemName: "Hidden Real Piece", category: "tops" } });
+      // A look built from the (real, no-source) fixture item.
+      const lookId = (await saveLook(userA.user.id, {
+        placements: [{ wardrobeItemId: userA.wardrobeItem.id, x: 0.2, y: 0.2, scale: 0.4, zOrder: 0 }],
+      }))!;
+
+      vi.stubEnv("NODE_ENV", "development");
+      vi.stubEnv("DEV_WARDROBE_VIEW", "seed");
+      const blank = await render(userA.user.id, { blank: "1" });
+      expect(blank).toContain("Seed Drawer Piece");
+      expect(blank).not.toContain("Hidden Real Piece");
+
+      // Editing the saved look: its real piece is still on the board.
+      const editing = await render(userA.user.id, { look: lookId });
+      expect(editing).toContain(userA.wardrobeItem.itemName);
+      expect(editing).not.toContain("Hidden Real Piece");
+
+      // In production the variable is ignored.
+      vi.stubEnv("NODE_ENV", "production");
+      expect(await render(userA.user.id, { blank: "1" })).toContain("Hidden Real Piece");
     },
     SLOW
   );

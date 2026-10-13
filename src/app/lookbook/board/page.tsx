@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { toWardrobeEntry } from "@/lib/wardrobeEntries";
 import { getLook } from "@/lib/looks/looks";
@@ -69,9 +70,23 @@ export default async function BoardPage({ searchParams }: PageProps<"/lookbook/b
   }
 
   const rows = await prisma.wardrobeItem.findMany({
-    where: { userId, status: { not: "returned" } },
+    where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
     include: { sourcePurchase: { select: { merchant: true, price: true } } },
   });
+  const look = lookId ? await getLook(userId, lookId) : null;
+  if (lookId && !look) notFound();
+
+  // A saved look keeps all of its pieces even if the dev view hides some of them.
+  const shown = new Set(rows.map((row) => row.id));
+  const hiddenPieceIds = (look?.pieces ?? []).map((piece) => piece.wardrobeItemId).filter((id) => !shown.has(id));
+  if (hiddenPieceIds.length > 0) {
+    rows.push(
+      ...(await prisma.wardrobeItem.findMany({
+        where: { userId, id: { in: hiddenPieceIds }, status: { not: "returned" } },
+        include: { sourcePurchase: { select: { merchant: true, price: true } } },
+      }))
+    );
+  }
   const entries = rows.map(toWardrobeEntry);
   const items: BoardItem[] = entries.map((entry) => ({
     id: entry.id,
@@ -86,9 +101,7 @@ export default async function BoardPage({ searchParams }: PageProps<"/lookbook/b
   const existingNames = (await prisma.look.findMany({ where: { userId }, select: { name: true } })).map((l) => l.name);
   const namePlaceholder = nextLookName(existingNames);
 
-  if (lookId) {
-    const look = await getLook(userId, lookId);
-    if (!look) notFound();
+  if (look) {
     return (
       <Board
         lookId={look.id}

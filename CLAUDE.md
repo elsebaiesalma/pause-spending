@@ -69,6 +69,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - `npx tsx scripts/deleteSeededMockWardrobe.ts` (dry run; `--confirm` deletes) removes only `source = "seed"` rows, refuses if a real wardrobe item was made from a seed purchase, and drops looks left empty.
 - Seeds from the earlier script have random ids (25 wardrobe items and 25 purchases at the time of writing): delete them first, or they sit alongside the new ones.
 - Keep `GMAIL_SYNC_PAUSED=true` in `.env` while mock data is loaded.
+- **Dev-only view filter:** `DEV_WARDROBE_VIEW=seed|real|all` in `.env` (`src/lib/devWardrobeView.ts`) limits every wardrobe listing (Wardrobe, Home, the board's drawer and suggestions, outfit suggestions, pause-screen matches, confirm-page categories) to seed rows or to real rows, with a "Showing seed items only" banner on every page. It does nothing when `NODE_ENV` is `production`, and `vitest.setup.ts` clears it so tests never depend on it. It is a view only: ownership checks and reads by id ignore it, and a saved look always keeps all of its pieces.
 
 ## Brand casing
 

@@ -506,6 +506,20 @@ input[type="file"] {
   outline-offset: 2px;
 }
 
+/* ---------- Dev view banner (DEV_WARDROBE_VIEW, never in production) ---------- */
+
+.dev-view-banner {
+  margin: 0;
+  padding: 0.35rem var(--gutter);
+  background: var(--color-fill);
+  color: var(--color-fill-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
 /* ---------- Buttons ---------- */
 
 button,

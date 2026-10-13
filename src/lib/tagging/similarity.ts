@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { Prisma, type WardrobeItem } from "@prisma/client";
 
 export type SimilarityProbe = {
@@ -51,6 +52,7 @@ export async function findSimilarWardrobeItems(
       status: "active",
       category: probe.category,
       OR: overlapConditions,
+      ...devWardrobeWhere(),
     },
   });
 }

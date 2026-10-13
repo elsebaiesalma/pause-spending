@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { ensureWardrobeItemTagged } from "@/lib/tagging/tagWardrobeItem";
 import { capitalizeFirst, stripBrandPrefix } from "@/lib/wardrobeDisplay";
 import type { Purchase, WardrobeItem } from "@prisma/client";
@@ -126,7 +127,7 @@ export async function markWardrobeItemReturned(
 
 export async function listActiveWardrobeItems(userId: string): Promise<WardrobeItem[]> {
   return prisma.wardrobeItem.findMany({
-    where: { userId, status: "active" },
+    where: { userId, status: "active", ...devWardrobeWhere() },
     orderBy: { ownedSince: "desc" },
   });
 }

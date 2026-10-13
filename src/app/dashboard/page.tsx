@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { formatMonthLabel } from "@/lib/monthLabel";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -43,7 +44,7 @@ export default async function DashboardPage() {
     getKeptSummary(userId, "this_month"),
     // Same "in the wardrobe" rule as the Wardrobe page: everything except returned.
     prisma.wardrobeItem.findMany({
-      where: { userId, status: { not: "returned" } },
+      where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
       include: { sourcePurchase: { select: { merchant: true, price: true } } },
     }),
   ]);

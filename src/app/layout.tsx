@@ -3,6 +3,7 @@ import { Inter, Space_Mono } from "next/font/google";
 import { clashDisplay } from "./fonts";
 import { auth } from "@/lib/auth";
 import { initialsFor } from "@/lib/initials";
+import { DevViewBanner } from "@/components/DevViewBanner";
 import { SiteHeader, SiteMain, SiteTabBar } from "@/components/SiteNav";
 import "./globals.css";
 
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           it does not suppress mismatches in children. */}
       <body style={{ display: "flex", flexDirection: "column" }} suppressHydrationWarning>
         <SiteHeader initials={initials} />
+        <DevViewBanner />
         <SiteMain signedIn={initials !== null}>{children}</SiteMain>
         <SiteTabBar signedIn={initials !== null} />
       </body>
