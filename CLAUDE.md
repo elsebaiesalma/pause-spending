@@ -95,7 +95,7 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 - **Lookbook tab** (`/lookbook`): count, New look, thumbnails (`LookThumb`), rename and delete. "Built instead of [item]" is text only.
 - **Pause screen:** "Build this look from your closet" sits in "A moment to think". A saved look for the item counts as a reflection answer for the Buy anyway gate (`hasReflectionAnswer`). The reflection fields are kept in sessionStorage across the trip to the board.
 - API: `/api/looks` (POST) and `/api/looks/[id]` (PUT, PATCH rename, DELETE), all scoped by the session user.
-- `npm install` needed `--legacy-peer-deps` (vitest 5 wants a newer `@types/node` than the project's; unrelated to the Lookbook).
+- Dependencies install with a plain `npm install` or `npm ci` (no `--legacy-peer-deps`): `@types/node` is `^22` to satisfy vitest 5's peer range, and `engines.node` is `24.x`.
 
 ## Migration rules
 
