@@ -1,0 +1,318 @@
+/* Rack view. Geometry mirrors RACK in src/lib/wardrobeView.ts: card 160 x 200
+   (4:5), 16px gaps, 52px divider tabs, shelf line at 340px, 104px below it
+   for the tags of items that stand on the shelf. Every label is 0.75rem
+   (12px) or larger and body text is 1rem. */
+
+.rackSection {
+  --card-w: 160px;
+  --card-h: 200px;
+  --stage-h: 340px;
+  --tag-row-h: 104px;
+  --divider-w: 52px;
+  margin-top: calc(var(--space-3) * 0.72);
+}
+
+/* ---------- Controls ---------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-faint);
+}
+
+/* Touch screens swipe; the buttons are for mouse and keyboard users. */
+.arrows {
+  display: none;
+  gap: 0.5rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .arrows {
+    display: flex;
+  }
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: 1.188rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.arrow:hover:not(:disabled) {
+  border-color: var(--color-ink);
+}
+
+.arrow:disabled,
+.arrow:disabled:hover {
+  background: var(--color-bg);
+  color: var(--color-ink-faint);
+  cursor: default;
+}
+
+.arrow:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Scroller and track ---------- */
+
+.scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  border-top: 1px solid transparent;
+  cursor: grab;
+}
+
+.scroller:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.scroller[data-dragging="true"] {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* Per-item snapping on touch screens. Mouse users drag freely, and snapping
+   is paused while dragging or jumping to a section. */
+@media (pointer: coarse) {
+  .scroller {
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+  }
+
+  .scroller[data-dragging="true"],
+  .scroller[data-jumping="true"] {
+    scroll-snap-type: none;
+  }
+}
+
+.track {
+  --sway: 0deg;
+  position: relative;
+  height: calc(var(--stage-h) + var(--tag-row-h));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The two levels: a rail along the top and a shelf line underneath. */
+.track::before,
+.track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px solid var(--color-ink);
+  pointer-events: none;
+}
+
+.track::before {
+  top: 0;
+}
+
+.track::after {
+  top: var(--stage-h);
+  border-top-color: var(--color-line-strong);
+}
+
+/* ---------- Divider tabs ---------- */
+
+.divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--divider-w);
+  display: flex;
+  justify-content: center;
+  padding-top: 0.75rem;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 0 0 2px 2px;
+  scroll-snap-align: start;
+  z-index: 1;
+}
+
+.dividerTab {
+  align-self: flex-start;
+  padding: 0.75rem 0.4rem;
+  background: var(--color-fill);
+  color: var(--color-fill-ink);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Items ---------- */
+
+.hanging,
+.standing {
+  position: absolute;
+  width: var(--card-w);
+  scroll-snap-align: start;
+}
+
+.hanging {
+  top: 0;
+}
+
+/* Cards stand with their bottom edge on the shelf line; the tag sits below it. */
+.standing {
+  top: calc(var(--stage-h) - var(--card-h));
+}
+
+/* Pivots at the hook, where the hanger meets the rail. */
+.swing {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0;
+  transform: rotate(var(--sway));
+  transition: transform 0.9s cubic-bezier(0.25, 1.9, 0.5, 1);
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .hanging:hover .swing {
+    transform: rotate(2.5deg);
+    transition-duration: 0.5s;
+  }
+}
+
+/* Don't let a card move under an open menu. */
+.swing:has(details[open]) {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swing,
+  .hanging:hover .swing {
+    transform: none;
+    transition: none;
+  }
+}
+
+.hanger {
+  display: block;
+  margin-top: -4px;
+  color: var(--color-ink);
+}
+
+.clip {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  margin-left: -14px;
+  z-index: 2;
+  color: var(--color-ink);
+}
+
+.card {
+  position: relative;
+  width: var(--card-w);
+  margin-top: 4px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+  background: var(--color-bg);
+}
+
+.standing .card {
+  margin-top: 0;
+}
+
+.cardImage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--color-bg-alt);
+  overflow: hidden;
+}
+
+.cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The card is too narrow for the badge and the ⋯ button side by side. */
+.cardImage .badgeBottom {
+  top: auto;
+  bottom: 0.5rem;
+}
+
+/* ---------- Tag ---------- */
+
+.tag {
+  width: 100%;
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.tagBrand {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tagName {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tagPrice {
+  font-size: 1rem;
+  color: var(--color-ink-soft);
+}
+
+.tagPriceMissing {
+  font-size: 1rem;
+  color: var(--color-ink-faint);
+}

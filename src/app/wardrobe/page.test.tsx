@@ -90,11 +90,24 @@ describe("WardrobePage", () => {
       expect(date).toBeGreaterThan(price);
     });
 
-    it("uses the category placeholder, not an image or silhouette, for seeded rows", async () => {
-      const html = await renderFor(await seedCard("seed"));
-      expect(html).not.toContain("example.com/tee.jpg");
-      expect(html).not.toContain("Garment illustration");
-      expect(html).toContain(">tops<");
+    it("shows a seeded row's photo, and the category placeholder only when it has no image", async () => {
+      const withImage = await renderFor(await seedCard("seed"));
+      expect(withImage).toContain("example.com/tee.jpg");
+      expect(withImage).not.toContain("Garment illustration");
+
+      await prisma.wardrobeItem.updateMany({ where: { id: { in: itemIds } }, data: { imageUrl: null } });
+      const withoutImage = await renderFor((await prisma.user.findFirstOrThrow()).id);
+      expect(withoutImage).not.toContain("example.com/tee.jpg");
+      expect(withoutImage).toContain(">tops<");
+    });
+
+    it("opens on the Grid view with the toggle pressed, and puts the hero and piece count at the top", async () => {
+      const html = await renderFor(await seedCard(null));
+      expect(html).toContain("What you already own is the starting point.");
+      expect(html).toMatch(/aria-pressed="true"[^>]*>Grid</);
+      expect(html).toMatch(/aria-pressed="false"[^>]*>Rack</);
+      expect(html).toContain('type="search"');
+      expect(html).not.toContain("Rack view");
     });
 
     it("keeps the real photo for non-seed items", async () => {

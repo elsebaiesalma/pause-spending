@@ -26,6 +26,7 @@
 //
 // Usage: npx tsx scripts/seedMockWardrobe.ts
 import { prisma } from "@/lib/prisma";
+import { seedImageUrlFor } from "@/lib/seedWardrobeImages";
 
 const SOURCE = "seed";
 
@@ -366,9 +367,9 @@ function daysAgoToDate(days: number): Date {
   return date;
 }
 
-function imageUrlFor(item: SeedItem, index: number): string | null {
-  if (!item.image) return null;
-  return `https://picsum.photos/seed/pause-seed-${index}/600/600`;
+// One Unsplash garment photo per category (src/lib/seedWardrobeImages.ts).
+function imageUrlFor(item: SeedItem): string | null {
+  return item.image ? seedImageUrlFor(item.category) : null;
 }
 
 async function main() {
@@ -380,7 +381,7 @@ async function main() {
   console.log(`Seeding ${ITEMS.length} mock wardrobe items for ${user.email} (${user.id})...`);
 
   let created = 0;
-  for (const [index, item] of ITEMS.entries()) {
+  for (const item of ITEMS) {
     const orderDate = daysAgoToDate(item.daysAgo);
     const purchaseStatus = item.price === null ? "needs_review" : "active";
 
@@ -392,7 +393,7 @@ async function main() {
         itemName: item.itemName,
         price: item.price,
         category: item.category,
-        imageUrl: imageUrlFor(item, index),
+        imageUrl: imageUrlFor(item),
         colorName: item.colorName,
         colorFamily: item.colorFamily,
         status: purchaseStatus,
@@ -405,7 +406,7 @@ async function main() {
         userId: user.id,
         sourcePurchaseId: purchase.id,
         itemName: item.itemName,
-        imageUrl: imageUrlFor(item, index),
+        imageUrl: imageUrlFor(item),
         category: item.category,
         colorName: item.colorName,
         colorFamily: item.colorFamily,
