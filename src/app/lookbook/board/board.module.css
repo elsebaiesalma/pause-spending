@@ -226,11 +226,21 @@
   grid-column: span 5;
 }
 
+.rowButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
 .addBtn {
   margin: 0;
 }
 
 @media (min-width: 900px) {
+  .rowButtons {
+    grid-template-columns: 1fr;
+  }
+
   .addBtn {
     display: none;
   }

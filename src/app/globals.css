@@ -271,7 +271,7 @@ p {
   }
 }
 
-/* Phone navigation: Home · Wardrobe · (+) Pause a purchase · Considering */
+/* Phone navigation: Home · Wardrobe · (+) Pause a purchase · Considering · Lookbook */
 .tab-bar {
   position: fixed;
   left: 0;
@@ -279,7 +279,7 @@ p {
   bottom: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   align-items: end;
   background: var(--color-bg);
   border-top: 1px solid var(--color-line-strong);

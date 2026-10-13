@@ -203,9 +203,22 @@ export function Board({
             onRemoved={() => select(null)}
           />
 
-          <button type="button" className={`action ${styles.addBtn}`} onClick={() => setDrawerOpen(true)}>
-            Add pieces
-          </button>
+          <div className={styles.rowButtons}>
+            <button type="button" className={`action ${styles.addBtn}`} onClick={() => setDrawerOpen(true)}>
+              Add pieces
+            </button>
+            <button
+              type="button"
+              className="action"
+              onClick={() => {
+                setPieces([]);
+                select(null);
+              }}
+              disabled={pieces.length === 0}
+            >
+              Start blank
+            </button>
+          </div>
 
           <Drawer
             open={drawerOpen}

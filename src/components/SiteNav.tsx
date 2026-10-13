@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/dashboard", label: "Home" },
   { href: "/wardrobe", label: "Wardrobe" },
   { href: "/considering", label: "Considering" },
+  { href: "/lookbook", label: "Lookbook" },
 ] as const;
 
 const PAUSE_HREF = "/desired-items/new";
@@ -85,7 +86,7 @@ export function SiteHeader({ initials }: { initials: string | null }) {
   );
 }
 
-// Home · Wardrobe · (+) Pause a purchase · Considering
+// Home · Wardrobe · (+) Pause a purchase · Considering · Lookbook
 export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   if (!signedIn || isPublicPath(pathname)) return null;
@@ -110,6 +111,9 @@ export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
         aria-current={isActive(pathname, "/considering") ? "page" : undefined}
       >
         Considering
+      </Link>
+      <Link href="/lookbook" className="tab-bar__item" aria-current={isActive(pathname, "/lookbook") ? "page" : undefined}>
+        Lookbook
       </Link>
     </nav>
   );
