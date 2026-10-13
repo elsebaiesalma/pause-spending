@@ -24,7 +24,9 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
           <h2>Paste a product URL</h2>
           <form action="/api/desired-items/from-url" method="POST">
             <input name="url" type="url" placeholder="https://..." required />
-            <button type="submit">Look it up</button>
+            <button type="submit" className="action">
+              Look it up
+            </button>
           </form>
         </div>
 
@@ -40,7 +42,9 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
           <h2>Upload a screenshot</h2>
           <form action="/api/desired-items/from-screenshot" method="POST" encType="multipart/form-data">
             <input name="screenshot" type="file" accept="image/*" required />
-            <button type="submit">Identify item</button>
+            <button type="submit" className="action">
+              Identify item
+            </button>
           </form>
         </div>
 
@@ -48,7 +52,7 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
           <h2>Or just type it</h2>
           <form action="/api/desired-items/from-text" method="POST">
             <input name="text" placeholder="e.g. navy wool blazer" required />
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary action">
               Continue
             </button>
           </form>

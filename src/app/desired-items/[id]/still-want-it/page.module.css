@@ -95,6 +95,8 @@
   background: var(--color-bg);
   color: var(--color-ink);
   width: 9rem;
+  box-sizing: border-box;
+  min-height: 3rem;
 }
 
 .visitOther {

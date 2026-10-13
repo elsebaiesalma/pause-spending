@@ -13,9 +13,9 @@ describe("per-feature model constants", () => {
   });
 
   it("every other feature defaults to the model it used before the single-model change", async () => {
-    const { TAGGING_MODEL, RECEIPT_EXTRACTION_MODEL, SCREENSHOT_MODEL, REDUNDANCY_MODEL, RECOMMENDATIONS_MODEL } =
+    const { TAGGING_MODEL, RECEIPT_EXTRACTION_MODEL, SCREENSHOT_MODEL, REDUNDANCY_MODEL } =
       await import("./anthropicModels");
-    for (const model of [TAGGING_MODEL, RECEIPT_EXTRACTION_MODEL, SCREENSHOT_MODEL, REDUNDANCY_MODEL, RECOMMENDATIONS_MODEL]) {
+    for (const model of [TAGGING_MODEL, RECEIPT_EXTRACTION_MODEL, SCREENSHOT_MODEL, REDUNDANCY_MODEL]) {
       expect(model).toBe("claude-opus-5");
     }
   });

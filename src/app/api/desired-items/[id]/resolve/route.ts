@@ -13,8 +13,7 @@ const OUTCOMES = new Set(["proceeded", "dropped", "saved_for_later"]);
 // its own real pause_status per the design's four-value enum, landing the
 // item on the wishlist; "proceeded" and "dropped" both resolve pause_status
 // to "proceeded" - decision_outcome keeps the real answer for the user's
-// own reflection/history - and "proceeded" is where Step 15's post-wait
-// recommendations pick up.
+// own reflection/history - and "proceeded" is where Still want it picks up.
 export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired-items/[id]/resolve">) {
   const userId = await requireUserId();
   if (typeof userId !== "string") return userId;

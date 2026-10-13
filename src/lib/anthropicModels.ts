@@ -24,6 +24,3 @@ export const SCREENSHOT_MODEL = modelFromEnv("ANTHROPIC_MODEL_SCREENSHOT", "clau
 
 // Pause-screen explanation of why an item overlaps with what you own.
 export const REDUNDANCY_MODEL = modelFromEnv("ANTHROPIC_MODEL_REDUNDANCY", "claude-opus-5");
-
-// Post-wait comparables, secondhand options and outfit ideas.
-export const RECOMMENDATIONS_MODEL = modelFromEnv("ANTHROPIC_MODEL_RECOMMENDATIONS", "claude-opus-5");

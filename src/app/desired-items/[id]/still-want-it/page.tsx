@@ -71,18 +71,18 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
               <span>Price you paid</span>
               <input type="number" name="price" min="0.01" step="0.01" inputMode="decimal" required />
             </label>
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary btn-sized">
               Yes, I bought it
             </button>
           </form>
           <div className={styles.visitOther}>
             <form action={`/api/desired-items/${id}/store-visit-answer`} method="POST">
-              <button type="submit" name="answer" value="not_bought" className="btn-quiet">
+              <button type="submit" name="answer" value="not_bought" className="btn-sized">
                 No
               </button>
             </form>
             <form action={`/api/desired-items/${id}/store-visit-answer`} method="POST">
-              <button type="submit" name="answer" value="not_sure" className="btn-quiet">
+              <button type="submit" name="answer" value="not_sure" className="btn-sized">
                 Not sure yet
               </button>
             </form>

@@ -348,6 +348,22 @@ p {
   display: flex;
   flex-direction: column;
 }
+/* One column: every field and every button share the width and left edge of
+   the shared action group (24rem). */
+.item-entry-flow > div {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.item-entry-flow form {
+  max-width: none;
+}
+
+.item-entry-flow input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
 .item-entry-flow__search { order: 1; }
 .item-entry-flow__url { order: 2; }
 .item-entry-flow__screenshot { order: 3; }
@@ -577,12 +593,18 @@ a:focus-visible {
   display: contents;
 }
 
-.action {
-  justify-self: stretch;
-  width: 100%;
+/* .btn-sized is the size alone, for buttons that sit in their own
+   arrangement (the "Did you buy it?" row); .action adds full width. */
+.action,
+.btn-sized {
   min-height: 3rem;
   padding: 0.75rem 1rem;
   text-align: center;
+}
+
+.action {
+  justify-self: stretch;
+  width: 100%;
 }
 
 .action--quiet {

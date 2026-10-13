@@ -38,7 +38,6 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Email sync must dedupe against a "proceeded" desired item when a matching order arrives. "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Model outfit descriptions can refer to the target item even though it is never in the outfit. Decide whether the prompt should forbid that.
 - Proceeded items with no list to show them. Decide whether any other proceeded items need a home.
-- The older recommendations page (`src/app/desired-items/[id]/recommendations`) is no longer linked from the resolve route. Keep or remove.
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
 ## Environment and branches
@@ -91,11 +90,11 @@ Each feature has its own constant and environment override. Defaults:
 | Receipt pipeline (email classification and extraction) | `RECEIPT_EXTRACTION_MODEL` | `ANTHROPIC_MODEL_RECEIPT_EXTRACTION` | `claude-opus-5` | `claude-opus-5` |
 | Screenshot reading | `SCREENSHOT_MODEL` | `ANTHROPIC_MODEL_SCREENSHOT` | `claude-opus-5` | `claude-opus-5` |
 | Pause-screen redundancy explanation | `REDUNDANCY_MODEL` | `ANTHROPIC_MODEL_REDUNDANCY` | `claude-opus-5` | `claude-opus-5` |
-| Post-wait recommendations | `RECOMMENDATIONS_MODEL` | `ANTHROPIC_MODEL_RECOMMENDATIONS` | `claude-opus-5` | `claude-opus-5` |
 
 - The "before" column is read from commit `d3974a1`. All nine call sites used `claude-opus-5`, so no previous model is missing.
 - URL and search extraction (`urlExtractor.ts`, `searchProduct.ts`) makes no Claude call, so it has no constant.
-- Redundancy and recommendations were not on the original feature list. Each has its own constant so that its model setting is not lost.
+- Redundancy was not on the original feature list. It has its own constant so that its model setting is not lost.
+- The old Post-wait recommendations page, library and `RECOMMENDATIONS_MODEL` were deleted (2026-10-13): nothing linked to them, and Still want it replaced them.
 - `claude-opus-5`, `claude-sonnet-5` and `claude-sonnet-5-5` all returned successful live responses on 2026-10-05. The live structured-output path (`messages.parse` with a zod schema) also returned valid output on `claude-sonnet-5-5`.
 - Mocked tests cannot catch a bad model ID. Re-run a real call after changing any model.
 - Outfit descriptions are built server-side from the chosen items' names. The model returns item ids only, and any extra prose it adds is ignored.
