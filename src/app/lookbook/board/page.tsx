@@ -6,31 +6,48 @@ import { getLook } from "@/lib/looks/looks";
 import { arrangeOutfit } from "@/lib/looks/arrange";
 import { nextLookName } from "@/lib/looks/placements";
 import { safeReturnPath } from "@/lib/looks/returnPath";
-import { getBoardSuggestion, type BoardSuggestion } from "@/lib/stillWantIt/outfits";
+import { SUGGESTION_TIMEOUT_MS, type SuggestionResult } from "@/lib/looks/suggestion";
+import { getBoardSuggestion } from "@/lib/stillWantIt/outfits";
 import { Board, type BoardItem } from "./Board";
-
-const SUGGESTION_TIMEOUT_MS = 12_000;
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-async function suggestionWithTimeout(userId: string, desiredItemId: string | null): Promise<BoardSuggestion> {
-  const timeout = new Promise<BoardSuggestion>((resolve) =>
-    setTimeout(() => resolve({ status: "unavailable" }), SUGGESTION_TIMEOUT_MS)
-  );
-  return Promise.race([getBoardSuggestion(userId, desiredItemId), timeout]).catch(() => ({ status: "unavailable" }));
+// Works out a suggested outfit without holding the page up: the board opens at
+// once and receives this later. Gives up after SUGGESTION_TIMEOUT_MS. It never
+// rejects, so an unread promise can never become an unhandled error.
+function buildSuggestion(
+  userId: string,
+  desiredItemId: string | null,
+  entries: { id: string; category: string | null }[]
+): Promise<SuggestionResult> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<SuggestionResult>((resolve) => {
+    timer = setTimeout(() => resolve({ status: "unavailable" }), SUGGESTION_TIMEOUT_MS);
+  });
+
+  const work = getBoardSuggestion(userId, desiredItemId).then((suggestion): SuggestionResult => {
+    if (suggestion.status !== "ok") return { status: suggestion.status };
+    const byId = new Map(entries.map((entry) => [entry.id, entry]));
+    const pieces = arrangeOutfit(
+      suggestion.itemIds.flatMap((id) => {
+        const entry = byId.get(id);
+        return entry ? [{ id, category: entry.category }] : [];
+      })
+    );
+    return pieces.length > 0 ? { status: "ok", pieces } : { status: "none" };
+  });
+
+  return Promise.race([work, timeout])
+    .catch((): SuggestionResult => ({ status: "unavailable" }))
+    .finally(() => clearTimeout(timer));
 }
 
-const NOTICES: Record<string, string> = {
-  too_small: "Not enough pieces yet for a suggestion. Add some from your wardrobe.",
-  unavailable: "A suggestion couldn't load just now. Here is a blank board.",
-  none: "No suggestion this time. Here is a blank board.",
-};
-
 // The board opens in one of four ways: editing a saved look (?look=), built
-// for a wanted item (?for=), blank (?blank=1), or pre-filled with a suggested
-// outfit (the default). ?returnTo= is where Close and Save go afterwards.
+// for a wanted item (?for=), blank (?blank=1), or with a suggested outfit (the
+// default), which is worked out in the background and placed if it arrives
+// before anything is touched. ?returnTo= is where Close and Save go afterwards.
 export default async function BoardPage({ searchParams }: PageProps<"/lookbook/board">) {
   const userId = await requireUserIdOrRedirect();
   const params = await searchParams;
@@ -84,7 +101,7 @@ export default async function BoardPage({ searchParams }: PageProps<"/lookbook/b
         builtInstead={look.builtInstead}
         items={items}
         returnTo={returnTo}
-        notice={null}
+        suggestion={null}
       />
     );
   }
@@ -96,34 +113,19 @@ export default async function BoardPage({ searchParams }: PageProps<"/lookbook/b
     builtInstead = wanted.itemName?.trim() || null;
   }
 
-  let initialPieces: ReturnType<typeof arrangeOutfit> = [];
-  let notice: string | null = null;
-  if (!blank) {
-    const suggestion = await suggestionWithTimeout(userId, forId ?? null);
-    if (suggestion.status === "ok") {
-      const byId = new Map(entries.map((entry) => [entry.id, entry]));
-      initialPieces = arrangeOutfit(
-        suggestion.itemIds.flatMap((id) => {
-          const entry = byId.get(id);
-          return entry ? [{ id, category: entry.category }] : [];
-        })
-      );
-    } else {
-      notice = NOTICES[suggestion.status] ?? null;
-    }
-  }
+  const suggestion = blank ? null : buildSuggestion(userId, forId ?? null, entries);
 
   return (
     <Board
       lookId={null}
       initialName=""
       namePlaceholder={namePlaceholder}
-      initialPieces={initialPieces}
+      initialPieces={[]}
       inspiredByDesiredItemId={forId ?? null}
       builtInstead={builtInstead}
       items={items}
       returnTo={returnTo}
-      notice={notice}
+      suggestion={suggestion}
     />
   );
 }

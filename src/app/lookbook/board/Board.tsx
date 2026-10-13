@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDrag, useGesture } from "@use-gesture/react";
 import {
@@ -15,7 +14,9 @@ import {
   resizePiece,
   stepZ,
 } from "@/lib/looks/boardOps";
+import { hasUnsavedChanges } from "@/lib/looks/dirty";
 import { MAX_PIECES, MAX_SCALE, MIN_SCALE, type LookPlacement } from "@/lib/looks/placements";
+import { receiveSuggestion, type SuggestionResult } from "@/lib/looks/suggestion";
 import { CATEGORIES, OTHER_CATEGORY } from "@/lib/wardrobeView";
 import { ItemImage } from "../../wardrobe/WardrobeParts";
 import { PieceCard } from "../PieceCard";
@@ -41,8 +42,10 @@ type Props = {
   builtInstead: string | null;
   items: BoardItem[];
   returnTo: string;
-  // One quiet line when the board opened blank for a reason ("No suggestion this time").
-  notice: string | null;
+  // A suggested outfit still being worked out. The board opens at once; if the
+  // suggestion arrives before anything has been touched it is placed, and if
+  // not it is dropped. Null when the board opened blank or on a saved look.
+  suggestion: Promise<SuggestionResult> | null;
 };
 
 const BOARD_ASPECT_HEIGHT = 1.25; // height / width of the 4:5 board
@@ -60,7 +63,7 @@ export function Board({
   builtInstead,
   items,
   returnTo,
-  notice,
+  suggestion,
 }: Props) {
   const router = useRouter();
   const [pieces, setPieces] = useState<LookPlacement[]>(initialPieces);
@@ -71,6 +74,57 @@ export function Board({
   const [error, setError] = useState<string | null>(null);
   const [boardWidth, setBoardWidth] = useState(300);
   const boardRef = useRef<HTMLDivElement>(null);
+
+  // "Touched" means the person has changed anything. A late suggestion never
+  // overwrites a touched board. "Saved" is what the board holds as far as the
+  // person's work goes: a placed suggestion is not their work, so it moves the
+  // baseline with it and leaving after it is not "unsaved changes".
+  const touchedRef = useRef(false);
+  const [pending, setPending] = useState(suggestion !== null);
+  const [suggestionNotice, setSuggestionNotice] = useState<string | null>(null);
+  const [baseline, setBaseline] = useState({ name: initialName, pieces: initialPieces });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const dirty = hasUnsavedChanges(baseline, { name, pieces });
+
+  // Every change the person makes goes through here.
+  const edit = useCallback((update: (pieces: LookPlacement[]) => LookPlacement[]) => {
+    touchedRef.current = true;
+    setPending(false);
+    setPieces(update);
+  }, []);
+
+  const applySuggestion = useCallback(
+    (result: SuggestionResult) => {
+      const outcome = receiveSuggestion({ touched: touchedRef.current, pieces: initialPieces }, result);
+      setPending(false);
+      setSuggestionNotice(outcome.notice);
+      if (outcome.placed) {
+        setPieces(outcome.pieces);
+        setBaseline({ name: initialName, pieces: outcome.pieces });
+      }
+    },
+    [initialPieces, initialName]
+  );
+
+  // Closing the tab or reloading with unsaved work asks first.
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (confirmOpen && !dialog.open) dialog.showModal();
+    if (!confirmOpen && dialog.open) dialog.close();
+  }, [confirmOpen]);
 
   const itemById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
 
@@ -91,6 +145,7 @@ export function Board({
   }
 
   async function save() {
+    setConfirmOpen(false);
     setSaving(true);
     setError(null);
     try {
@@ -119,9 +174,13 @@ export function Board({
   return (
     <div className={styles.shell}>
       <header className={styles.topbar}>
-        <Link href={returnTo} className={`btn ${styles.closeBtn}`}>
+        <button
+          type="button"
+          className={styles.closeBtn}
+          onClick={() => (dirty ? setConfirmOpen(true) : router.push(returnTo))}
+        >
           Close
-        </Link>
+        </button>
         <div className={styles.nameField}>
           <label htmlFor="look-name" className="sr-only">
             Look name
@@ -129,7 +188,11 @@ export function Board({
           <input
             id="look-name"
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              touchedRef.current = true;
+              setPending(false);
+              setName(event.target.value);
+            }}
             placeholder={namePlaceholder}
             maxLength={60}
             autoComplete="off"
@@ -145,10 +208,10 @@ export function Board({
         </button>
       </header>
 
-      {(builtInstead || notice || error) && (
+      {(builtInstead || suggestionNotice || error) && (
         <div className={styles.lines}>
           {builtInstead && <p className={styles.line}>Built instead of {builtInstead}</p>}
-          {notice && <p className={styles.line}>{notice}</p>}
+          {suggestionNotice && <p className={styles.line}>{suggestionNotice}</p>}
           {error && (
             <p className={styles.line} role="alert">
               {error}
@@ -169,7 +232,16 @@ export function Board({
               if (event.target === event.currentTarget) select(null);
             }}
           >
-            {pieces.length === 0 && <p className={styles.emptyBoard}>Add a piece from your wardrobe to begin.</p>}
+            {pieces.length === 0 && (
+              <p className={styles.emptyBoard} role="status">
+                {pending ? "Styling a suggestion…" : "Add a piece from your wardrobe to begin."}
+              </p>
+            )}
+            {suggestion && pending && (
+              <Suspense fallback={null}>
+                <SuggestionSlot promise={suggestion} onArrive={applySuggestion} />
+              </Suspense>
+            )}
             {/* A stable DOM order: stacking is z-index. Re-ordering the nodes
                 when a piece comes to the front would drop an in-progress drag. */}
             {[...pieces]
@@ -185,12 +257,12 @@ export function Board({
                     boardWidth={boardWidth}
                     selected={piece.wardrobeItemId === selected}
                     onSelect={select}
-                    onChange={setPieces}
+                    onChange={edit}
                   />
                 );
               })}
             {selectedPiece && (
-              <ResizeHandle piece={selectedPiece} boardWidth={boardWidth} onChange={setPieces} />
+              <ResizeHandle piece={selectedPiece} boardWidth={boardWidth} onChange={edit} />
             )}
           </div>
         </div>
@@ -199,7 +271,7 @@ export function Board({
           <SelectionBar
             selected={selectedPiece ? selectedPiece.wardrobeItemId : null}
             name={selectedItem?.name ?? null}
-            onChange={setPieces}
+            onChange={edit}
             onRemoved={() => select(null)}
           />
 
@@ -211,10 +283,10 @@ export function Board({
               type="button"
               className="action"
               onClick={() => {
-                setPieces([]);
+                edit(() => []);
                 select(null);
               }}
-              disabled={pieces.length === 0}
+              disabled={pieces.length === 0 && !pending}
             >
               Start blank
             </button>
@@ -227,14 +299,56 @@ export function Board({
             onBoard={new Set(pieces.map((piece) => piece.wardrobeItemId))}
             full={pieces.length >= MAX_PIECES}
             onPick={(id) => {
-              setPieces((current) => addPiece(current, id));
+              edit((current) => addPiece(current, id));
               select(id);
             }}
           />
         </div>
       </div>
+
+      <dialog
+        ref={dialogRef}
+        className={styles.dialog}
+        aria-labelledby="leave-title"
+        onClose={() => setConfirmOpen(false)}
+      >
+        <h2 id="leave-title" className={styles.dialogTitle}>
+          Leave without saving?
+        </h2>
+        <p className={styles.dialogText}>Your changes to this look will be lost.</p>
+        <div className="action-group">
+          <button type="button" className="btn-primary action" onClick={save} disabled={saving || pieces.length === 0}>
+            Save
+          </button>
+          <button type="button" className="action" onClick={() => router.push(returnTo)}>
+            Leave
+          </button>
+          <button type="button" className="action action--quiet" onClick={() => setConfirmOpen(false)}>
+            Keep editing
+          </button>
+        </div>
+      </dialog>
     </div>
   );
+}
+
+// Reads the suggestion once it has arrived (the board is already on screen and
+// usable while it is pending) and hands it to the board to place or drop.
+function SuggestionSlot({
+  promise,
+  onArrive,
+}: {
+  promise: Promise<SuggestionResult>;
+  onArrive: (result: SuggestionResult) => void;
+}) {
+  const result = use(promise);
+  const arrived = useRef(false);
+  useEffect(() => {
+    if (arrived.current) return;
+    arrived.current = true;
+    onArrive(result);
+  }, [result, onArrive]);
+  return null;
 }
 
 // ---------- A piece on the board ----------

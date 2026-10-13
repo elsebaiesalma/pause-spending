@@ -46,6 +46,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - `GMAIL_SYNC_PAUSED=true` is set in `.env` while mock wardrobe data is loaded for UI work. Set it back to `false` after `scripts/deleteSeededMockWardrobe.ts` removes the seeded rows.
 - Work is committed on `master` (`a573821` to `13d295a`), not pushed. The working tree is clean.
 - Vendored skill packs (`.agents/`, `.claude/skills/`, `skills-lock.json`) are gitignored.
+- **Run only one dev server at a time.** Two `next dev` processes on different ports share the same `.next` build cache and corrupt it (symptoms: `Internal Server Error`, `TurbopackInternalError: Failed to restore meta`, a missing `.sst` file). Before starting one, check `netstat -ano | grep LISTEN | grep :3000` and reuse the running server; do not delete `.next` while one is running.
 
 ## Wording (2026-10-13)
 
@@ -89,6 +90,8 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 ## Lookbook (built 2026-10-13)
 
 - **Board** (`src/app/lookbook/board`, full screen): opens pre-filled with a suggested outfit (`getBoardSuggestion` in `src/lib/stillWantIt/outfits.ts`, ids validated, laid out by `src/lib/looks/arrange.ts`), or blank (`?blank=1`, or the Start blank button). `?look=` edits a saved look, `?for=<desiredItemId>` builds one for a wanted item (and opens that item's existing look if it has one), `?returnTo=` is where Close and Save go (same-site paths only, `safeReturnPath`). Drag, pinch and the corner handle use `@use-gesture/react`; every action is also a button and a key. Pieces render in a stable DOM order (z-index stacks), because re-ordering nodes mid-drag drops the pointer.
+- **Opening is instant.** The suggestion is a promise (`buildSuggestion` in `page.tsx`, 6 s timeout, `src/lib/looks/suggestion.ts`) read by `SuggestionSlot` in the board. While it is pending the board says "Styling a suggestion…" and Start blank stays enabled. If it arrives before anything has been touched it is placed; if the person has already changed anything (a piece, Start blank, the name) it is dropped (`receiveSuggestion`). A placed suggestion becomes the "saved" baseline, so leaving after it is not unsaved work.
+- **Unsaved changes.** `hasUnsavedChanges` (`src/lib/looks/dirty.ts`) compares the name and every piece's id, place, size and stacking. Close asks "Leave without saving?" (Save, Leave, Keep editing) in a native `<dialog>` when there is unsaved work, and a `beforeunload` warning covers closing the tab.
 - **Lookbook tab** (`/lookbook`): count, New look, thumbnails (`LookThumb`), rename and delete. "Built instead of [item]" is text only.
 - **Pause screen:** "Build this look from your closet" sits in "A moment to think". A saved look for the item counts as a reflection answer for the Buy anyway gate (`hasReflectionAnswer`). The reflection fields are kept in sessionStorage across the trip to the board.
 - API: `/api/looks` (POST) and `/api/looks/[id]` (PUT, PATCH rename, DELETE), all scoped by the session user.

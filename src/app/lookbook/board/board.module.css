@@ -436,3 +436,31 @@
   letter-spacing: 0.15em;
   color: var(--color-ink-soft);
 }
+
+/* ---------- Leave without saving? ---------- */
+
+.dialog {
+  /* The global reset zeroes margins, which would pin a modal to the top-left. */
+  margin: auto;
+  box-sizing: border-box;
+  width: min(24rem, calc(100vw - 2 * var(--gutter)));
+  padding: var(--space-3);
+  border: 1px solid var(--color-line-strong);
+  border-radius: 2px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+.dialog::backdrop {
+  background: rgba(31, 26, 26, 0.45);
+}
+
+.dialogTitle {
+  margin: 0 0 var(--space-1);
+  font-size: 1.25rem;
+}
+
+.dialogText {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink-soft);
+}

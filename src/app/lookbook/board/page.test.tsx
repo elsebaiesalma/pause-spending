@@ -7,12 +7,18 @@ vi.mock("@/lib/auth", () => ({
 
 // The board is a client component that calls useRouter(); there is no app
 // router when it is rendered to static markup. notFound and redirect stay real.
+// The suggestion comes from the model; tests control when (and whether) it arrives.
+vi.mock("@/lib/stillWantIt/outfits", () => ({
+  getBoardSuggestion: vi.fn(),
+}));
+
 vi.mock("next/navigation", async (importOriginal) => ({
   ...(await importOriginal<typeof import("next/navigation")>()),
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
 }));
 
 import { auth } from "@/lib/auth";
+import { getBoardSuggestion } from "@/lib/stillWantIt/outfits";
 import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import { saveLook } from "@/lib/looks/looks";
 import BoardPage from "./page";
@@ -24,6 +30,7 @@ describe("BoardPage", () => {
 
   afterEach(async () => {
     vi.mocked(auth).mockReset();
+    vi.mocked(getBoardSuggestion).mockReset();
     await fixture?.cleanup();
     fixture = undefined;
   });
@@ -102,6 +109,38 @@ describe("BoardPage", () => {
       // redirect() throws; its digest names the destination.
       const error = await render(userA.user.id, { for: userA.desiredItem.id }).catch((e: unknown) => e as { digest?: string });
       expect(String((error as { digest?: string }).digest)).toContain(`/lookbook/board?look=${lookId}`);
+    },
+    SLOW
+  );
+
+  it(
+    "opens at once without waiting for the suggestion, which is still being worked out",
+    async () => {
+      fixture = await createTwoTenantFixture();
+      const { userA } = fixture;
+      // A model call that never comes back.
+      vi.mocked(getBoardSuggestion).mockReturnValue(new Promise(() => {}));
+      vi.mocked(auth).mockResolvedValueOnce({ user: { id: userA.user.id } } as never);
+
+      const opened = BoardPage({ params: Promise.resolve({}), searchParams: Promise.resolve({}) });
+      const outcome = await Promise.race([
+        opened.then(() => "opened"),
+        new Promise((resolve) => setTimeout(() => resolve("waited"), 15_000)),
+      ]);
+
+      expect(outcome).toBe("opened");
+      expect(getBoardSuggestion).toHaveBeenCalledWith(userA.user.id, null);
+    },
+    SLOW
+  );
+
+  it(
+    "does not ask for a suggestion for a blank board or a saved look",
+    async () => {
+      fixture = await createTwoTenantFixture();
+      const { userA } = fixture;
+      await render(userA.user.id, { blank: "1" });
+      expect(getBoardSuggestion).not.toHaveBeenCalled();
     },
     SLOW
   );
