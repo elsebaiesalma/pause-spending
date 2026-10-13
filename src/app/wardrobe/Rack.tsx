@@ -50,7 +50,7 @@ function Clip() {
   );
 }
 
-function RackCard({ item }: { item: WardrobeEntry }) {
+function RackCard({ item, menu = true }: { item: WardrobeEntry; menu?: boolean }) {
   return (
     <div className={styles.card}>
       <a href={`/wardrobe/${item.id}/edit`} className={cardStyles.cardLink} aria-label={`Edit ${item.displayName}`} />
@@ -58,7 +58,20 @@ function RackCard({ item }: { item: WardrobeEntry }) {
         <ItemImage item={item} sizes={`${RACK.cardW}px`} />
         {item.needsReview && <span className={`badge-review ${cardStyles.reviewBadge} ${styles.badgeBottom}`}>Needs review</span>}
       </div>
-      <ItemMenu item={item} />
+      {menu && <ItemMenu item={item} />}
+    </div>
+  );
+}
+
+// One hanging piece: hanger, clip, card and tag, pivoting from the hook. Used
+// by the Rack and by Home's short rail, so both look and sway the same.
+export function HangingPiece({ item, menu = true }: { item: WardrobeEntry; menu?: boolean }) {
+  return (
+    <div className={styles.swing}>
+      <Hanger />
+      <Clip />
+      <RackCard item={item} menu={menu} />
+      <RackTag item={item} />
     </div>
   );
 }
@@ -288,12 +301,7 @@ export function Rack({ items, scrollTarget }: { items: WardrobeEntry[]; scrollTa
 
             return entry.hangs ? (
               <li key={entry.key} className={styles.hanging} style={{ left: entry.x }} {...ariaPosition}>
-                <div className={styles.swing}>
-                  <Hanger />
-                  <Clip />
-                  <RackCard item={entry.item} />
-                  <RackTag item={entry.item} />
-                </div>
+                <HangingPiece item={entry.item} />
               </li>
             ) : (
               <li key={entry.key} className={styles.standing} style={{ left: entry.x }} {...ariaPosition}>

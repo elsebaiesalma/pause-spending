@@ -28,14 +28,16 @@ export function WardrobeBrowser({
   items,
   initialCategory,
   initialSort,
+  initialView = "grid",
   addPanel,
 }: {
   items: WardrobeEntry[];
   initialCategory: string;
   initialSort: Sort;
+  initialView?: View;
   addPanel: ReactNode;
 }) {
-  const [view, setView] = useState<View>("grid");
+  const [view, setView] = useState<View>(initialView);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState<Sort>(initialSort);

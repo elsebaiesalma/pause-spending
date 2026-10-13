@@ -3,7 +3,13 @@ import type { DesiredItem } from "@prisma/client";
 import { listWaitingQueue } from "@/lib/waitQueue";
 import { getReflectionAnswer } from "@/lib/pauseScreen/reflection";
 import { getKeptSummary } from "@/lib/dashboard/kept";
-import { getConsideringMeta, sweepStaleSavedItems, SAVED_RETENTION_DAYS } from "./consideringMeta";
+import {
+  getConsideringMeta,
+  getPauseEndedAt,
+  sweepEndedPauses,
+  sweepStaleSavedItems,
+  SAVED_RETENTION_DAYS,
+} from "./consideringMeta";
 import { listUndecidedVisits } from "@/lib/stillWantIt/storeVisit";
 
 export type OnPauseRow = {
@@ -20,6 +26,9 @@ export type UndecidedRow = {
 export type SavedRow = {
   item: DesiredItem;
   savedDaysAgo: number;
+  // Set when the item is here because its pause ended ("Pause ended Oct 14").
+  pauseEndedAt: Date | null;
+  reflectionSummary: string | null;
 };
 
 export type LetGoTotals = {
@@ -57,6 +66,9 @@ export function buildReflectionSummary(
 // timer - so a page load never shows an item as still saved past its
 // retention window.
 export async function assembleConsidering(userId: string, now: Date = new Date()): Promise<ConsideringPayload> {
+  // Ended pauses first (silently, no notice), so their 60-day clock is
+  // already running when the stale sweep looks at them.
+  await sweepEndedPauses(userId, now);
   await sweepStaleSavedItems(userId, now);
 
   const [waitingQueue, savedItems] = await Promise.all([
@@ -65,9 +77,12 @@ export async function assembleConsidering(userId: string, now: Date = new Date()
   ]);
 
   const onPauseItems = [...waitingQueue.elapsed, ...waitingQueue.stillWaiting];
-  const meta = await getConsideringMeta([...onPauseItems.map((i) => i.id), ...savedItems.map((i) => i.id)]);
+  const allIds = [...onPauseItems.map((i) => i.id), ...savedItems.map((i) => i.id)];
+  const [meta, pauseEnded] = await Promise.all([getConsideringMeta(allIds), getPauseEndedAt(savedItems.map((i) => i.id))]);
 
-  const reflections = await Promise.all(onPauseItems.map((item) => getReflectionAnswer(item.id, userId)));
+  // Reflection answers stay attached to an item as it moves between sections.
+  const reflectionItems = [...onPauseItems, ...savedItems];
+  const reflections = await Promise.all(reflectionItems.map((item) => getReflectionAnswer(item.id, userId)));
 
   const replacedIds = Array.from(
     new Set(reflections.filter((r) => r?.replacesWardrobeItemId).map((r) => r!.replacesWardrobeItemId as string))
@@ -77,22 +92,24 @@ export async function assembleConsidering(userId: string, now: Date = new Date()
     : [];
   const replacedNameById = new Map(replacedItems.map((w) => [w.id, w.itemName]));
 
-  const onPause: OnPauseRow[] = onPauseItems.map((item, index) => {
+  const summaryAt = (index: number): string | null => {
     const reflection = reflections[index];
     const replacedName = reflection?.replacesWardrobeItemId
       ? (replacedNameById.get(reflection.replacesWardrobeItemId) ?? null)
       : null;
-    return {
-      item,
-      pausedAt: meta[item.id]?.pausedAt ?? item.createdAt,
-      reflectionSummary: buildReflectionSummary(reflection, replacedName),
-    };
-  });
+    return buildReflectionSummary(reflection, replacedName);
+  };
 
-  const saved: SavedRow[] = savedItems.map((item) => {
+  const onPause: OnPauseRow[] = onPauseItems.map((item, index) => ({
+    item,
+    pausedAt: meta[item.id]?.pausedAt ?? item.createdAt,
+    reflectionSummary: summaryAt(index),
+  }));
+
+  const saved: SavedRow[] = savedItems.map((item, index) => {
     const savedAt = meta[item.id]?.savedAt ?? item.createdAt;
     const savedDaysAgo = Math.max(0, Math.floor((now.getTime() - savedAt.getTime()) / 86_400_000));
-    return { item, savedDaysAgo };
+    return { item, savedDaysAgo, pauseEndedAt: pauseEnded[item.id] ?? null, reflectionSummary: summaryAt(onPauseItems.length + index) };
   });
 
   const undecidedVisits = await listUndecidedVisits(userId);

@@ -7,8 +7,11 @@ import styles from "./page.module.css";
 // One box for every way in. A pasted link goes to the URL route; typed text
 // goes to the search step when search is configured (it lists matches to pick
 // from) and straight to the text route otherwise. A screenshot is picked with
-// the button and submitted on its own. All of them end at the same confirm
-// step, because those routes already do.
+// the button beside it and submitted on its own. All of them end at the same
+// confirm step, because those routes already do.
+//
+// Laid out like the Add item page: one 24rem column, a 3rem input and the
+// shared action buttons, with the two buttons side by side under the box.
 export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
   const [value, setValue] = useState("");
   const screenshotForm = useRef<HTMLFormElement>(null);
@@ -28,6 +31,8 @@ export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
 
   return (
     <div className={styles.smartAdd}>
+      {/* Both forms are display: contents so the input and the two buttons
+          share one grid: input on top, buttons side by side beneath. */}
       <form action={action} method={action === "/desired-items/new" ? "GET" : "POST"} className={styles.smartAddForm}>
         <input type="hidden" name={field} value={fieldValue} />
         <label htmlFor="smart-add" className="sr-only">
@@ -41,7 +46,7 @@ export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
           autoComplete="off"
           className={styles.smartAddInput}
         />
-        <button type="submit" className="btn btn-primary" disabled={input.kind === "empty"}>
+        <button type="submit" className="btn-primary action" disabled={input.kind === "empty"}>
           {input.kind === "url" ? "Look it up" : "Continue"}
         </button>
       </form>
@@ -51,8 +56,9 @@ export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
         action="/api/desired-items/from-screenshot"
         method="POST"
         encType="multipart/form-data"
+        className={styles.screenshotForm}
       >
-        <label className={`btn ${styles.screenshotBtn}`}>
+        <label className={`btn action ${styles.screenshotBtn}`}>
           Screenshot
           <input
             type="file"

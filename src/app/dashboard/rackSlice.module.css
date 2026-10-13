@@ -1,0 +1,49 @@
+/* Home's short rail. The hanger, clip, card and tag come from the Wardrobe
+   rack (rack.module.css); this only lays them out in a static row. Labels
+   are 0.75rem or larger and body text is 1rem, as in the rack. */
+
+.rail {
+  --card-w: 100%;
+  --sway: 0deg;
+  position: relative;
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  /* Only the first row is visible: items that do not fit land in zero-height
+     rows and are clipped, so the slice never scrolls. */
+  grid-auto-rows: 0;
+  grid-template-rows: auto;
+  gap: 0 0.75rem;
+  overflow: hidden;
+}
+
+/* The rail itself: a thin hairline the hooks sit on. */
+.rail::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--color-ink);
+  pointer-events: none;
+}
+
+.item {
+  min-width: 0;
+}
+
+/* Subtle sway on hover, pivoting at the hook; none with reduced motion. */
+@media (hover: hover) and (pointer: fine) {
+  .item:hover > div {
+    transform: rotate(2.5deg);
+    transition-duration: 0.5s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item:hover > div {
+    transform: none;
+  }
+}

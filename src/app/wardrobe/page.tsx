@@ -1,16 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
-import { capitalizeFirst, stripBrandPrefix } from "@/lib/wardrobeDisplay";
-import { CATEGORIES, OTHER_CATEGORY, categoryKeyOf, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
+import { capitalizeFirst } from "@/lib/wardrobeDisplay";
+import { toWardrobeEntry } from "@/lib/wardrobeEntries";
+import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
 import { BigNumeral } from "@/components/kit/BigNumeral";
 import { PageHero } from "@/components/kit/PageHero";
 import { WardrobeBrowser } from "./WardrobeBrowser";
 import styles from "./page.module.css";
-
-// ownedSince is a date-only column stored at UTC midnight, so it must be
-// formatted in UTC or it shows the previous month west of Greenwich.
-const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -26,6 +23,8 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
     ? (categoryParam as string)
     : "all";
   const initialSort: Sort = firstParam(resolvedSearchParams.sort) === "price" ? "price" : "newest";
+  // Grid is the default on every visit; only Home's "See your closet" link asks for Rack.
+  const initialView = firstParam(resolvedSearchParams.view) === "rack" ? "rack" : "grid";
 
   // Not just status: "active" - a needs_review item must still show (with its
   // own tag) for that state to ever be reachable. "returned" items are the
@@ -36,26 +35,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
     include: { sourcePurchase: { select: { merchant: true, price: true } } },
   });
 
-  const items: WardrobeEntry[] = rows.map((item) => {
-    const brand = item.sourcePurchase?.merchant ?? null;
-    const colorName = item.colorName ?? item.colorFamily;
-    return {
-      id: item.id,
-      displayName: stripBrandPrefix(item.itemName, brand),
-      brand,
-      category: item.category,
-      categoryKey: categoryKeyOf(item.category),
-      colorLabel: colorName ? capitalizeFirst(colorName) : null,
-      colorFamily: item.colorFamily,
-      price: item.sourcePurchase?.price != null ? Number(item.sourcePurchase.price) : null,
-      ownedSince: item.ownedSince ? MONTH_YEAR_FORMAT.format(item.ownedSince) : null,
-      sortTime: item.ownedSince?.getTime() ?? 0,
-      // Seeded rows carry mock photos too; a row with no image gets the
-      // designed placeholder card in both views.
-      imageUrl: item.imageUrl || null,
-      needsReview: item.status === "needs_review",
-    };
-  });
+  const items: WardrobeEntry[] = rows.map(toWardrobeEntry);
 
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
@@ -95,7 +75,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
       <div className={styles.numeral}>
         <BigNumeral label="Pieces" value={items.length} />
       </div>
-      <WardrobeBrowser items={items} initialCategory={initialCategory} initialSort={initialSort} addPanel={addPanel} />
+      <WardrobeBrowser items={items} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={addPanel} />
     </div>
   );
 }

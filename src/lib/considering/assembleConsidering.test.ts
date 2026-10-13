@@ -6,7 +6,7 @@ import { assembleConsidering } from "./assembleConsidering";
 // consideringMeta.ts) that currently fail (the migration isn't applied
 // yet) and are caught - each failure is a real, slow network round trip to
 // Neon, so these need a longer-than-default test timeout.
-const SLOW_TEST_TIMEOUT = 30_000;
+const SLOW_TEST_TIMEOUT = 60_000;
 
 describe("assembleConsidering", () => {
   const desiredItemIds: string[] = [];

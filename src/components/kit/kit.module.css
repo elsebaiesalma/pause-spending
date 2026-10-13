@@ -70,39 +70,18 @@ a.numeral:hover .numeralValue {
   font-family: var(--font-mono);
 }
 
-.receiptLine {
-  display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: baseline;
+.receiptRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
   padding: 0.35rem 0;
   font-size: 0.875rem;
-}
-
-.receiptDate {
-  color: var(--color-ink-soft);
-  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
-.receiptName {
-  overflow-wrap: anywhere;
-}
-
-.receiptBrand {
-  color: var(--color-ink-soft);
-}
-
-.receiptPrice {
+.receiptAmount {
   font-variant-numeric: tabular-nums;
-}
-
-.receiptMore,
-.receiptEmpty {
-  padding: 0.35rem 0;
-  font-size: 0.875rem;
-  color: var(--color-ink-soft);
 }
 
 .receiptRule {
@@ -122,13 +101,6 @@ a.numeral:hover .numeralValue {
 
 .receiptTotalOver {
   color: var(--color-accent);
-}
-
-@media (max-width: 480px) {
-  .receiptLine {
-    grid-template-columns: 3rem minmax(0, 1fr) auto;
-    gap: 0.5rem;
-  }
 }
 
 /* ---------- QuoteBand ---------- */

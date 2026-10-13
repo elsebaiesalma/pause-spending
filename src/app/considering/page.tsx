@@ -90,7 +90,7 @@ export default async function ConsideringPage() {
           <p className={styles.emptyNote}>Nothing saved for later.</p>
         ) : (
           <div>
-            {saved.map(({ item, savedDaysAgo }) => {
+            {saved.map(({ item, savedDaysAgo, pauseEndedAt, reflectionSummary }) => {
               const price = item.price ? Number(item.price) : null;
               return (
                 <div key={item.id} className={styles.row}>
@@ -101,7 +101,10 @@ export default async function ConsideringPage() {
                     </div>
                     {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                   </div>
-                  <p className={styles.rowMeta}>{savedDaysAgoLabel(savedDaysAgo)}</p>
+                  <p className={styles.rowMeta}>
+                    {pauseEndedAt ? `Pause ended ${PAUSED_DATE_FORMAT.format(pauseEndedAt)}` : savedDaysAgoLabel(savedDaysAgo)}
+                  </p>
+                  {reflectionSummary && <p className={styles.rowReflection}>{reflectionSummary}</p>}
                   <div className={styles.rowActions}>
                     <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
                       <input type="hidden" name="outcome" value="dropped" />

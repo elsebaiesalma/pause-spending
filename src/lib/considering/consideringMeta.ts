@@ -73,7 +73,9 @@ export async function markSaved(id: string, userId: string, at: Date): Promise<v
     `;
   } catch (error) {
     console.error("[considering] savedAt not saved - migration 20260925100000 isn't applied yet:", error);
+    return;
   }
+  await clearPauseEnded(id, userId);
 }
 
 // Called whenever an item becomes decisionOutcome "dropped" via the normal,
@@ -116,5 +118,78 @@ export async function sweepStaleSavedItems(userId: string, now: Date = new Date(
     `;
   } catch (error) {
     console.error("[considering] auto-move sweep skipped - migration 20260925100000 isn't applied yet:", error);
+  }
+}
+
+// Pauses end silently. Any item still "waiting" whose wait_until has passed is
+// moved to "saved for later" the next time its owner loads the app - no
+// notification, no prompt, nothing to decide. The 60-day clock starts at the
+// moment the pause ended (saved_at = wait_until), not when this runs and not
+// at any earlier save, so the existing auto-move to Let go applies from there.
+// Reflection answers, price and everything else on the item are untouched.
+//
+// The move itself only uses columns that are already applied. The "Pause
+// ended Oct 14" marker (pause_ended_at, prisma/manual/pause-ended-at.sql) is
+// written in a second statement that degrades to a no-op until that column
+// exists, so the move never waits on it.
+export async function sweepEndedPauses(userId: string, now: Date = new Date()): Promise<string[]> {
+  let movedIds: string[] = [];
+  try {
+    const rows = await prisma.$queryRaw<{ id: string }[]>`
+      UPDATE "desired_items"
+      SET
+        "pause_status" = 'saved_for_later',
+        "saved_at" = "wait_until",
+        "let_go_automatically" = false,
+        "let_go_at" = NULL
+      WHERE "user_id" = ${userId}::uuid
+        AND "pause_status" = 'waiting'
+        AND "wait_until" IS NOT NULL
+        AND "wait_until" <= ${now}
+      RETURNING "id"
+    `;
+    movedIds = rows.map((row) => row.id);
+  } catch (error) {
+    console.error("[considering] ended pauses not moved - migration 20260925100000 isn't applied yet:", error);
+    return [];
+  }
+
+  if (movedIds.length > 0) {
+    try {
+      await prisma.$executeRaw`
+        UPDATE "desired_items" SET "pause_ended_at" = "wait_until"
+        WHERE "user_id" = ${userId}::uuid AND "id" = ANY(${movedIds}::uuid[])
+      `;
+    } catch (error) {
+      console.error("[considering] pause_ended_at not saved - prisma/manual/pause-ended-at.sql isn't applied yet:", error);
+    }
+  }
+  return movedIds;
+}
+
+// When each item's pause ended, for the "Pause ended Oct 14" line. Empty until
+// pause_ended_at exists; callers then fall back to the plain saved-days line.
+export async function getPauseEndedAt(ids: string[]): Promise<Record<string, Date>> {
+  if (ids.length === 0) return {};
+  try {
+    const rows = await prisma.$queryRaw<{ id: string; pause_ended_at: Date | null }[]>`
+      SELECT "id", "pause_ended_at" FROM "desired_items"
+      WHERE "id" = ANY(${ids}::uuid[]) AND "pause_ended_at" IS NOT NULL
+    `;
+    return Object.fromEntries(rows.map((row) => [row.id, row.pause_ended_at as Date]));
+  } catch {
+    return {};
+  }
+}
+
+// A deliberate save (or a restore from Let go) is not an ended pause.
+export async function clearPauseEnded(id: string, userId: string): Promise<void> {
+  try {
+    await prisma.$executeRaw`
+      UPDATE "desired_items" SET "pause_ended_at" = NULL
+      WHERE "id" = ${id}::uuid AND "user_id" = ${userId}::uuid
+    `;
+  } catch {
+    // Column not applied yet: nothing to clear.
   }
 }
