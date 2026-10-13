@@ -3,9 +3,11 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
 import { capitalizeFirst } from "@/lib/wardrobeDisplay";
 import { toWardrobeEntry } from "@/lib/wardrobeEntries";
+import { buildConcentration } from "@/lib/wardrobeClusters";
 import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
 import { BigNumeral } from "@/components/kit/BigNumeral";
 import { PageHero } from "@/components/kit/PageHero";
+import { ClosetConcentration } from "./ClosetConcentration";
 import { WardrobeBrowser } from "./WardrobeBrowser";
 import styles from "./page.module.css";
 
@@ -36,6 +38,18 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   });
 
   const items: WardrobeEntry[] = rows.map(toWardrobeEntry);
+
+  // Well-stocked categories hold a cluster of 3+ near-duplicate active items.
+  const concentration = buildConcentration(
+    rows.map((row, index) => ({
+      id: row.id,
+      categoryKey: items[index].categoryKey,
+      colorFamily: row.colorFamily,
+      styleTags: row.styleTags,
+      status: row.status,
+    }))
+  );
+  const wellStocked = concentration.filter((row) => row.wellStocked).map((row) => row.key);
 
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
@@ -75,7 +89,8 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
       <div className={styles.numeral}>
         <BigNumeral label="Pieces" value={items.length} />
       </div>
-      <WardrobeBrowser items={items} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={addPanel} />
+      <ClosetConcentration rows={concentration} />
+      <WardrobeBrowser items={items} wellStocked={wellStocked} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={addPanel} />
     </div>
   );
 }

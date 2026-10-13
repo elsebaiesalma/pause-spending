@@ -158,6 +158,20 @@
   white-space: nowrap;
 }
 
+.chipTag {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.4rem;
+  background: var(--color-fill);
+  color: var(--color-fill-ink);
+  border-radius: 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.chip[aria-current="true"] .chipTag {
+  background: var(--color-bg);
+}
+
 .chip:hover {
   background: transparent;
   border-color: var(--color-ink);

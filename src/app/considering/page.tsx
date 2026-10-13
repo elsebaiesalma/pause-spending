@@ -6,9 +6,9 @@ import styles from "./page.module.css";
 const PAUSED_DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
 
 function savedDaysAgoLabel(days: number): string {
-  if (days === 0) return "Saved today";
-  if (days === 1) return "Saved 1 day ago";
-  return `Saved ${days} days ago`;
+  if (days === 0) return "Undecided since today";
+  if (days === 1) return "Undecided for 1 day";
+  return `Undecided for ${days} days`;
 }
 
 export default async function ConsideringPage() {
@@ -72,7 +72,7 @@ export default async function ConsideringPage() {
                     {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                   </div>
                   <p className={styles.rowMeta}>
-                    Went to the store, undecided · visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}
+                    Went to the store · visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}
                   </p>
                   <div className={styles.rowActions}>
                     <a href={`/desired-items/${item.id}/still-want-it`} className="btn-quiet">Decide now</a>
@@ -85,9 +85,9 @@ export default async function ConsideringPage() {
       )}
 
       <section className="section">
-        <p className={styles.sectionLabel}>03 / Saved for later</p>
+        <p className={styles.sectionLabel}>03 / Undecided</p>
         {saved.length === 0 ? (
-          <p className={styles.emptyNote}>Nothing saved for later.</p>
+          <p className={styles.emptyNote}>Nothing undecided.</p>
         ) : (
           <div>
             {saved.map(({ item, savedDaysAgo, pauseEndedAt, reflectionSummary }) => {
@@ -128,7 +128,7 @@ export default async function ConsideringPage() {
           </div>
           <div>
             <div className={styles.totalValue}>${letGo.totalKept.toFixed(0)}</div>
-            <p className={styles.totalLabel}>kept</p>
+            <p className={styles.totalLabel}>saved</p>
           </div>
         </div>
         <a href="/considering/let-go" className="link section" style={{ display: "inline-block" }}>

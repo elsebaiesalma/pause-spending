@@ -79,6 +79,15 @@ describe("layoutRack", () => {
     expect(layout.width).toBe(last.x + RACK.cardW + RACK.pad);
   });
 
+  it("marks the divider of a well-stocked category", () => {
+    const layout = layoutRack([entry("a"), entry("b", { categoryKey: "shoes" })], new Set(["shoes"]));
+    const flags = layout.entries.flatMap((e) => (e.kind === "divider" ? [[e.label, e.wellStocked]] : []));
+    expect(flags).toEqual([
+      ["Tops", false],
+      ["Shoes", true],
+    ]);
+  });
+
   it("is empty for no items", () => {
     expect(layoutRack([])).toMatchObject({ entries: [], sections: [], itemCount: 0 });
   });

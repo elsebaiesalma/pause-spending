@@ -107,7 +107,7 @@ export default async function AccountPage() {
         <h2 className={styles.heading}>
           Auto-move timing <span className="tag">Coming later</span>
         </h2>
-        <p className={styles.status}>Choose how long a saved item waits before it moves to Let go. Today it&apos;s 60 days.</p>
+        <p className={styles.status}>Choose how long an undecided item waits before it moves to Let go. Today it&apos;s 60 days.</p>
       </section>
 
       <form

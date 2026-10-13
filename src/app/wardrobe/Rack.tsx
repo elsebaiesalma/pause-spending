@@ -88,7 +88,15 @@ function RackTag({ item }: { item: WardrobeEntry }) {
   );
 }
 
-export function Rack({ items, scrollTarget }: { items: WardrobeEntry[]; scrollTarget: ScrollTarget | null }) {
+export function Rack({
+  items,
+  scrollTarget,
+  wellStocked = [],
+}: {
+  items: WardrobeEntry[];
+  scrollTarget: ScrollTarget | null;
+  wellStocked?: string[];
+}) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef(0);
   const lastLeftRef = useRef(0);
@@ -103,7 +111,7 @@ export function Rack({ items, scrollTarget }: { items: WardrobeEntry[]; scrollTa
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
 
-  const layout = useMemo(() => layoutRack(items), [items]);
+  const layout = useMemo(() => layoutRack(items, new Set(wellStocked)), [items, wellStocked]);
   const virtualized = layout.itemCount > VIRTUALIZE_AFTER;
   const shown = useMemo(
     () => (virtualized ? visibleEntries(layout.entries, viewport.left, viewport.width, viewport.width) : layout.entries),
@@ -288,8 +296,14 @@ export function Rack({ items, scrollTarget }: { items: WardrobeEntry[]; scrollTa
                   <span className={styles.dividerTab} aria-hidden="true">
                     {entry.label}
                   </span>
+                  {entry.wellStocked && (
+                    <span className={styles.dividerTag} aria-hidden="true">
+                      Well stocked
+                    </span>
+                  )}
                   <span className={styles.srOnly}>
                     {entry.label}, {entry.count} {entry.count === 1 ? "piece" : "pieces"}
+                    {entry.wellStocked ? ", well stocked" : ""}
                   </span>
                 </li>
               );

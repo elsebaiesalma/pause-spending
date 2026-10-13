@@ -48,6 +48,12 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Work is committed on `master` (`a573821` to `13d295a`), not pushed. The working tree is clean.
 - Vendored skill packs (`.agents/`, `.claude/skills/`, `skills-lock.json`) are gitignored.
 
+## Wording (2026-10-13)
+
+- "Saved" means money only: the let-go total reads "$540 saved", and Home says "$540 saved by letting 6 things go".
+- The old "Saved for later" section is **Undecided**, and the old "Save for later" button is **Decide later**. "Went to the store, undecided" is now **Went to the store**. "Pause for 24 hours", "Pause for 7 days", "Decide later", "Let it go" and "Buy anyway" are identical on every screen.
+- Internal names are unchanged on purpose: `saved_for_later`, `savedAt`, `getKeptSummary`, `totalKept`.
+
 ## Brand casing
 
 The product name is always written **PAUSE** in all caps when it is used as a proper noun: logo, nav, headings, body copy, `<title>`, meta descriptions, and emails. "Pause" as an ordinary word, such as "Pause for 24h", "your pause is up" or "the pause", keeps normal casing. Code identifiers such as `PauseScreenPage` are not affected.
@@ -120,9 +126,8 @@ Each feature has its own constant and environment override. Defaults:
 
 **Locked pause state**
 - While an item is paused, show only name, brand and "unlocks [date]". Hide the image and product details. No countdown.
-- When the hold ends, send one quiet opt-out notification, or a daily digest. Tone example: "Your pause on [item] is up. Decide whenever you're ready."
-- Items not returned to within about 7 days of unlock become a tracked outcome, "faded". Its place in the dashboard is undecided.
-- Show the saved reflection answers on the unlock screen. Open question: the app is in-app only, so a digest may need to be an in-app badge.
+- Pauses end silently. There is no unlock notice, notification or digest, and Home never mentions an ended pause: reminding someone of a paused item undoes the cooling-off. When the wait passes, the item quietly moves to Undecided (internally `saved_for_later`), its 60-day clock starts at that moment, and Considering shows "Pause ended Oct 14" with the saved reflection answers still attached. Built 2026-10-13 in `sweepEndedPauses` (`src/lib/considering/consideringMeta.ts`), which runs on Home and Considering loads. The "Pause ended" wording needs `prisma/manual/pause-ended-at.sql` (not applied; keep `pause_ended_at` out of `schema.prisma` until it is).
+- Show the saved reflection answers on the unlock screen.
 
 **Pause screen layout**
 - Put the wanted item and its single closest owned match side by side ("YOU WANT" / "YOU OWN"). Other matches go below as smaller cards.

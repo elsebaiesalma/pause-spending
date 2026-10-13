@@ -88,7 +88,7 @@ export const RACK = {
 export const VIRTUALIZE_AFTER = 60;
 
 export type RackEntry<T> =
-  | { kind: "divider"; key: string; x: number; label: string; count: number }
+  | { kind: "divider"; key: string; x: number; label: string; count: number; wellStocked: boolean }
   | { kind: "item"; key: string; x: number; item: T; hangs: boolean; position: number };
 
 export type RackLayout<T> = {
@@ -101,7 +101,10 @@ export type RackLayout<T> = {
 // Groups items by category in rack order (items keep their incoming order
 // inside a section) and assigns each divider tab and item an x position.
 // Empty categories produce no section at all.
-export function layoutRack<T extends { id: string; categoryKey: string }>(items: readonly T[]): RackLayout<T> {
+export function layoutRack<T extends { id: string; categoryKey: string }>(
+  items: readonly T[],
+  wellStocked: ReadonlySet<string> = new Set()
+): RackLayout<T> {
   const order = [...CATEGORIES, OTHER_CATEGORY];
   const entries: RackEntry<T>[] = [];
   const sections: RackLayout<T>["sections"] = [];
@@ -113,7 +116,14 @@ export function layoutRack<T extends { id: string; categoryKey: string }>(items:
     if (inSection.length === 0) continue;
 
     sections.push({ key: category.key, label: category.label, x, count: inSection.length });
-    entries.push({ kind: "divider", key: `divider-${category.key}`, x, label: category.label, count: inSection.length });
+    entries.push({
+      kind: "divider",
+      key: `divider-${category.key}`,
+      x,
+      label: category.label,
+      count: inSection.length,
+      wellStocked: wellStocked.has(category.key),
+    });
     x += RACK.dividerW + RACK.gap;
 
     for (const item of inSection) {

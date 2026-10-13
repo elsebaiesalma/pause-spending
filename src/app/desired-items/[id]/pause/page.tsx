@@ -220,7 +220,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
             Pause for 7 days
           </button>
           <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action">
-            Save for later
+            Decide later
           </button>
           <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
             Let it go

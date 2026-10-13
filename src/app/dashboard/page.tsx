@@ -85,7 +85,7 @@ export default async function DashboardPage() {
 
           {kept.itemsLetGo > 0 && (
             <a href="/considering/let-go" className={styles.keptLine}>
-              {dollars(kept.totalKept)} kept by letting {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"}{" "}
+              {dollars(kept.totalKept)} saved by letting {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"}{" "}
               go &rarr;
             </a>
           )}

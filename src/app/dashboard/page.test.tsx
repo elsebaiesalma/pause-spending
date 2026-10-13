@@ -162,7 +162,7 @@ describe("DashboardPage (Home)", () => {
       vi.mocked(getKeptSummary).mockResolvedValueOnce({ totalKept: 120, itemsLetGo: 2 });
       const html = await render();
 
-      expect(html).toContain("$120 kept by letting 2 things");
+      expect(html).toContain("$120 saved by letting 2 things");
       expect(html).toContain('href="/considering/let-go"');
     });
   });

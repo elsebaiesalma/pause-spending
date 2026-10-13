@@ -32,6 +32,15 @@
 
 .item {
   min-width: 0;
+  min-height: 0;
+  /* Items that do not fit sit in a zero-height row; clipping each one in its
+     own box keeps even a hanger hook from showing. */
+  overflow: hidden;
+}
+
+/* The hook sits on the rail line, at the top of the item box. */
+.item > div > svg:first-child {
+  margin-top: 0;
 }
 
 /* Subtle sway on hover, pivoting at the hook; none with reduced motion. */

@@ -26,12 +26,15 @@ const SORT_OPTIONS: { value: Sort; label: string }[] = [
 // view is plain component state, never remembered between visits.
 export function WardrobeBrowser({
   items,
+  wellStocked = [],
   initialCategory,
   initialSort,
   initialView = "grid",
   addPanel,
 }: {
   items: WardrobeEntry[];
+  // Category keys that hold a cluster of 3+ near-duplicates.
+  wellStocked?: string[];
   initialCategory: string;
   initialSort: Sort;
   initialView?: View;
@@ -121,6 +124,7 @@ export function WardrobeBrowser({
               onClick={() => chooseCategory(chip.key)}
             >
               {chip.label} ({counts.get(chip.key)})
+              {wellStocked.includes(chip.key) && <span className={styles.chipTag}>Well stocked</span>}
             </button>
           ))}
         </div>
@@ -147,7 +151,7 @@ export function WardrobeBrowser({
         searched.length === 0 ? (
           <p className={styles.emptyState}>{items.length === 0 ? "Nothing on the rack yet." : "No pieces match your search."}</p>
         ) : (
-          <Rack items={searched} scrollTarget={scrollTarget} />
+          <Rack items={searched} scrollTarget={scrollTarget} wellStocked={wellStocked} />
         )
       ) : gridItems.length === 0 ? (
         <p className={styles.emptyState}>
