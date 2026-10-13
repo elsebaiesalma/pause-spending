@@ -29,7 +29,9 @@ export function SiteHeader({ initials }: { initials: string | null }) {
   return (
     <header className={`site-header${isLanding ? " site-header--overlay" : ""}`}>
       <div className="site-header__inner">
-        <Link href="/" className="site-header__brand">
+        {/* Signed-in pages keep the logo inside the app; only the landing page and
+            signed-out visitors go to "/". */}
+        <Link href={initials !== null && !isLanding ? "/dashboard" : "/"} className="site-header__brand">
           PAUSE.
         </Link>
 

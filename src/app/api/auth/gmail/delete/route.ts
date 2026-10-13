@@ -34,5 +34,5 @@ export async function POST(request: NextRequest) {
   // those purchases - a full purge of data derived from this connection.
   await prisma.emailConnection.delete({ where: { id: connection.id } });
 
-  return NextResponse.redirect(new URL("/", request.url));
+  return NextResponse.redirect(new URL("/account", request.url));
 }

@@ -1,0 +1,57 @@
+/* "Set aside" note after pausing. Same tokens and type as the rest of the
+   app; above the phone tab bar on small screens, bottom centre on desktop. */
+
+.toast {
+  position: fixed;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-line-strong);
+  border-left: 3px solid var(--color-fill);
+  border-radius: 2px;
+  box-shadow: 0 4px 16px rgba(31, 26, 26, 0.12);
+  animation: toast-in 0.25s ease-out;
+}
+
+@media (min-width: 900px) {
+  .toast {
+    bottom: var(--space-4);
+  }
+}
+
+.message {
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+
+.dismiss {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 0.9rem;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

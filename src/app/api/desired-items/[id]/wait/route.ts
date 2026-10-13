@@ -28,12 +28,13 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
   }
 
   const pausedAt = new Date();
+  const waitUntil = new Date(pausedAt.getTime() + waitMs);
   try {
     await prisma.desiredItem.update({
       where: { id, userId },
       data: {
         pauseStatus: "waiting",
-        waitUntil: new Date(pausedAt.getTime() + waitMs),
+        waitUntil,
         // Pausing again after "Buy anyway" must not leave a stale "proceeded"
         // outcome behind on an item that is waiting again.
         decisionOutcome: null,
@@ -60,5 +61,9 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
     await saveReflectionAnswer(id, userId, reflection);
   }
 
-  return NextResponse.redirect(new URL("/", request.url));
+  // Back to Home, which shows the "Set aside" confirmation (PauseConfirmation).
+  // "/" is the public landing page, which is outside the signed-in app.
+  const destination = new URL("/dashboard", request.url);
+  destination.searchParams.set("paused", waitUntil.toISOString());
+  return NextResponse.redirect(destination);
 }

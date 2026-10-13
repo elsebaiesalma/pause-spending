@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatUnlockTime } from "./unlockTime";
+import { formatUnlockTime, formatUnlockWhen } from "./unlockTime";
 
 describe("formatUnlockTime", () => {
   it("reads as ready once the wait has elapsed", () => {
@@ -37,5 +37,14 @@ describe("formatUnlockTime", () => {
     const now = new Date(2026, 2, 15, 0, 0);
     expect(formatUnlockTime(new Date(2026, 2, 15, 12, 0), now)).toBe("unlocks today, 12pm");
     expect(formatUnlockTime(new Date(2026, 2, 16, 0, 0), now)).toBe("unlocks tomorrow, 12am");
+  });
+});
+
+describe("formatUnlockWhen", () => {
+  it("gives the bare phrase that formatUnlockTime builds on", () => {
+    const now = new Date(2026, 9, 8, 14, 0);
+    expect(formatUnlockWhen(new Date(2026, 9, 9, 9, 0), now)).toBe("tomorrow, 9am");
+    expect(formatUnlockWhen(new Date(2026, 9, 8, 18, 30), now)).toBe("today, 6:30pm");
+    expect(formatUnlockWhen(new Date(2026, 9, 9, 9, 0), now)).toBe(formatUnlockTime(new Date(2026, 9, 9, 9, 0), now).replace("unlocks ", ""));
   });
 });

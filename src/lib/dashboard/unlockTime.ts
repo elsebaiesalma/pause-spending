@@ -20,28 +20,33 @@ function formatClockTime(date: Date): string {
   return minutes === 0 ? `${hours}${period}` : `${hours}:${String(minutes).padStart(2, "0")}${period}`;
 }
 
-export function formatUnlockTime(waitUntil: Date, now: Date = new Date()): string {
-  if (waitUntil <= now) {
-    return "ready for a decision";
-  }
-
+// The "when" part alone ("tomorrow, 9am"), for sentences that supply their
+// own lead-in. The time is always the real wait_until, in the viewer's zone.
+export function formatUnlockWhen(waitUntil: Date, now: Date = new Date()): string {
   const time = formatClockTime(waitUntil);
 
   if (isSameCalendarDay(waitUntil, now)) {
-    return `unlocks today, ${time}`;
+    return `today, ${time}`;
   }
 
   const daysAway = calendarDaysBetween(waitUntil, now);
 
   if (daysAway === 1) {
-    return `unlocks tomorrow, ${time}`;
+    return `tomorrow, ${time}`;
   }
 
   if (daysAway <= 6) {
     const weekday = waitUntil.toLocaleDateString(undefined, { weekday: "long" });
-    return `unlocks ${weekday}, ${time}`;
+    return `${weekday}, ${time}`;
   }
 
   const date = waitUntil.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  return `unlocks ${date}, ${time}`;
+  return `${date}, ${time}`;
+}
+
+export function formatUnlockTime(waitUntil: Date, now: Date = new Date()): string {
+  if (waitUntil <= now) {
+    return "ready for a decision";
+  }
+  return `unlocks ${formatUnlockWhen(waitUntil, now)}`;
 }

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatMonthLabel } from "@/lib/monthLabel";
 import { currentMonthKey, getBudgetForMonth } from "@/lib/budget";
 import { csrfTokenForUser } from "@/lib/csrf";
 import { requireUserIdOrRedirect } from "@/lib/session";
@@ -83,10 +84,10 @@ export default async function AccountPage() {
         <h2 className={styles.heading}>Monthly plan</h2>
         {budget ? (
           <p className={styles.status}>
-            ${Number(budget.amount).toFixed(0)} for {monthKey}.
+            ${Number(budget.amount).toFixed(0)} for {formatMonthLabel(monthKey)}.
           </p>
         ) : (
-          <p className={styles.status}>No plan set for {monthKey} yet.</p>
+          <p className={styles.status}>No plan set for {formatMonthLabel(monthKey)} yet.</p>
         )}
         <div className="row">
           <a href="/budget" className="btn">

@@ -1,4 +1,5 @@
 import { computeSuggestedBudget, currentMonthKey, getBudgetForMonth, getMonthSpend } from "@/lib/budget";
+import { formatMonthLabel } from "@/lib/monthLabel";
 import { requireUserIdOrRedirect } from "@/lib/session";
 
 export default async function BudgetPage() {
@@ -16,7 +17,7 @@ export default async function BudgetPage() {
 
       {!budget ? (
         <div className="section stack">
-          <p className="page__lede">You haven&apos;t set a budget for {monthKey} yet.</p>
+          <p className="page__lede">You haven&apos;t set a budget for {formatMonthLabel(monthKey)} yet.</p>
           {suggestion !== null && (
             <p className="note">
               Based on your past spending, a starting figure of{" "}
@@ -46,7 +47,7 @@ export default async function BudgetPage() {
           <p className="item-row__price" style={{ fontSize: "2.15rem" }}>
             ${Number(budget.amount).toFixed(2)}
           </p>
-          <p className="page__lede">budget for {monthKey}</p>
+          <p className="page__lede">budget for {formatMonthLabel(monthKey)}</p>
           <hr className="divider" />
           <div className="row" style={{ justifyContent: "space-between" }}>
             <span>Spent so far</span>

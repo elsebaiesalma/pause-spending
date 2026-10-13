@@ -37,5 +37,5 @@ export async function POST(request: NextRequest) {
     data: { status: "disconnected" },
   });
 
-  return NextResponse.redirect(new URL("/", request.url));
+  return NextResponse.redirect(new URL("/account", request.url));
 }

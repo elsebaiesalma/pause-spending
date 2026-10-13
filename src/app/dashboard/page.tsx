@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatMonthLabel } from "@/lib/monthLabel";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { listWaitingQueue } from "@/lib/waitQueue";
@@ -11,6 +12,7 @@ import { ColorStripe } from "@/components/kit/ColorStripe";
 import { QuoteBand } from "@/components/kit/QuoteBand";
 import { ReceiptBlock } from "@/components/kit/ReceiptBlock";
 import { LocalGreeting } from "./LocalGreeting";
+import { PauseConfirmation } from "@/components/PauseConfirmation";
 import { SmartAdd } from "./SmartAdd";
 import styles from "./page.module.css";
 
@@ -77,6 +79,7 @@ export default async function DashboardPage() {
   return (
     <div className={`page ${styles.home}`}>
       <LocalGreeting firstName={firstName} />
+      <PauseConfirmation />
 
       <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} />
 
@@ -98,7 +101,7 @@ export default async function DashboardPage() {
       <div className={styles.numerals}>
         <div className={styles.column}>
           {planAmount === null ? (
-            <BigNumeral label="This month" value={dollars(spend)} note={`No plan set for ${monthKey} yet.`}>
+            <BigNumeral label="This month" value={dollars(spend)} note={`No plan set for ${formatMonthLabel(monthKey)} yet.`}>
               <form action="/api/budget" method="POST" className={styles.inlineBudgetForm}>
                 <label htmlFor="home-plan" className="sr-only">
                   Monthly plan amount
