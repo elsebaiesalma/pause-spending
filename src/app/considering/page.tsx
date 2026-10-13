@@ -46,7 +46,7 @@ export default async function ConsideringPage() {
                   <div className={styles.rowActions}>
                     <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
                       <input type="hidden" name="outcome" value="dropped" />
-                      <button type="submit">Let it go now</button>
+                      <button type="submit" className="btn-quiet">Let it go</button>
                     </form>
                   </div>
                 </div>
@@ -75,7 +75,7 @@ export default async function ConsideringPage() {
                     Went to the store, undecided · visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}
                   </p>
                   <div className={styles.rowActions}>
-                    <a href={`/desired-items/${item.id}/still-want-it`}>Decide now</a>
+                    <a href={`/desired-items/${item.id}/still-want-it`} className="btn-quiet">Decide now</a>
                   </div>
                 </div>
               );
@@ -105,9 +105,9 @@ export default async function ConsideringPage() {
                   <div className={styles.rowActions}>
                     <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
                       <input type="hidden" name="outcome" value="dropped" />
-                      <button type="submit">Let it go</button>
+                      <button type="submit" className="btn-quiet">Let it go</button>
                     </form>
-                    <a href={`/desired-items/${item.id}/pause`}>Decide now</a>
+                    <a href={`/desired-items/${item.id}/pause`} className="btn-quiet">Decide now</a>
                   </div>
                 </div>
               );

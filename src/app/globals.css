@@ -493,7 +493,8 @@ input[type="file"] {
 /* ---------- Buttons ---------- */
 
 button,
-.btn {
+.btn,
+.btn-quiet {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -554,6 +555,50 @@ a:focus-visible {
   background: transparent;
   color: var(--color-accent);
   text-decoration-color: var(--color-accent);
+}
+
+/* ---------- Action groups ----------
+   The pause / let go / save / buy actions, wherever they appear. One width,
+   one left edge, one gap, one typeface (the button base above: Space Mono
+   caps). Stacked full width of the content column on every screen size,
+   capped so a desktop button is not absurdly wide. Variants differ only in
+   fill, border and weight: primary (filled), secondary (outlined, the
+   default button look) and quiet (no border, softer colour, underlined). */
+
+.action-group {
+  display: grid;
+  gap: 0.625rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
+/* A form that wraps one button must not become its own indented box. */
+.action-group form {
+  display: contents;
+}
+
+.action {
+  justify-self: stretch;
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.action--quiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-ink-soft);
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-line-strong);
+}
+
+.action--quiet:hover {
+  background: transparent;
+  color: var(--color-ink);
+  text-decoration-color: var(--color-ink);
 }
 
 .btn-danger {

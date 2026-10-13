@@ -29,10 +29,10 @@ export default async function LetGoListPage() {
                 {automatic && <p className={styles.rowAutoTag}>Moved automatically</p>}
                 <div className={styles.rowActions}>
                   <form action={`/api/desired-items/${item.id}/mark-purchased`} method="POST">
-                    <button type="submit">I bought this after all</button>
+                    <button type="submit" className="btn-quiet">I bought this after all</button>
                   </form>
                   <form action={`/api/desired-items/${item.id}/restore`} method="POST">
-                    <button type="submit">Restore</button>
+                    <button type="submit" className="btn-quiet">Restore</button>
                   </form>
                 </div>
               </div>

@@ -206,13 +206,6 @@
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: calc(var(--space-2) * 0.72) var(--space-2);
-  align-items: center;
-}
-
-.actions form {
   margin: 0;
 }
 

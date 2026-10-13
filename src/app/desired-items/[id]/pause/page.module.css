@@ -338,34 +338,12 @@
 
 .actions {
   margin-top: calc(var(--space-5) * 0.72);
-  display: grid;
-  gap: 0.432rem 0.6rem;
-  max-width: 24rem;
 }
 
-.secondaryPauseOption {
-  border-color: transparent;
-  background: transparent;
-  color: var(--color-ink-soft);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.secondaryPauseOption:hover {
-  background: transparent;
-  color: var(--color-ink);
-}
-
+/* Holds the Buy anyway button and its warning in one grid cell. */
 .buyAnywayWrap {
-  margin-top: 0.288rem;
-  justify-self: center;
-}
-
-.buyAnywayLink {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  text-transform: none;
-  letter-spacing: normal;
+  display: grid;
+  gap: 0.288rem;
 }
 
 .buyAnywayWarning {

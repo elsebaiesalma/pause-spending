@@ -142,16 +142,16 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
           {reflectionSummary ?? "No reflection answers were saved for this item."}
         </p>
 
-        <div className={styles.actions}>
+        <div className={`action-group ${styles.actions}`}>
           <form action={`/api/desired-items/${id}/wait`} method="POST">
             <input type="hidden" name="duration" value="24h" />
-            <button type="submit" className="btn-primary">
+            <button type="submit" className="btn-primary action">
               Pause for 24 hours
             </button>
           </form>
           <form action={`/api/desired-items/${id}/resolve`} method="POST">
             <input type="hidden" name="outcome" value="dropped" />
-            <button type="submit" className="btn-quiet">
+            <button type="submit" className="action">
               Let it go
             </button>
           </form>

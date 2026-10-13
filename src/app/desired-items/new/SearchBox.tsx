@@ -143,16 +143,12 @@ export default function SearchBox({ initialQuery = "" }: { initialQuery?: string
         style={{ minHeight: 44 }}
       />
 
-      <p className="section">
-        <button
-          type="button"
-          className="btn-quiet"
-          style={{ minHeight: 44 }}
-          onClick={() => manualFormRef.current?.requestSubmit()}
-        >
-          None of these - enter manually
+      {/* A real alternative path, so it sits right under the field, above the match cards. */}
+      <div className="section action-group">
+        <button type="button" className="action" onClick={() => manualFormRef.current?.requestSubmit()}>
+          Enter manually
         </button>
-      </p>
+      </div>
 
       {state.status === "loading" && (
         <div className="stack" aria-live="polite" aria-label="Searching">

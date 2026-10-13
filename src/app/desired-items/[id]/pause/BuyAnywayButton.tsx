@@ -33,7 +33,7 @@ export function BuyAnywayButton({ formAction, alreadyAnswered }: { formAction: s
         name="outcome"
         value="proceeded"
         onClick={handleClick}
-        className={`btn-quiet ${styles.buyAnywayLink}`}
+        className="action action--quiet"
       >
         Buy anyway
       </button>

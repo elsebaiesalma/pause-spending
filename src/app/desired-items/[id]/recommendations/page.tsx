@@ -72,10 +72,10 @@ export default async function RecommendationsPage({
         </div>
       )}
 
-      <form action={`/api/desired-items/${desiredItem.id}/resolve`} method="POST" className="section">
+      <form action={`/api/desired-items/${desiredItem.id}/resolve`} method="POST" className="section action-group">
         <input type="hidden" name="outcome" value="saved_for_later" />
-        <button type="submit" className="btn-primary">
-          Save for later instead
+        <button type="submit" className="action">
+          Save for later
         </button>
       </form>
     </div>

@@ -211,14 +211,18 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         </section>
 
         {/* 5. Actions */}
-        <div className={styles.actions}>
-          <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary">
+        {/* Same labels, order and styles as every other screen with these actions. */}
+        <div className={`action-group ${styles.actions}`}>
+          <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary action">
             Pause for 24 hours
           </button>
-          <button type="submit" formAction={waitAction} name="duration" value="7d" className={styles.secondaryPauseOption}>
-            Pause for 7 days instead
+          <button type="submit" formAction={waitAction} name="duration" value="7d" className="action">
+            Pause for 7 days
           </button>
-          <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="btn">
+          <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action">
+            Save for later
+          </button>
+          <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
             Let it go
           </button>
           <BuyAnywayButton formAction={resolveAction} alreadyAnswered={reflection !== null} />
