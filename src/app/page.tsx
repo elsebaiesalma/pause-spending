@@ -190,9 +190,9 @@ export default function Home() {
               <div>
                 <h3>Wait it out, or move forward clearly</h3>
                 <p>
-                  Choose a 24-hour or 7-day wait with no notifications - just an in-app queue you check
-                  when you&apos;re ready. Still want it after that? We&apos;ll suggest lower-priced
-                  alternatives, secondhand options, and outfit ideas built from your real wardrobe.
+                  Choose a 24-hour or 7-day wait. When it ends, the item quietly moves to Undecided, with
+                  no notifications. Still want it? Lay out a look from what you already own and see how
+                  it fits, in a lookbook built from your real wardrobe.
                 </p>
               </div>
             </div>

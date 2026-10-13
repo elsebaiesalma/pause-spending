@@ -181,26 +181,6 @@
   background: var(--color-bg-alt);
 }
 
-.textRows {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.textRows li {
-  display: flex;
-  justify-content: space-between;
-  gap: calc(var(--space-2) * 0.72) var(--space-2);
-  padding: 0.432rem 0;
-  border-bottom: 1px solid var(--color-line);
-}
-
-.textRows a {
-  color: var(--color-ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 .reflection {
   font-size: 1rem;
   color: var(--color-ink);

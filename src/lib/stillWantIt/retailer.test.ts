@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getStoredRetailerAlternatives, retailerFromRawInput } from "./retailer";
+import { retailerFromRawInput } from "./retailer";
 
 describe("retailerFromRawInput", () => {
   it("takes the host of a pasted link, without www", () => {
@@ -17,11 +17,5 @@ describe("retailerFromRawInput", () => {
     expect(retailerFromRawInput("javascript:alert(1)")).toBeNull();
     expect(retailerFromRawInput(null)).toBeNull();
     expect(retailerFromRawInput("")).toBeNull();
-  });
-});
-
-describe("getStoredRetailerAlternatives", () => {
-  it("returns nothing yet, so the lower-priced section stays hidden and no price is ever invented", () => {
-    expect(getStoredRetailerAlternatives()).toEqual([]);
   });
 });

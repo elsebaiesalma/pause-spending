@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -6,8 +7,8 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { ColorDot } from "@/components/ColorDot";
 import { getReflectionAnswer } from "@/lib/pauseScreen/reflection";
 import { buildReflectionSummary } from "@/lib/considering/assembleConsidering";
-import { buildResaleSearchLinks } from "@/lib/stillWantIt/secondhand";
-import { getStoredRetailerAlternatives, retailerFromRawInput } from "@/lib/stillWantIt/retailer";
+import { hasLookForDesiredItem } from "@/lib/looks/looks";
+import { retailerFromRawInput } from "@/lib/stillWantIt/retailer";
 import { getStoreVisitState, shouldAskDidYouBuy } from "@/lib/stillWantIt/storeVisit";
 import { OutfitSection, OutfitSkeleton } from "./OutfitSection";
 import styles from "./page.module.css";
@@ -37,8 +38,7 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
 
   const price = item.price ? Number(item.price) : null;
   const retailer = retailerFromRawInput(item.rawInput);
-  const alternatives = getStoredRetailerAlternatives();
-  const resaleLinks = buildResaleSearchLinks(item.brand, item.itemName);
+  const hasLook = await hasLookForDesiredItem(userId, id);
   const askDidYouBuy = shouldAskDidYouBuy(storeState);
 
   return (
@@ -99,47 +99,31 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
         </Suspense>
       </section>
 
-      {alternatives.length > 0 && (
-        <section className="section" aria-labelledby="lower-priced">
-          <p className={styles.sectionLabel} id="lower-priced">
-            02 / Lower-priced options
-          </p>
-          <ul className={styles.textRows}>
-            {alternatives.map((alt, index) => (
-              <li key={index}>
-                <a href={alt.url} target="_blank" rel="noopener noreferrer">
-                  {[alt.brand, alt.name].filter(Boolean).join(" ")}
-                </a>
-                {alt.price !== null && <span>${alt.price.toFixed(2)}</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {resaleLinks.length > 0 && (
-        <section className="section" aria-labelledby="secondhand">
-          <p className={styles.sectionLabel} id="secondhand">
-            03 / Secondhand
-          </p>
-          <ul className={styles.textRows}>
-            {resaleLinks.map((site) => (
-              <li key={site.name}>
-                <a href={site.url} target="_blank" rel="noopener noreferrer">
-                  Search on {site.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <section className="section" aria-labelledby="build-from-closet">
+        <p className={styles.sectionLabel} id="build-from-closet">
+          02 / Build it from your closet
+        </p>
+        <p className={styles.reflection}>
+          {hasLook
+            ? "You have built a look for this one. Open it to keep rearranging."
+            : "Lay out a look from what you already own, and see how this piece would fit."}
+        </p>
+        <div className="action-group">
+          <Link
+            href={`/lookbook/board?for=${id}&returnTo=${encodeURIComponent(`/desired-items/${id}/still-want-it`)}`}
+            className="btn action"
+          >
+            {hasLook ? "Open your look" : "Build it from your closet"}
+          </Link>
+        </div>
+      </section>
 
       <section className="section" aria-labelledby="one-last-check">
         <p className={styles.sectionLabel} id="one-last-check">
-          04 / One last check
+          03 / One last check
         </p>
         <p className={styles.reflection}>
-          {reflectionSummary ?? "No reflection answers were saved for this item."}
+          {reflectionSummary ?? (hasLook ? "You built a look from your closet." : "No reflection answers were saved for this item.")}
         </p>
 
         <div className={`action-group ${styles.actions}`}>

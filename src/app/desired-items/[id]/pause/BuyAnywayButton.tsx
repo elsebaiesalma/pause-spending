@@ -26,7 +26,7 @@ export function BuyAnywayButton({ formAction, alreadyAnswered }: { formAction: s
   }
 
   return (
-    <div className={styles.buyAnywayWrap}>
+    <div className={styles.buyAnywayWrap} data-reflection-answered={alreadyAnswered}>
       <button
         type="submit"
         formAction={formAction}

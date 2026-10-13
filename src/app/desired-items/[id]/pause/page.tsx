@@ -4,6 +4,9 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
+import { hasLookForDesiredItem } from "@/lib/looks/looks";
+import { hasReflectionAnswer } from "@/lib/pauseScreen/reflectionGate";
+import { BuildLookButton } from "./BuildLookButton";
 import { BuyAnywayButton } from "./BuyAnywayButton";
 import styles from "./page.module.css";
 
@@ -24,6 +27,9 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
     throw error;
   }
   const { desiredItem, similarItems, similarItemReasons, budget, reflection } = payload;
+
+  // A look built from the closet for this item counts as a reflection answer.
+  const hasLook = await hasLookForDesiredItem(userId, desiredItem.id);
 
   const price = desiredItem.price ? Number(desiredItem.price) : null;
   const waitAction = `/api/desired-items/${desiredItem.id}/wait`;
@@ -162,6 +168,14 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                 </label>
               </div>
             </div>
+
+            <div className={styles.question}>
+              <p className={styles.questionLabel}>Or picture it with what you own</p>
+              <div className="action-group">
+                <BuildLookButton itemId={desiredItem.id} />
+              </div>
+              {hasLook && <p className={styles.emptyNote}>You have built a look for this one.</p>}
+            </div>
           </div>
         </section>
 
@@ -225,7 +239,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
             Let it go
           </button>
-          <BuyAnywayButton formAction={resolveAction} alreadyAnswered={reflection !== null} />
+          <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
         </div>
       </form>
     </div>

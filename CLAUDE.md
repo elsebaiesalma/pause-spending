@@ -7,7 +7,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 ## Resume here
 
 **Done**
-- Still want it: the page, outfit suggestions (validated, ids only, description built from names), secondhand links, go-to-store with the once-per-visit prompt, and undecided items on Considering.
+- Still want it: the page, outfit suggestions (validated, ids only, description built from names), a "Build it from your closet" button into the Lookbook board, go-to-store with the once-per-visit prompt, and undecided items on Considering. The lower-priced and secondhand sections (and `resaleSites.json`) were removed 2026-10-13.
 - Store-visit columns (`went_to_store_at`, `store_visit_answer`) are applied and recorded on BOTH Neon branches (migration `20260926090000_add_desired_item_store_visit`, checksums match the file). They are in `schema.prisma`, `prisma generate` has run, and `src/lib/stillWantIt/storeVisit.ts` now uses the generated client, every query scoped by `userId`. Database tests cover undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit) and cross-tenant access. Commits `44f0b53`, `0877fba`, `5e20fcc`.
 - One model constant per feature, each with an env override.
 - Feedback pass (2026-10-06, commit `0c2dd82`): global spacing about 28% tighter vertically, body 16px, no text under 12px; one shared header and tab bar in the root layout (`src/components/SiteNav.tsx`) for every signed-in route, with the nav, initials circle and one centered container (`--width-container`) shared by header and pages; new Account page (`/account`, `/settings` redirects to it); Wardrobe seed placeholders, brand stripped from displayed names, add-to-wardrobe in the header with a 15-colour dropdown; landing copy, sourced stats, image slots, and a first-visit Welcome intro on Connect Gmail.
@@ -16,7 +16,6 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 **Waiting on the user**
 - Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. Only DOM measurements of the new layout were taken (2026-10-06); no screenshots have been looked at yet.
-- Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
 - Create a private GitHub repo. The git repo has no remote, so nothing is pushed.
 - Supply the landing images in `public/images/`: `hero`, `pause-screen` (a real screenshot of our Pause screen), `sample-1`, `sample-2`, as .jpg, .jpeg, .png, .webp or .avif. Until a file exists the slot shows a neutral placeholder naming the expected file (`src/components/ImageSlot.tsx`).
 - Check the Welcome intro on Connect Gmail in a real browser (first visit only, tap to skip, none with reduced motion), and the phone layout of the new tab bar.
@@ -87,6 +86,14 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 - All reads and writes go through `src/lib/looks/looks.ts`, scoped by the session user. A look with no pieces is deleted on the next list; the Gmail permanent delete also removes looks left empty; deleting a user cascades.
 - Coordinates are fractions of a portrait 4:5 board: x, y = top-left corner, scale = width as a fraction of board width, zOrder high draws on top.
 
+## Lookbook (built 2026-10-13)
+
+- **Board** (`src/app/lookbook/board`, full screen): opens pre-filled with a suggested outfit (`getBoardSuggestion` in `src/lib/stillWantIt/outfits.ts`, ids validated, laid out by `src/lib/looks/arrange.ts`), or blank (`?blank=1`, or the Start blank button). `?look=` edits a saved look, `?for=<desiredItemId>` builds one for a wanted item (and opens that item's existing look if it has one), `?returnTo=` is where Close and Save go (same-site paths only, `safeReturnPath`). Drag, pinch and the corner handle use `@use-gesture/react`; every action is also a button and a key. Pieces render in a stable DOM order (z-index stacks), because re-ordering nodes mid-drag drops the pointer.
+- **Lookbook tab** (`/lookbook`): count, New look, thumbnails (`LookThumb`), rename and delete. "Built instead of [item]" is text only.
+- **Pause screen:** "Build this look from your closet" sits in "A moment to think". A saved look for the item counts as a reflection answer for the Buy anyway gate (`hasReflectionAnswer`). The reflection fields are kept in sessionStorage across the trip to the board.
+- API: `/api/looks` (POST) and `/api/looks/[id]` (PUT, PATCH rename, DELETE), all scoped by the session user.
+- `npm install` needed `--legacy-peer-deps` (vitest 5 wants a newer `@types/node` than the project's; unrelated to the Lookbook).
+
 ## Migration rules
 
 - Destructive or hard-to-reverse migrations (renames, drops, anything with real data behind it) are not applied through `scripts/apply-migration-via-http.mjs`. Hand-write the SQL, show it for review, and let the user run `prisma migrate deploy` themselves.
@@ -115,7 +122,6 @@ Each feature has its own constant and environment override. Defaults:
 ## Still want it (built 2026-10-05)
 
 - The page is at `src/app/desired-items/[id]/still-want-it`, reached from "Buy anyway". Its state is in two columns, `went_to_store_at` and `store_visit_answer`, read and written through the generated client in `src/lib/stillWantIt/storeVisit.ts`. The hand-run SQL is kept in `prisma/manual/still-want-it-store-visit.sql` for reference.
-- **Section 02 (lower-priced options) is hidden until alternatives are stored at intake.** Nothing at intake persists other-retailer results yet. `getStoredRetailerAlternatives()` returns nothing, and no price is ever estimated. Before this section can show anything, intake must store the results, and this function must read them.
 - **The outfit cache is in-memory and must be made durable before deploy.** It lives in `globalThis` per process, so each cold start re-calls the model. It is keyed by user, desired item and wardrobe version. Move it to a table or column first.
 - **"Yes" creates no `Purchase` row.** It only sets the desired item to `proceeded` with a price. Email sync must dedupe against that proceeded item, or it will create a second record for the same purchase.
 - "Not sure yet" keeps the item `proceeded` with `decision_outcome` `proceeded`, and sets `store_visit_answer` to `not_sure`. Considering lists it under "Went to the store, undecided". The Kept total (dropped only) and the 60-day sweep (saved_for_later only) never touch it. Clicking "Go to" again clears the answer, so the next visit asks again.

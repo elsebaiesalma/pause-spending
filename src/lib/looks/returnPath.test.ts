@@ -9,7 +9,7 @@ describe("safeReturnPath", () => {
   });
 
   it("falls back to the Lookbook for anything that could leave the site", () => {
-    for (const bad of ["https://evil.example", "//evil.example", "/\evil.example", "javascript:alert(1)", "evil", "", undefined, null]) {
+    for (const bad of ["https://evil.example", "//evil.example", String.raw`/\evil.example`,"javascript:alert(1)", "evil", "", undefined, null]) {
       expect(safeReturnPath(bad as string | undefined)).toBe("/lookbook");
     }
   });
