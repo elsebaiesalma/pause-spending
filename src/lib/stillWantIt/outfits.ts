@@ -73,6 +73,15 @@ Rules:
 - Return only the ids. Do not write descriptions or any other text.
 - Return an empty list if no sensible outfit is possible.`;
 
+// Used when there is no wanted item: the Lookbook's "start from a suggestion".
+const OPEN_SYSTEM_PROMPT = `You suggest outfits built from a person's own wardrobe.
+
+Rules:
+- Use only the owned pieces provided, referenced by their id. Never invent an id.
+- Each outfit uses 2 to 4 pieces that work well together: a top or a dress, bottoms when there is no dress, and shoes or a bag when they suit it.
+- Return only the ids. Do not write descriptions or any other text.
+- Return an empty list if no sensible outfit is possible.`;
+
 export function wardrobeVersion(pieces: OutfitPiece[]): string {
   const canonical = [...pieces]
     .sort((a, b) => a.id.localeCompare(b.id))
@@ -80,7 +89,8 @@ export function wardrobeVersion(pieces: OutfitPiece[]): string {
   return createHash("sha256").update(JSON.stringify(canonical)).digest("hex").slice(0, 16);
 }
 
-export function buildOutfitPrompt(target: OutfitTarget, pieces: OutfitPiece[]): string {
+export function buildOutfitPrompt(target: OutfitTarget | null, pieces: OutfitPiece[]): string {
+  if (target === null) return ["Owned pieces:", JSON.stringify(pieces)].join("\n");
   return [
     "Target item (not owned, do not include it):",
     JSON.stringify({
@@ -122,11 +132,11 @@ export function validateOutfits(outfits: unknown[], ownedIds: ReadonlySet<string
   });
 }
 
-async function generateValidOutfits(target: OutfitTarget, pieces: OutfitPiece[]): Promise<ValidOutfit[]> {
+async function generateValidOutfits(target: OutfitTarget | null, pieces: OutfitPiece[]): Promise<ValidOutfit[]> {
   const response = await getAnthropicClient().messages.parse({
     model: OUTFIT_MODEL,
     max_tokens: 1024,
-    system: OUTFIT_SYSTEM_PROMPT,
+    system: target === null ? OPEN_SYSTEM_PROMPT : OUTFIT_SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildOutfitPrompt(target, pieces) }],
     output_config: { format: zodOutputFormat(outfitResponseSchema) },
   });
@@ -241,6 +251,59 @@ export async function getOutfitSuggestions(
   });
 
   return { status: "ok", outfits: withItems };
+}
+
+// One validated outfit of owned piece ids for the Lookbook board, or a reason
+// there isn't one. With a wanted item it is the same (cached) suggestion Still
+// want it shows, so the board opens with what that page described; without one
+// it is a general suggestion from the whole wardrobe. Ids only, and every id
+// has been checked against this user's own active pieces.
+export type BoardSuggestion =
+  | { status: "ok"; itemIds: string[] }
+  | { status: "too_small" | "unavailable" | "none" };
+
+export async function getBoardSuggestion(
+  userId: string,
+  desiredItemId: string | null,
+  now: number = Date.now()
+): Promise<BoardSuggestion> {
+  if (desiredItemId) {
+    const result = await getOutfitSuggestions(userId, desiredItemId, now);
+    if (!result) return { status: "none" };
+    if (result.status !== "ok") return { status: result.status };
+    const first = result.outfits[0];
+    return first ? { status: "ok", itemIds: first.items.map((item) => item.id) } : { status: "none" };
+  }
+
+  const rows = await prisma.wardrobeItem.findMany({
+    where: { userId, status: "active" },
+    select: { id: true, category: true, colorFamily: true, colorName: true, styleTags: true, useCaseTags: true },
+    orderBy: { id: "asc" },
+  });
+  if (rows.length < MIN_OWNED_PIECES) return { status: "too_small" };
+
+  const pieces: OutfitPiece[] = rows.map((row) => ({
+    id: row.id,
+    category: row.category,
+    colorFamily: row.colorFamily,
+    colorName: row.colorName,
+    tags: Array.from(new Set([...row.styleTags, ...row.useCaseTags])),
+  }));
+
+  const key = `${userId}:open:${wardrobeVersion(pieces)}`;
+  let outfits = readCache(key, now);
+  if (!outfits) {
+    try {
+      outfits = await generateValidOutfits(null, pieces);
+    } catch (error) {
+      const status = error instanceof Anthropic.APIError ? error.status : undefined;
+      console.error(`[lookbook] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`, error);
+      return { status: "unavailable" };
+    }
+    writeCache(key, outfits, now);
+  }
+  const first = outfits[0];
+  return first ? { status: "ok", itemIds: first.itemIds } : { status: "none" };
 }
 
 export function clearOutfitCacheForTests(): void {

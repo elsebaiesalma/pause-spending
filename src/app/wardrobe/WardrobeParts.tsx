@@ -9,11 +9,20 @@ const UNSPLASH_PREFIX = "https://images.unsplash.com/";
 // The Unsplash host is allowed in next.config.ts, so those photos go through
 // next/image. Real items can come from any retailer's domain, which Next
 // can't be told about ahead of time, so they stay plain lazy <img> tags.
-export function ItemImage({ item, sizes }: { item: WardrobeEntry; sizes: string }) {
+export function ItemImage({
+  item,
+  sizes,
+  compact = false,
+}: {
+  item: Pick<WardrobeEntry, "imageUrl" | "displayName" | "category">;
+  sizes: string;
+  // Thumbnails: the placeholder keeps its colour but drops its label.
+  compact?: boolean;
+}) {
   if (!item.imageUrl) {
     return (
       <div className={styles.imagePlaceholder}>
-        <span className={styles.imagePlaceholderLabel}>{item.category || "No category"}</span>
+        {!compact && <span className={styles.imagePlaceholderLabel}>{item.category || "No category"}</span>}
       </div>
     );
   }
