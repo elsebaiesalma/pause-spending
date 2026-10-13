@@ -14,6 +14,7 @@ export default async function DeleteGmailDataPage() {
         <li>Revoke this app&apos;s access to your Gmail account.</li>
         <li>Permanently delete every purchase parsed from that account.</li>
         <li>Permanently delete every wardrobe item seeded from those purchases.</li>
+        <li>Remove any look made only from those pieces.</li>
       </ul>
       <p className="note section">
         <strong>This cannot be undone.</strong> Manually-added wardrobe items you created yourself are

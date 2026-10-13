@@ -15,7 +15,6 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Full suite passing: 85 files, 477 tests. Type check clean. Lint has 3 errors left (see below).
 
 **Waiting on the user**
-- Run `prisma/manual/lookbook.sql` on main and test (Lookbook tables, phase 1, 2026-10-13), then confirm. Until then the Lookbook models stay out of `schema.prisma`; phases 2-4 wait on it. Also still pending: `prisma/manual/pause-ended-at.sql`.
 - Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. Only DOM measurements of the new layout were taken (2026-10-06); no screenshots have been looked at yet.
 - Verify the resale search URL patterns in `src/lib/stillWantIt/resaleSites.json` by hand in a browser. They were written without a live check.
 - Create a private GitHub repo. The git repo has no remote, so nothing is pushed.
@@ -80,6 +79,13 @@ The user ran `prisma/manual/pending-desired-items.sql` in Neon's SQL editor on m
 The migration files' header comments still say "NOT YET APPLIED". Those headers are stale, but do not edit the `.sql` files: a change to any byte changes its checksum, and Prisma would then flag the recorded migration as modified.
 
 Future schema changes still go through `npx prisma migrate deploy`, run by the user from a terminal with port access. Use the same by-hand SQL pattern if the HTTP route is needed.
+
+## Lookbook schema (applied on both branches, 2026-10-13)
+
+- `looks` and `look_items` (migration `20261013120000_add_lookbook`, recorded in `_prisma_migrations` on main and test with the file checksum). In `schema.prisma`, generated. Do not edit the migration file.
+- Same-user integrity is in the database: `look_items` carries `user_id`, with composite foreign keys to `looks(id, user_id)` and `wardrobe_items(id, user_id)` (so `wardrobe_items` has a unique `(id, user_id)`). The wanted-item link (`inspired_by_desired_item_id`) is checked in the app. Pieces are written with `createMany`, never a nested create (two composite keys share `user_id`).
+- All reads and writes go through `src/lib/looks/looks.ts`, scoped by the session user. A look with no pieces is deleted on the next list; the Gmail permanent delete also removes looks left empty; deleting a user cascades.
+- Coordinates are fractions of a portrait 4:5 board: x, y = top-left corner, scale = width as a fraction of board width, zOrder high draws on top.
 
 ## Migration rules
 

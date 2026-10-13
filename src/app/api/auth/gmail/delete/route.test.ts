@@ -17,6 +17,7 @@ import { auth } from "@/lib/auth";
 import { csrfTokenForUser } from "@/lib/csrf";
 import { encrypt } from "@/lib/encryption";
 import { prisma } from "@/lib/prisma";
+import { saveLook } from "@/lib/looks/looks";
 import { POST } from "./route";
 
 const FAKE_STORED_TOKEN = JSON.stringify({
@@ -145,4 +146,56 @@ describe("POST /api/auth/gmail/delete", () => {
       await prisma.wardrobeItem.deleteMany({ where: { id: manualWardrobeItem.id } });
     }
   });
+});
+
+describe("POST /api/auth/gmail/delete and looks", () => {
+  afterEach(() => {
+    vi.mocked(revokeGoogleToken).mockReset();
+    vi.mocked(auth).mockReset();
+  });
+
+  it(
+    "removes a look made only from deleted pieces, and keeps one that also holds a manually-added piece",
+    async () => {
+      const user = await prisma.user.create({ data: { email: `looks-delete-${Date.now()}@pause-spending.test` } });
+      try {
+        await prisma.emailConnection.create({
+          data: { userId: user.id, provider: "gmail", encryptedToken: encrypt(FAKE_STORED_TOKEN), status: "connected" },
+        });
+        const connection = await prisma.emailConnection.findFirstOrThrow({ where: { userId: user.id } });
+        const purchase = await prisma.purchase.create({
+          data: {
+            userId: user.id,
+            sourceEmailConnectionId: connection.id,
+            merchant: "Shop",
+            orderDate: new Date("2026-01-01"),
+            itemName: "Gmail Coat",
+            category: "outerwear",
+            price: "100.00",
+            status: "active",
+          },
+        });
+        const fromGmail = await prisma.wardrobeItem.create({
+          data: { userId: user.id, sourcePurchaseId: purchase.id, itemName: "Gmail Coat", status: "active" },
+        });
+        const manual = await prisma.wardrobeItem.create({
+          data: { userId: user.id, itemName: "Manual Boots", status: "active" },
+        });
+        const place = (wardrobeItemId: string, zOrder: number) => ({ wardrobeItemId, x: 0.2, y: 0.2, scale: 0.4, zOrder });
+        const onlyGmail = await saveLook(user.id, { placements: [place(fromGmail.id, 0)] });
+        const mixed = await saveLook(user.id, { placements: [place(fromGmail.id, 0), place(manual.id, 1)] });
+
+        mockSession(user.id);
+        const response = await POST(buildRequest(csrfTokenForUser(user.id)));
+        expect(response.status).toBeLessThan(400);
+
+        expect(await prisma.look.findUnique({ where: { id: onlyGmail! } })).toBeNull();
+        const kept = await prisma.look.findUnique({ where: { id: mixed! }, include: { items: true } });
+        expect(kept?.items.map((i) => i.wardrobeItemId)).toEqual([manual.id]);
+      } finally {
+        await prisma.user.deleteMany({ where: { id: user.id } });
+      }
+    },
+    60_000
+  );
 });

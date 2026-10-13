@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { revokeConnectionToken } from "@/lib/emailConnections";
 import { auth } from "@/lib/auth";
 import { verifyCsrfToken } from "@/lib/csrf";
+import { deleteEmptyLooks } from "@/lib/looks/looks";
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -33,6 +34,10 @@ export async function POST(request: NextRequest) {
   // from this connection, and from there to every wardrobe item sourced from
   // those purchases - a full purge of data derived from this connection.
   await prisma.emailConnection.delete({ where: { id: connection.id } });
+
+  // A look built only from pieces that were just deleted has nothing left on
+  // it, so it goes too. Looks that also hold a manually-added piece stay.
+  await deleteEmptyLooks(session.user.id);
 
   return NextResponse.redirect(new URL("/account", request.url));
 }
