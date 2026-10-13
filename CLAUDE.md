@@ -11,7 +11,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Store-visit columns (`went_to_store_at`, `store_visit_answer`) are applied and recorded on BOTH Neon branches (migration `20260926090000_add_desired_item_store_visit`, checksums match the file). They are in `schema.prisma`, `prisma generate` has run, and `src/lib/stillWantIt/storeVisit.ts` now uses the generated client, every query scoped by `userId`. Database tests cover undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit) and cross-tenant access. Commits `44f0b53`, `0877fba`, `5e20fcc`.
 - One model constant per feature, each with an env override.
 - Feedback pass (2026-10-06, commit `0c2dd82`): global spacing about 28% tighter vertically, body 16px, no text under 12px; one shared header and tab bar in the root layout (`src/components/SiteNav.tsx`) for every signed-in route, with the nav, initials circle and one centered container (`--width-container`) shared by header and pages; new Account page (`/account`, `/settings` redirects to it); Wardrobe seed placeholders, brand stripped from displayed names, add-to-wardrobe in the header with a 15-colour dropdown; landing copy, sourced stats, image slots, and a first-visit Welcome intro on Connect Gmail.
-- Wardrobe Rack view (2026-10-13): Grid | Rack toggle, search, rail + shelf line, category divider tabs, hanging vs standing items, sway, drag/arrows/snap, virtualized past 60 items. Logic in `src/lib/wardrobeView.ts`, UI in `src/app/wardrobe/` (`WardrobeBrowser`, `Rack`). Seeded rows now show Unsplash photos (`src/lib/seedWardrobeImages.ts`; existing rows re-pointed with `scripts/pointSeedImagesAtUnsplash.ts`). Not yet checked on a real phone.
+- Wardrobe Rack view (2026-10-13): Grid | Rack toggle, search, rail + shelf line, category divider tabs, hanging vs standing items, sway, drag/arrows/snap, virtualized past 60 items. Logic in `src/lib/wardrobeView.ts`, UI in `src/app/wardrobe/` (`WardrobeBrowser`, `Rack`). Not yet checked on a real phone.
 - Full suite passing: 85 files, 477 tests. Type check clean. Lint has 3 errors left (see below).
 
 **Waiting on the user**
@@ -61,6 +61,14 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - "Saved" means money only: the let-go total reads "$540 saved", and Home says "$540 saved by letting 6 things go".
 - The old "Saved for later" section is **Undecided**, and the old "Save for later" button is **Decide later**. "Went to the store, undecided" is now **Went to the store**. "Pause for 24 hours", "Pause for 7 days", "Decide later", "Let it go" and "Buy anyway" are identical on every screen.
 - Internal names are unchanged on purpose: `saved_for_later`, `savedAt`, `getKeptSummary`, `totalKept`.
+
+## Mock wardrobe (reworked 2026-10-13, not yet loaded)
+
+- Data: `data/mock-wardrobe.json` (30 items, CAD, with deliberate near-duplicates and messy cases); images: `public/mock/` (its README lists each filename and a search term). Parsing and row-building: `src/lib/mockWardrobe.ts`; seeding and deleting: `src/lib/mockWardrobeDb.ts`.
+- `npx tsx scripts/seedMockWardrobe.ts` is a dry run; `--confirm` writes. Rows are tagged `source = "seed"` with fixed ids per user and item, so re-running updates instead of duplicating. An image is linked only if its file exists in `public/mock/`, so add images and re-run.
+- `npx tsx scripts/deleteSeededMockWardrobe.ts` (dry run; `--confirm` deletes) removes only `source = "seed"` rows, refuses if a real wardrobe item was made from a seed purchase, and drops looks left empty.
+- Seeds from the earlier script have random ids (25 wardrobe items and 25 purchases at the time of writing): delete them first, or they sit alongside the new ones.
+- Keep `GMAIL_SYNC_PAUSED=true` in `.env` while mock data is loaded.
 
 ## Brand casing
 

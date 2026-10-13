@@ -1,52 +1,41 @@
-// Deletes ONLY the rows scripts/seedMockWardrobe.ts created - every query
-// and delete in this file is filtered by source: "seed", which real data
-// never has (it's null on every purchase/wardrobe item created by the real
-// Gmail-sync or manual-entry paths - see prisma/schema.prisma). There is no
-// broader delete anywhere in this file: it can't drop a real purchase or
-// wardrobe item no matter how it's invoked.
+// Deletes ONLY the mock rows scripts/seedMockWardrobe.ts created (and the ones
+// older versions of it created): every query and delete goes through
+// src/lib/mockWardrobeDb.ts, which filters by source: "seed". Real Gmail-synced
+// and hand-added rows have no source, so they cannot match. It also refuses to
+// run if a real wardrobe item was ever made from a seed purchase, since deleting
+// the purchase would cascade to it.
 //
-// Defaults to a dry run that only reports what it would delete. Pass
-// --confirm to actually delete.
+// A look left with no pieces after the delete is removed too, for the affected
+// accounts only.
+//
+// Defaults to a dry run that only reports what it would delete. Pass --confirm
+// to actually delete.
 //
 // Usage:
 //   npx tsx scripts/deleteSeededMockWardrobe.ts            (dry run, reports only)
 //   npx tsx scripts/deleteSeededMockWardrobe.ts --confirm  (actually deletes)
 import { prisma } from "@/lib/prisma";
+import { deleteSeededMockWardrobe } from "@/lib/mockWardrobeDb";
 
-const SOURCE = "seed";
 const CONFIRM = process.argv.includes("--confirm");
 
 async function main() {
-  const [wardrobeItems, purchases] = await Promise.all([
-    prisma.wardrobeItem.findMany({ where: { source: SOURCE }, select: { id: true, itemName: true } }),
-    prisma.purchase.findMany({ where: { source: SOURCE }, select: { id: true, itemName: true } }),
-  ]);
-
-  console.log(`Found ${wardrobeItems.length} seeded wardrobe item(s) and ${purchases.length} seeded purchase(s).`);
+  const summary = await deleteSeededMockWardrobe({ confirm: CONFIRM });
+  console.log(`Found ${summary.wardrobeItems} seeded wardrobe item(s) and ${summary.purchases} seeded purchase(s).`);
 
   if (!CONFIRM) {
-    console.log("Dry run only (no rows deleted). Re-run with --confirm to actually delete these rows:");
-    for (const item of wardrobeItems) console.log(`  wardrobe_item: ${item.itemName}`);
-    for (const purchase of purchases) console.log(`  purchase: ${purchase.itemName}`);
+    console.log("Dry run only (no rows deleted). Re-run with --confirm to actually delete them.");
     return;
   }
-
-  const deletedWardrobeItems = await prisma.wardrobeItem.deleteMany({ where: { source: SOURCE } });
-  const deletedPurchases = await prisma.purchase.deleteMany({ where: { source: SOURCE } });
-
   console.log(
-    `Deleted ${deletedWardrobeItems.count} seeded wardrobe item(s) and ${deletedPurchases.count} seeded purchase(s).`
+    `Deleted ${summary.wardrobeItems} seeded wardrobe item(s) and ${summary.purchases} seeded purchase(s)` +
+      (summary.looksRemoved > 0 ? `, and ${summary.looksRemoved} look(s) left empty.` : ".")
   );
-
-  const remaining = await prisma.wardrobeItem.count({ where: { source: SOURCE } });
-  if (remaining > 0) {
-    throw new Error(`${remaining} seeded wardrobe item(s) still remain after delete - investigate before re-running.`);
-  }
 }
 
 main()
   .catch((error) => {
-    console.error(error);
+    console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
   })
   .finally(async () => {
