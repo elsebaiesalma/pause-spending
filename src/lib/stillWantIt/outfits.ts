@@ -6,6 +6,7 @@ import { OUTFIT_MODEL } from "@/lib/anthropicModels";
 import { getAnthropicClient } from "@/lib/anthropicClient";
 import { prisma } from "@/lib/prisma";
 import { devWardrobeWhere } from "@/lib/devWardrobeView";
+import { readStoredOutfits, writeStoredOutfits } from "./outfitCacheStore";
 
 // Below this many owned pieces, a 2-4 item outfit would mostly repeat the
 // same few things, so we say so instead of guessing.
@@ -149,7 +150,7 @@ async function generateValidOutfits(target: OutfitTarget | null, pieces: OutfitP
   return validateOutfits(response.parsed_output.outfits, new Set(pieces.map((p) => p.id)));
 }
 
-// Cache is per process and keyed by user, desired item and wardrobe version,
+// The in-memory layer is per process and keyed by user, desired item and wardrobe version,
 // so a change to the wardrobe is a natural miss. The key includes userId, so
 // one user's entry can never be served to another. Entries hold ids only.
 type CacheEntry = { outfits: ValidOutfit[]; expiresAt: number };
@@ -172,6 +173,35 @@ function writeCache(key: string, outfits: ValidOutfit[], now: number): void {
     if (oldest !== undefined) outfitCache.delete(oldest);
   }
   outfitCache.set(key, { outfits, expiresAt: now + CACHE_TTL_MS });
+}
+
+// Memory first, then the durable table (a no-op until the table exists), then
+// the model. Both layers are keyed by user, desired item (null for the
+// Lookbook's open suggestion) and wardrobe version.
+async function cachedOutfits(
+  userId: string,
+  desiredItemId: string | null,
+  pieces: OutfitPiece[],
+  now: number,
+  generate: () => Promise<ValidOutfit[]>
+): Promise<ValidOutfit[]> {
+  const version = wardrobeVersion(pieces);
+  const key = `${userId}:${desiredItemId ?? "open"}:${version}`;
+  const inMemory = readCache(key, now);
+  if (inMemory) return inMemory;
+
+  const stored = await readStoredOutfits(userId, desiredItemId, version, new Date(now - CACHE_TTL_MS));
+  if (stored) {
+    // Ids are re-checked against this user's current pieces, as for a fresh answer.
+    const valid = validateOutfits(stored, new Set(pieces.map((p) => p.id)));
+    writeCache(key, valid, now);
+    return valid;
+  }
+
+  const outfits = await generate();
+  writeCache(key, outfits, now);
+  await writeStoredOutfits(userId, desiredItemId, version, outfits, new Date(now));
+  return outfits;
 }
 
 // Returns null when the desired item doesn't belong to this user, so the
@@ -212,29 +242,24 @@ export async function getOutfitSuggestions(
     tags: Array.from(new Set([...row.styleTags, ...row.useCaseTags])),
   }));
 
-  const key = `${userId}:${desiredItemId}:${wardrobeVersion(pieces)}`;
-  let outfits = readCache(key, now);
-
-  if (!outfits) {
-    try {
-      const target: OutfitTarget = {
-        category: desired.category,
-        colorFamily: desired.colorFamily,
-        colorName: desired.colorName,
-        tags: desired.styleTags,
-      };
-      outfits = await generateValidOutfits(target, pieces);
-    } catch (error) {
-      // Not cached, so the next load retries. Logged with the API status
-      // where there is one, so a bad model ID or auth problem is visible.
-      const status = error instanceof Anthropic.APIError ? error.status : undefined;
-      console.error(
-        `[still-want-it] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`,
-        error
-      );
-      return { status: "unavailable" };
-    }
-    writeCache(key, outfits, now);
+  let outfits: ValidOutfit[];
+  try {
+    const target: OutfitTarget = {
+      category: desired.category,
+      colorFamily: desired.colorFamily,
+      colorName: desired.colorName,
+      tags: desired.styleTags,
+    };
+    outfits = await cachedOutfits(userId, desiredItemId, pieces, now, () => generateValidOutfits(target, pieces));
+  } catch (error) {
+    // Not cached, so the next load retries. Logged with the API status
+    // where there is one, so a bad model ID or auth problem is visible.
+    const status = error instanceof Anthropic.APIError ? error.status : undefined;
+    console.error(
+      `[still-want-it] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`,
+      error
+    );
+    return { status: "unavailable" };
   }
 
   const byId = new Map(rows.map((row) => [row.id, row]));
@@ -291,17 +316,13 @@ export async function getBoardSuggestion(
     tags: Array.from(new Set([...row.styleTags, ...row.useCaseTags])),
   }));
 
-  const key = `${userId}:open:${wardrobeVersion(pieces)}`;
-  let outfits = readCache(key, now);
-  if (!outfits) {
-    try {
-      outfits = await generateValidOutfits(null, pieces);
-    } catch (error) {
-      const status = error instanceof Anthropic.APIError ? error.status : undefined;
-      console.error(`[lookbook] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`, error);
-      return { status: "unavailable" };
-    }
-    writeCache(key, outfits, now);
+  let outfits: ValidOutfit[];
+  try {
+    outfits = await cachedOutfits(userId, null, pieces, now, () => generateValidOutfits(null, pieces));
+  } catch (error) {
+    const status = error instanceof Anthropic.APIError ? error.status : undefined;
+    console.error(`[lookbook] outfit model call failed (model=${OUTFIT_MODEL}, status=${status ?? "none"}):`, error);
+    return { status: "unavailable" };
   }
   const first = outfits[0];
   return first ? { status: "ok", itemIds: first.itemIds } : { status: "none" };

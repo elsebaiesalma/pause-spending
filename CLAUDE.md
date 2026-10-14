@@ -25,27 +25,22 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - `src/app/dashboard/KeptToggle.tsx:37` and `src/app/desired-items/new/SearchBox.tsx:76`: `react-hooks/set-state-in-effect`. Fixing either changes render timing.
 
 **Design queue (screens to design)**
-- Add item
 - Receipts review
-- Settings: the Account page now has "Coming later" placeholders for Tone and Auto-move timing; the saved-item retention setting would live there
 - Item detail
-- The pause-ended moment (see "Locked pause state" in Parked items)
+- No separate pause-ended screen: pauses now end silently into Undecided.
 
 **Open decisions (before building)**
-- Outfit cache must become durable before deploy. Options: a `DesiredItem` column holding the outfit JSON plus its wardrobe version, or a small table.
-- Lower-priced options (section 02) stay hidden until intake stores other-retailer results. Decide what intake stores, and where.
-- Email sync must dedupe against a "proceeded" desired item when a matching order arrives. "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
-- Model outfit descriptions can refer to the target item even though it is never in the outfit. Decide whether the prompt should forbid that.
-- Proceeded items with no list to show them. Decide whether any other proceeded items need a home.
+- Email sync must dedupe against a "proceeded" desired item when a matching order arrives (for when email parsing resumes). "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
 ## Pre-deploy checklist
 
-- Make the outfit cache durable (see Open decisions and "Still want it" below): it is in memory per process today.
+- Make the outfit cache durable: the code is written (`src/lib/stillWantIt/outfitCacheStore.ts`) and falls back to the in-memory cache until the table exists. Run `prisma/manual/outfit-suggestions.sql` in Neon's SQL editor on main and the test branch, run its verification query (expect 7 rows), then tell Claude so the fallback can be removed.
+- Fix the 3 lint errors listed under "Resume here".
 - **Set the host to Node 24.** `package.json` has `engines.node` of `24.x`, but `engines` is advisory unless the host enforces it, so choose the Node version in the host's settings.
 - **Run `prisma generate` as part of the build, not through install scripts.** The `build` script is just `next build`, so nothing in the build generates the client; leaving it to an install script is fragile, because npm 11 reports several install scripts as not yet allowed (next item). Make the host's build command `prisma generate && next build` (or put it in the `build` script), and confirm a clean `npm ci` followed by the build works from a fresh checkout.
 - **Review the npm 11 `allowScripts` warning.** `npm install` lists four packages whose install scripts are not yet covered by an `allowScripts` setting: `@prisma/engines` (postinstall), `prisma` (preinstall), `esbuild` (postinstall) and `unrs-resolver` (postinstall). Run `npm install-scripts ls` and decide per package whether to approve it (`npm install-scripts approve <pkg>`). Do not approve one just to silence the message: check what each script does and what breaks without it (the Prisma engines and esbuild binary are the likely ones that matter; `unrs-resolver` is a lint resolver).
-- Apply the pending SQL if not yet run: `prisma/manual/pause-ended-at.sql` on main and test.
+- Apply the pending manual SQL if not yet run (`prisma/manual/pause-ended-at.sql`, `prisma/manual/outfit-suggestions.sql`). The user runs manual SQL in Neon's SQL editor on main and the test branch, not from a terminal.
 
 ## Environment and branches
 
