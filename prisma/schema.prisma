@@ -21,12 +21,13 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  emailConnections EmailConnection[]
-  purchases        Purchase[]
-  wardrobeItems    WardrobeItem[]
-  desiredItems     DesiredItem[]
-  budgets          Budget[]
-  looks            Look[]
+  emailConnections  EmailConnection[]
+  purchases         Purchase[]
+  wardrobeItems     WardrobeItem[]
+  desiredItems      DesiredItem[]
+  budgets           Budget[]
+  looks             Look[]
+  outfitSuggestions OutfitSuggestion[]
 
   @@map("users")
 }
@@ -99,41 +100,41 @@ model EmailConnection {
 }
 
 model Purchase {
-  id                      String    @id @default(uuid()) @db.Uuid
-  userId                  String    @map("user_id") @db.Uuid
-  sourceEmailConnectionId String?   @map("source_email_connection_id") @db.Uuid
+  id                      String   @id @default(uuid()) @db.Uuid
+  userId                  String   @map("user_id") @db.Uuid
+  sourceEmailConnectionId String?  @map("source_email_connection_id") @db.Uuid
   merchant                String
-  orderDate               DateTime  @map("order_date") @db.Date
-  itemName                String    @map("item_name")
+  orderDate               DateTime @map("order_date") @db.Date
+  itemName                String   @map("item_name")
   // Null when extraction couldn't confidently isolate this item's own line
   // price (ambiguous multi-item pricing, a subtotal-reconciliation
   // mismatch, or a genuinely missing price) - never a guessed number. Only
   // `active` purchases are guaranteed to have a real price; a null price
   // always implies status = "needs_review".
-  price                   Decimal?  @db.Decimal(10, 2)
+  price                   Decimal? @db.Decimal(10, 2)
   category                String
-  imageUrl                String?   @map("image_url")
-  productLink             String?   @map("product_link")
-  sourceEmailId           String?   @map("source_email_id")
+  imageUrl                String?  @map("image_url")
+  productLink             String?  @map("product_link")
+  sourceEmailId           String?  @map("source_email_id")
   // The retailer's own order number, when identifiable - used to detect
   // that a later shipping/delivery email refers to an order a prior
   // confirmation email already captured, instead of creating a duplicate.
-  orderReference          String?   @map("order_reference")
-  status                  String    @default("active")
+  orderReference          String?  @map("order_reference")
+  status                  String   @default("active")
   // Set by confirmReviewPurchase() when a human corrects a needs_review
   // placeholder. extractAndPersistPurchase() checks this before ever
   // deleting/replacing an existing row for an order, so a later, more
   // detailed email can never silently clobber a human correction.
-  userEdited              Boolean   @default(false) @map("user_edited")
+  userEdited              Boolean  @default(false) @map("user_edited")
   // Free-text color for display only (e.g. "Espresso") - never used in
   // redundancy matching. See colorFamily.
-  colorName               String?   @map("color_name")
+  colorName               String?  @map("color_name")
   // One of COLOR_FAMILIES (src/lib/colorFamily.ts). App-validated String,
   // not a Postgres enum, matching this schema's existing convention for
   // status/pauseStatus. Redundancy matching (similarity.ts) uses only this
   // field, never colorName - never populated on Purchase itself by matching,
   // it exists here so seedWardrobeItemFromPurchase can carry it forward.
-  colorFamily             String?   @map("color_family")
+  colorFamily             String?  @map("color_family")
   // Set to "seed" on rows written by scripts/seedMockWardrobe.ts, so
   // scripts/deleteSeededMockWardrobe.ts can find and remove exactly those
   // rows and nothing else. Null on every real, sync-derived purchase.
@@ -174,14 +175,12 @@ model WardrobeItem {
   // added wardrobe item.
   source           String?
 
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourcePurchase Purchase? @relation(fields: [sourcePurchaseId], references: [id], onDelete: Cascade)
+  user                   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourcePurchase         Purchase?     @relation(fields: [sourcePurchaseId], references: [id], onDelete: Cascade)
   // Back-relation for the proposed reflectionReplacesWardrobeItem FK on
   // DesiredItem - see that model's comment. Not yet backed by an applied
   // migration.
   reflectingDesiredItems DesiredItem[]
-
-  @@map("wardrobe_items")
 
   // Pieces of saved looks. Deleting the item removes it from every look.
   lookItems LookItem[]
@@ -189,46 +188,47 @@ model WardrobeItem {
   // Target of look_items' composite foreign key, which is what guarantees a
   // look and every piece on it belong to the same user.
   @@unique([id, userId])
+  @@map("wardrobe_items")
 }
 
 model DesiredItem {
-  id              String    @id @default(uuid()) @db.Uuid
-  userId          String    @map("user_id") @db.Uuid
-  sourceType      String    @map("source_type")
-  rawInput        String?   @map("raw_input")
-  itemName        String?   @map("item_name")
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  sourceType         String    @map("source_type")
+  rawInput           String?   @map("raw_input")
+  itemName           String?   @map("item_name")
   // From the brand list (src/lib/brands/brandList.json) when matched, or
   // free text for an unlisted brand - never validated against the list,
   // since the list is an acceleration aid, not a closed set.
-  brand           String?
+  brand              String?
   // "low" | "medium" | "high" (see FieldConfidence in urlExtractor.ts), or
   // null when itemName is either fully manual or not set at all. Explicit,
   // not inferred from which other fields happen to be populated - the
   // confirm page uses this to show a distinct low-confidence banner
   // instead of presenting a slug-derived guess (URL paste's extraction
   // failure fallback) or a low-confidence search candidate as a fact.
-  itemNameConfidence String? @map("item_name_confidence")
-  price           Decimal?  @db.Decimal(10, 2)
-  imageUrl        String?   @map("image_url")
-  category        String?
+  itemNameConfidence String?   @map("item_name_confidence")
+  price              Decimal?  @db.Decimal(10, 2)
+  imageUrl           String?   @map("image_url")
+  category           String?
   // Free-text color for display only (e.g. "Espresso") - never used in
   // redundancy matching. Renamed from primaryColor; see colorFamily.
-  colorName       String?   @map("color_name")
+  colorName          String?   @map("color_name")
   // One of COLOR_FAMILIES (src/lib/colorFamily.ts). Redundancy matching
   // (similarity.ts) uses only this field, never colorName.
-  colorFamily     String?   @map("color_family")
-  styleTags       String[]  @map("style_tags")
-  userConfirmed   Boolean   @default(false) @map("user_confirmed")
+  colorFamily        String?   @map("color_family")
+  styleTags          String[]  @map("style_tags")
+  userConfirmed      Boolean   @default(false) @map("user_confirmed")
   // Set when the user submits the confirm form for this item (whether or
   // not they actually changed a value). ensureDesiredItemTagged() checks
   // this before auto-filling category/color/tags, so it never overwrites
   // what the user explicitly confirmed - including an intentionally blank
   // category.
-  userEdited      Boolean   @default(false) @map("user_edited")
-  pauseStatus     String    @default("pending_confirmation") @map("pause_status")
-  waitUntil       DateTime? @map("wait_until")
-  decisionOutcome String?   @map("decision_outcome")
-  createdAt       DateTime  @default(now()) @map("created_at")
+  userEdited         Boolean   @default(false) @map("user_edited")
+  pauseStatus        String    @default("pending_confirmation") @map("pause_status")
+  waitUntil          DateTime? @map("wait_until")
+  decisionOutcome    String?   @map("decision_outcome")
+  createdAt          DateTime  @default(now()) @map("created_at")
 
   // --- Pause screen "a moment to think" reflection (proposed - see
   // prisma/migrations/20260925090000_add_desired_item_reflection/migration.sql).
@@ -268,42 +268,43 @@ model DesiredItem {
   // createdAt, which is when the item was first flagged, potentially
   // earlier. Set by the wait endpoint; used for the Considering tab's
   // "Paused Sep 24" line.
-  pausedAt            DateTime? @map("paused_at")
+  pausedAt           DateTime? @map("paused_at")
   // When the item most recently entered pauseStatus "saved_for_later" - set
   // on save and reset on restore-from-let-go. Used for "Saved 34 days ago"
   // and as the anchor for the 60-day auto-move sweep
   // (src/lib/considering/consideringMeta.ts's SAVED_RETENTION_DAYS).
   // Falls back to createdAt (same honest-proxy convention used elsewhere in
   // this schema) for any row saved before this column existed.
-  savedAt             DateTime? @map("saved_at")
+  savedAt            DateTime? @map("saved_at")
   // True only when the 60-day sweep moved this item to "let go" on its own
   // - false (the default) for a user-initiated "Let it go"/"Let it go now".
   // Purely a display distinction; decisionOutcome "dropped" already covers
   // both paths identically for counting (src/lib/dashboard/kept.ts's filter
   // needs no change), so this never needs its own separate outcome value.
-  letGoAutomatically  Boolean   @default(false) @map("let_go_automatically")
+  letGoAutomatically Boolean   @default(false) @map("let_go_automatically")
   // When the item most recently became decisionOutcome "dropped" - lets the
   // Considering tab's "this month" kept total stay accurate even though an
   // auto-moved item's createdAt can be up to 60 days earlier than when it
   // was actually let go.
-  letGoAt             DateTime? @map("let_go_at")
+  letGoAt            DateTime? @map("let_go_at")
 
   // --- Still want it store-visit state (migration
   // 20260926090000_add_desired_item_store_visit).
   // When the user last clicked "Go to [retailer]". Reset on every click.
-  wentToStoreAt       DateTime? @map("went_to_store_at")
+  wentToStoreAt    DateTime? @map("went_to_store_at")
   // Answer to "Did you buy it?" for that visit: "bought" | "not_bought" |
   // "not_sure", or null while still unanswered. App-validated string, like
   // pauseStatus. Cleared by the next "Go to" click so the prompt re-asks.
-  storeVisitAnswer    String?   @map("store_visit_answer")
+  storeVisitAnswer String?   @map("store_visit_answer")
 
-  user                          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reflectionReplacesWardrobeItem WardrobeItem? @relation(fields: [reflectionReplacesWardrobeItemId], references: [id], onDelete: SetNull)
 
-  @@map("desired_items")
-
   // Looks built from the closet at this item's moment of temptation.
-  looks Look[]
+  looks             Look[]
+  outfitSuggestions OutfitSuggestion[]
+
+  @@map("desired_items")
 }
 
 model Budget {
@@ -365,4 +366,24 @@ model LookItem {
   @@index([lookId])
   @@index([wardrobeItemId])
   @@map("look_items")
+}
+
+// Durable outfit cache (prisma/manual/outfit-suggestions.sql, applied by hand on
+// both Neon branches). Ids only. desiredItemId is null for the Lookbook's "New
+// look" suggestion. Uniqueness is two partial unique indexes in the database
+// (one per null/non-null case), which Prisma cannot express, so writes use
+// createMany with skipDuplicates.
+model OutfitSuggestion {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  desiredItemId   String?  @map("desired_item_id") @db.Uuid
+  wardrobeVersion String   @map("wardrobe_version")
+  outfits         Json
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  desiredItem DesiredItem? @relation(fields: [desiredItemId], references: [id], onDelete: Cascade)
+
+  @@index([desiredItemId])
+  @@map("outfit_suggestions")
 }

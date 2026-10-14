@@ -9,8 +9,8 @@ import { prisma } from "@/lib/prisma";
 import { createTwoTenantFixture, type TwoTenantFixture } from "@/lib/testHelpers/twoTenantFixture";
 import {
   MIN_OWNED_PIECES,
-  clearOutfitCacheForTests,
   describeOutfit,
+  getBoardSuggestion,
   getOutfitSuggestions,
   validateOutfits,
   wardrobeVersion,
@@ -115,7 +115,6 @@ describe("getOutfitSuggestions (database, mocked model)", () => {
   let parse: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    clearOutfitCacheForTests();
     parse = vi.fn().mockResolvedValue({ parsed_output: { outfits: [] } });
     vi.mocked(getAnthropicClient).mockReturnValue({ messages: { parse } } as never);
   });
@@ -237,5 +236,41 @@ describe("getOutfitSuggestions (database, mocked model)", () => {
     await prisma.wardrobeItem.update({ where: { id: first }, data: { colorFamily: "navy" } });
     await getOutfitSuggestions(userA, fixture.userA.desiredItem.id);
     expect(parse).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("getBoardSuggestion cache (database, mocked model)", () => {
+  let fixture: TwoTenantFixture | undefined;
+
+  afterEach(async () => {
+    await fixture?.cleanup();
+    fixture = undefined;
+  });
+
+  it("stores the open Lookbook suggestion per user, so a second call and the other user's call behave independently", async () => {
+    const parse = vi.fn();
+    vi.mocked(getAnthropicClient).mockReturnValue({ messages: { parse } } as never);
+    fixture = await createTwoTenantFixture();
+    const userA = fixture.userA.user.id;
+    const userB = fixture.userB.user.id;
+    const ids: string[] = [];
+    for (let i = 0; i < MIN_OWNED_PIECES; i++) {
+      const row = await prisma.wardrobeItem.create({
+        data: { userId: userA, itemName: `Piece ${i}`, category: "tops", colorFamily: "black", status: "active" },
+      });
+      ids.push(row.id);
+    }
+    parse.mockResolvedValue({ parsed_output: { outfits: [{ itemIds: [ids[0], ids[1]] }] } });
+
+    const first = await getBoardSuggestion(userA, null);
+    const second = await getBoardSuggestion(userA, null);
+    expect(first).toEqual({ status: "ok", itemIds: [ids[0], ids[1]] });
+    expect(second).toEqual(first);
+    expect(parse).toHaveBeenCalledTimes(1);
+
+    const rows = await prisma.outfitSuggestion.findMany({ where: { userId: userA } });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].desiredItemId).toBeNull();
+    expect(await prisma.outfitSuggestion.count({ where: { userId: userB } })).toBe(0);
   });
 });

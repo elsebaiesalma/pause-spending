@@ -35,7 +35,6 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 ## Pre-deploy checklist
 
-- Make the outfit cache durable: the code is written (`src/lib/stillWantIt/outfitCacheStore.ts`) and falls back to the in-memory cache until the table exists. Run `prisma/manual/outfit-suggestions.sql` in Neon's SQL editor on main and the test branch, run its verification query (expect 7 rows), then tell Claude so the fallback can be removed.
 - Fix the 3 lint errors listed under "Resume here".
 - **Set the host to Node 24.** `package.json` has `engines.node` of `24.x`, but `engines` is advisory unless the host enforces it, so choose the Node version in the host's settings.
 - **Run `prisma generate` as part of the build, not through install scripts.** The `build` script is just `next build`, so nothing in the build generates the client; leaving it to an install script is fragile, because npm 11 reports several install scripts as not yet allowed (next item). Make the host's build command `prisma generate && next build` (or put it in the `build` script), and confirm a clean `npm ci` followed by the build works from a fresh checkout.
@@ -137,7 +136,7 @@ Each feature has its own constant and environment override. Defaults:
 ## Still want it (built 2026-10-05)
 
 - The page is at `src/app/desired-items/[id]/still-want-it`, reached from "Buy anyway". Its state is in two columns, `went_to_store_at` and `store_visit_answer`, read and written through the generated client in `src/lib/stillWantIt/storeVisit.ts`. The hand-run SQL is kept in `prisma/manual/still-want-it-store-visit.sql` for reference.
-- **The outfit cache is in-memory and must be made durable before deploy.** It lives in `globalThis` per process, so each cold start re-calls the model. It is keyed by user, desired item and wardrobe version. Move it to a table or column first.
+- **The outfit cache is durable** (table `outfit_suggestions`, applied by hand on main and test 2026-10-14; `src/lib/stillWantIt/outfitCacheStore.ts`). Keyed by user, optional desired item (null for the Lookbook "New look") and wardrobe version; one row per user and item, replaced when the wardrobe changes; an hour of freshness.
 - **"Yes" creates no `Purchase` row.** It only sets the desired item to `proceeded` with a price. Email sync must dedupe against that proceeded item, or it will create a second record for the same purchase.
 - "Not sure yet" keeps the item `proceeded` with `decision_outcome` `proceeded`, and sets `store_visit_answer` to `not_sure`. Considering lists it under "Went to the store, undecided". The Kept total (dropped only) and the 60-day sweep (saved_for_later only) never touch it. Clicking "Go to" again clears the answer, so the next visit asks again.
 - Pausing again from this page clears a stale `proceeded` outcome (`/wait` sets `decision_outcome` to null).

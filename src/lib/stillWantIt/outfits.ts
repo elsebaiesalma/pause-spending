@@ -15,7 +15,6 @@ const MAX_OUTFITS = 3;
 const MAX_ITEMS_PER_OUTFIT = 4;
 const MIN_ITEMS_PER_OUTFIT = 2;
 const CACHE_TTL_MS = 60 * 60 * 1000;
-const CACHE_MAX_ENTRIES = 200;
 
 // The only fields of an owned piece that ever reach the model. Names,
 // brands, prices and photos stay on our side.
@@ -150,34 +149,9 @@ async function generateValidOutfits(target: OutfitTarget | null, pieces: OutfitP
   return validateOutfits(response.parsed_output.outfits, new Set(pieces.map((p) => p.id)));
 }
 
-// The in-memory layer is per process and keyed by user, desired item and wardrobe version,
-// so a change to the wardrobe is a natural miss. The key includes userId, so
-// one user's entry can never be served to another. Entries hold ids only.
-type CacheEntry = { outfits: ValidOutfit[]; expiresAt: number };
-const globalForOutfits = globalThis as unknown as { stillWantItOutfits?: Map<string, CacheEntry> };
-const outfitCache = (globalForOutfits.stillWantItOutfits ??= new Map<string, CacheEntry>());
-
-function readCache(key: string, now: number): ValidOutfit[] | null {
-  const entry = outfitCache.get(key);
-  if (!entry) return null;
-  if (entry.expiresAt <= now) {
-    outfitCache.delete(key);
-    return null;
-  }
-  return entry.outfits;
-}
-
-function writeCache(key: string, outfits: ValidOutfit[], now: number): void {
-  if (outfitCache.size >= CACHE_MAX_ENTRIES) {
-    const oldest = outfitCache.keys().next().value;
-    if (oldest !== undefined) outfitCache.delete(oldest);
-  }
-  outfitCache.set(key, { outfits, expiresAt: now + CACHE_TTL_MS });
-}
-
-// Memory first, then the durable table (a no-op until the table exists), then
-// the model. Both layers are keyed by user, desired item (null for the
-// Lookbook's open suggestion) and wardrobe version.
+// The durable cache (outfit_suggestions) is keyed by user, desired item (null
+// for the Lookbook's open suggestion) and wardrobe version, so a change to the
+// wardrobe is a natural miss. Entries hold ids only.
 async function cachedOutfits(
   userId: string,
   desiredItemId: string | null,
@@ -186,20 +160,11 @@ async function cachedOutfits(
   generate: () => Promise<ValidOutfit[]>
 ): Promise<ValidOutfit[]> {
   const version = wardrobeVersion(pieces);
-  const key = `${userId}:${desiredItemId ?? "open"}:${version}`;
-  const inMemory = readCache(key, now);
-  if (inMemory) return inMemory;
-
   const stored = await readStoredOutfits(userId, desiredItemId, version, new Date(now - CACHE_TTL_MS));
-  if (stored) {
-    // Ids are re-checked against this user's current pieces, as for a fresh answer.
-    const valid = validateOutfits(stored, new Set(pieces.map((p) => p.id)));
-    writeCache(key, valid, now);
-    return valid;
-  }
+  // Ids are re-checked against this user's current pieces, as for a fresh answer.
+  if (stored) return validateOutfits(stored, new Set(pieces.map((p) => p.id)));
 
   const outfits = await generate();
-  writeCache(key, outfits, now);
   await writeStoredOutfits(userId, desiredItemId, version, outfits, new Date(now));
   return outfits;
 }
@@ -326,8 +291,4 @@ export async function getBoardSuggestion(
   }
   const first = outfits[0];
   return first ? { status: "ok", itemIds: first.itemIds } : { status: "none" };
-}
-
-export function clearOutfitCacheForTests(): void {
-  outfitCache.clear();
 }
