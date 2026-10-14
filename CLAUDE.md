@@ -62,12 +62,12 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - The old "Saved for later" section is **Undecided**, and the old "Save for later" button is **Decide later**. "Went to the store, undecided" is now **Went to the store**. "Pause for 24 hours", "Pause for 7 days", "Decide later", "Let it go" and "Buy anyway" are identical on every screen.
 - Internal names are unchanged on purpose: `saved_for_later`, `savedAt`, `getKeptSummary`, `totalKept`.
 
-## Mock wardrobe (reworked 2026-10-13, not yet loaded)
+## Mock wardrobe (reworked and loaded 2026-10-13)
 
 - Data: `data/mock-wardrobe.json` (30 items, CAD, with deliberate near-duplicates and messy cases); images: `public/mock/` (its README lists each filename and a search term). Parsing and row-building: `src/lib/mockWardrobe.ts`; seeding and deleting: `src/lib/mockWardrobeDb.ts`.
 - `npx tsx scripts/seedMockWardrobe.ts` is a dry run; `--confirm` writes. Rows are tagged `source = "seed"` with fixed ids per user and item, so re-running updates instead of duplicating. An image is linked only if its file exists in `public/mock/`, so add images and re-run.
 - `npx tsx scripts/deleteSeededMockWardrobe.ts` (dry run; `--confirm` deletes) removes only `source = "seed"` rows, refuses if a real wardrobe item was made from a seed purchase, and drops looks left empty.
-- Seeds from the earlier script have random ids (25 wardrobe items and 25 purchases at the time of writing): delete them first, or they sit alongside the new ones.
+- Loaded 2026-10-13 on the real account: the 25 older seeds (random ids) and the one look built from them were deleted first, then the 30 items were seeded (so 30 seed + 72 real wardrobe items). No image files are in `public/mock/` yet, so every seed item shows the placeholder until they are added and the seed script is re-run. `.env` has `DEV_WARDROBE_VIEW=seed` and `GMAIL_SYNC_PAUSED=true`; restart `next dev` after changing `.env`.
 - Keep `GMAIL_SYNC_PAUSED=true` in `.env` while mock data is loaded.
 - **Dev-only view filter:** `DEV_WARDROBE_VIEW=seed|real|all` in `.env` (`src/lib/devWardrobeView.ts`) limits every wardrobe listing (Wardrobe, Home, the board's drawer and suggestions, outfit suggestions, pause-screen matches, confirm-page categories) to seed rows or to real rows, with a "Showing seed items only" banner on every page. It does nothing when `NODE_ENV` is `production`, and `vitest.setup.ts` clears it so tests never depend on it. It is a view only: ownership checks and reads by id ignore it, and a saved look always keeps all of its pieces.
 
