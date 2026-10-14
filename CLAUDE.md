@@ -43,6 +43,8 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 ## Environment and branches
 
+- **Never remove a fallback, add a model to `schema.prisma`, or rely on a new table or column until the user has confirmed the SQL ran on BOTH Neon branches (main and test).** Write the code to degrade until then, and say what is waiting on that confirmation.
+- Hand-run SQL is recorded in `_prisma_migrations` with a migration folder whose `migration.sql` checksum matches (see `20261014120000_add_outfit_suggestions`). `prisma/manual/pause-ended-at.sql` has been applied (column exists on both branches) but has no migration record.
 - The git repo has one local branch, `master`, and no remote. "Main" and "test" in our notes mean the two **Neon database branches**, not git branches. `DATABASE_URL` is main, `TEST_DATABASE_URL` is test.
 - Raw Postgres TCP (5432) is blocked from the sandbox, so `prisma migrate dev` fails with P1001. Read-only SQL over Neon's HTTP adapter works. Migrations that add or change columns are run by the user with `npx prisma migrate deploy` from their own terminal.
 - `GMAIL_SYNC_PAUSED=true` is set in `.env` while mock wardrobe data is loaded for UI work. Set it back to `false` after `scripts/deleteSeededMockWardrobe.ts` removes the seeded rows.
