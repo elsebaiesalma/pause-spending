@@ -33,6 +33,13 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Email sync must dedupe against a "proceeded" desired item when a matching order arrives (for when email parsing resumes). "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
+## Demo mode (2026-11-02, while Gmail is parked)
+
+- **Google sign-in and Gmail are hidden unless `GMAIL_ENABLED=true`.** The code is untouched; the flag only gates the login button, the landing CTAs, Account's Gmail section and the `/connect/gmail/*` pages (which redirect Home). See `src/lib/demo.ts`.
+- **"Try the demo"** (`POST /api/demo`) creates a fresh user per click (`guest-xxxx@demo.pause.test`), seeds the 30-item mock wardrobe with dates shifted so the newest lands this month, sets a $250 plan, and writes an Auth.js database session + the matching cookie (`__Secure-` prefix on https). Demo emails end in `.test`, so the seed scripts never pick one.
+- Mock images go in `public/mock/` and must also be listed in `data/mock-images.json` (serverless functions can't see `public/`).
+- The pause screen's two model calls (tagging, redundancy explanation) are non-fatal: a failed call logs and the screen renders without it. The redundancy explanation is generated but not shown anywhere yet; decide whether to show it or drop the call.
+
 ## Pre-deploy checklist
 
 - Fix the 3 lint errors listed under "Resume here".

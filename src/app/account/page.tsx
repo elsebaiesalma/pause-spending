@@ -4,6 +4,7 @@ import { currentMonthKey, getBudgetForMonth } from "@/lib/budget";
 import { csrfTokenForUser } from "@/lib/csrf";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { signOut } from "@/lib/auth";
+import { isDemoEmail, isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
 
 export default async function AccountPage() {
@@ -15,70 +16,80 @@ export default async function AccountPage() {
     prisma.emailConnection.findUnique({ where: { userId_provider: { userId, provider: "gmail" } } }),
     getBudgetForMonth(userId, monthKey),
   ]);
+  const demo = isDemoEmail(user.email);
 
   return (
     <div className="page">
       <span className="page__eyebrow">Account</span>
       <h1>{user.name ?? user.email}</h1>
-      {user.name && <p className="page__lede">{user.email}</p>}
-
-      <section className={styles.block}>
-        <h2 className={styles.heading}>Gmail connection</h2>
-        {gmailConnection?.status === "connected" ? (
-          <>
-            <p className={styles.status}>Connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
-            <div className="row">
-              <form action="/api/sync/gmail/run" method="POST">
-                <button type="submit">Sync now</button>
-              </form>
-              <form action="/api/auth/gmail/disconnect" method="POST">
-                <input type="hidden" name="csrfToken" value={csrfTokenForUser(userId)} />
-                <button type="submit">Disconnect</button>
-              </form>
-              <a href="/purchases" className="btn-quiet">
-                Purchase history
-              </a>
-            </div>
-          </>
-        ) : gmailConnection?.status === "expired" ? (
-          <>
-            <p className={styles.status}>
-              Your Gmail connection has expired and needs to be reconnected before syncing can continue.
-            </p>
-            <div className="row">
-              <a href="/connect/gmail" className="btn btn-primary">
-                Reconnect Gmail
-              </a>
-            </div>
-          </>
-        ) : gmailConnection?.status === "disconnected" ? (
-          <>
-            <p className={styles.status}>Gmail is disconnected. Previously parsed data is kept.</p>
-            <div className="row">
-              <a href="/connect/gmail" className="btn btn-primary">
-                Reconnect Gmail
-              </a>
-              <a href="/purchases" className="btn-quiet">
-                Purchase history
-              </a>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className={styles.status}>Gmail isn&apos;t connected yet.</p>
-            <div className="row">
-              <a href="/connect/gmail" className="btn btn-primary">
-                Connect Gmail
-              </a>
-            </div>
-          </>
-        )}
-        <p className={styles.deleteRow}>
-          <a href="/connect/gmail/delete" className="btn btn-danger">
-            Permanently delete my data
-          </a>
+      {demo ? (
+        <p className="page__lede">
+          This is a demo account with a sample closet. Signing out ends it, and its items aren&apos;t kept.
         </p>
-      </section>
+      ) : (
+        user.name && <p className="page__lede">{user.email}</p>
+      )}
+
+      {/* Parked with Google sign-in until GMAIL_ENABLED=true (src/lib/demo.ts). */}
+      {isGmailEnabled() && (
+        <section className={styles.block}>
+          <h2 className={styles.heading}>Gmail connection</h2>
+          {gmailConnection?.status === "connected" ? (
+            <>
+              <p className={styles.status}>Connected since {gmailConnection.connectedAt.toLocaleString()}.</p>
+              <div className="row">
+                <form action="/api/sync/gmail/run" method="POST">
+                  <button type="submit">Sync now</button>
+                </form>
+                <form action="/api/auth/gmail/disconnect" method="POST">
+                  <input type="hidden" name="csrfToken" value={csrfTokenForUser(userId)} />
+                  <button type="submit">Disconnect</button>
+                </form>
+                <a href="/purchases" className="btn-quiet">
+                  Purchase history
+                </a>
+              </div>
+            </>
+          ) : gmailConnection?.status === "expired" ? (
+            <>
+              <p className={styles.status}>
+                Your Gmail connection has expired and needs to be reconnected before syncing can continue.
+              </p>
+              <div className="row">
+                <a href="/connect/gmail" className="btn btn-primary">
+                  Reconnect Gmail
+                </a>
+              </div>
+            </>
+          ) : gmailConnection?.status === "disconnected" ? (
+            <>
+              <p className={styles.status}>Gmail is disconnected. Previously parsed data is kept.</p>
+              <div className="row">
+                <a href="/connect/gmail" className="btn btn-primary">
+                  Reconnect Gmail
+                </a>
+                <a href="/purchases" className="btn-quiet">
+                  Purchase history
+                </a>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className={styles.status}>Gmail isn&apos;t connected yet.</p>
+              <div className="row">
+                <a href="/connect/gmail" className="btn btn-primary">
+                  Connect Gmail
+                </a>
+              </div>
+            </>
+          )}
+          <p className={styles.deleteRow}>
+            <a href="/connect/gmail/delete" className="btn btn-danger">
+              Permanently delete my data
+            </a>
+          </p>
+        </section>
+      )}
 
       <section className={styles.block}>
         <h2 className={styles.heading}>Monthly plan</h2>

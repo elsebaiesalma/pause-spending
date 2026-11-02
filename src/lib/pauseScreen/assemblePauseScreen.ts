@@ -80,7 +80,13 @@ export async function assemblePauseScreen(
     where: { id: desiredItemId, userId },
   });
 
-  const tagged = await ensureDesiredItemTagged(item);
+  // The two model calls on this path are extras: matching, the per-item
+  // reasons and the budget all work without them. A failed call (no key, an
+  // outage, a rate limit) must leave the screen usable, not take it down.
+  const tagged = await ensureDesiredItemTagged(item).catch((error) => {
+    console.error("Pause screen: tagging failed, continuing untagged", error);
+    return item;
+  });
 
   const probe = {
     category: tagged.category,
@@ -93,7 +99,10 @@ export async function assemblePauseScreen(
     getReflectionAnswer(desiredItemId, userId),
   ]);
 
-  const redundancyExplanation = await generateRedundancyExplanation(tagged, similarItems);
+  const redundancyExplanation = await generateRedundancyExplanation(tagged, similarItems).catch((error) => {
+    console.error("Pause screen: redundancy explanation failed, showing without it", error);
+    return null;
+  });
 
   const similarItemReasons: Record<string, string> = {};
   for (const similarItem of similarItems) {

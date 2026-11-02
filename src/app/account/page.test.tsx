@@ -13,6 +13,7 @@ import AccountPage from "./page";
 describe("AccountPage", () => {
   afterEach(() => {
     vi.mocked(auth).mockReset();
+    vi.unstubAllEnvs();
   });
 
   async function render() {
@@ -27,6 +28,7 @@ describe("AccountPage", () => {
   });
 
   it("has Gmail connection, Monthly plan, and the two coming-later placeholders", async () => {
+    vi.stubEnv("GMAIL_ENABLED", "true");
     const { html } = await render();
     expect(html).toContain("Gmail connection");
     expect(html).toContain("Permanently delete my data");
@@ -37,12 +39,33 @@ describe("AccountPage", () => {
   });
 
   it("shows a clear reconnect prompt, not an error, when the Gmail connection has expired", async () => {
+    vi.stubEnv("GMAIL_ENABLED", "true");
     const spy = vi.spyOn(prisma.emailConnection, "findUnique").mockResolvedValueOnce({ status: "expired" } as never);
     try {
       const { html } = await render();
       expect(html).toContain("expired");
       expect(html).toContain('href="/connect/gmail"');
       expect(html).toContain("Reconnect Gmail");
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("hides the Gmail section while Gmail is parked, and keeps the monthly plan", async () => {
+    const { html } = await render();
+    expect(html).not.toContain("Gmail connection");
+    expect(html).not.toContain('href="/connect/gmail"');
+    expect(html).toContain("Monthly plan");
+  });
+
+  it("tells a demo visitor what signing out means, instead of showing a throwaway email", async () => {
+    const spy = vi
+      .spyOn(prisma.user, "findUniqueOrThrow")
+      .mockResolvedValueOnce({ email: "guest-1a2b3c4d@demo.pause.test", name: "Guest" } as never);
+    try {
+      const { html } = await render();
+      expect(html).toContain("demo account");
+      expect(html).not.toContain("demo.pause.test");
     } finally {
       spy.mockRestore();
     }

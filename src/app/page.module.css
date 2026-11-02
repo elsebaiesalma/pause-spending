@@ -4,6 +4,25 @@
    landing look and reads color through the same shared tokens, so it
    never breaks if the theme mapping changes. */
 
+/* Strips native button chrome so the demo CTA (a form button, since it
+   POSTs) looks exactly like the link classes it's paired with. Kept first so
+   .display, .inlineLink and .footerCta all override it. */
+.buttonReset {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.buttonReset:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
 .root {
   font-family: var(--font-body);
   color: var(--color-ink);

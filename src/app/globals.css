@@ -389,6 +389,12 @@ p {
   margin-top: calc(var(--space-2) * 0.72);
 }
 
+.page__note {
+  color: var(--color-ink-soft);
+  font-size: 0.875rem;
+  margin-top: calc(var(--space-1) * 0.72);
+}
+
 /* ---------- Layout helpers ---------- */
 
 .stack {
