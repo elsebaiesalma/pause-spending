@@ -125,10 +125,11 @@ Each feature has its own constant and environment override. Defaults:
 | Wardrobe tagging, colour family | `TAGGING_MODEL` | `ANTHROPIC_MODEL_TAGGING` | `claude-opus-5` | `claude-opus-5` |
 | Receipt pipeline (email classification and extraction) | `RECEIPT_EXTRACTION_MODEL` | `ANTHROPIC_MODEL_RECEIPT_EXTRACTION` | `claude-opus-5` | `claude-opus-5` |
 | Screenshot reading | `SCREENSHOT_MODEL` | `ANTHROPIC_MODEL_SCREENSHOT` | `claude-opus-5` | `claude-opus-5` |
+| Product link reading (page-text fallback) | `URL_EXTRACTION_MODEL` | `ANTHROPIC_MODEL_URL_EXTRACTION` | (new feature, none) | `claude-sonnet-5-5` |
 | Pause-screen redundancy explanation | `REDUNDANCY_MODEL` | `ANTHROPIC_MODEL_REDUNDANCY` | `claude-opus-5` | `claude-opus-5` |
 
 - The "before" column is read from commit `d3974a1`. All nine call sites used `claude-opus-5`, so no previous model is missing.
-- URL and search extraction (`urlExtractor.ts`, `searchProduct.ts`) makes no Claude call, so it has no constant.
+- URL extraction (`src/lib/itemExtraction/`) reads a link in layers: Shopify's `/products/<handle>.js` feed, then the page's JSON-LD / Open Graph / title (fetched with a desktop-browser user agent), then the browser-worker, then a Claude reading of the page text (`pageTextExtractor.ts`, `URL_EXTRACTION_MODEL`) only when the price is missing or the name is just the page title. Everything Claude fills is "low" confidence. `extractFromUrl(url, { aiFallback: false })` skips the model call; `searchProduct.ts` uses it so a search never triggers several calls. Search extraction itself still makes no Claude call. Verified against saved fixtures only, not live stores.
 - Redundancy was not on the original feature list. It has its own constant so that its model setting is not lost.
 - The old Post-wait recommendations page, library and `RECOMMENDATIONS_MODEL` were deleted (2026-10-13): nothing linked to them, and Still want it replaced them.
 - `claude-opus-5`, `claude-sonnet-5` and `claude-sonnet-5-5` all returned successful live responses on 2026-10-05. The live structured-output path (`messages.parse` with a zod schema) also returned valid output on `claude-sonnet-5-5`.
