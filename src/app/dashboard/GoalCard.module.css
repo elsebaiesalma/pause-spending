@@ -1,0 +1,195 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  display: grid;
+  gap: calc(var(--space-2) * 0.72);
+  align-content: start;
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-rose-deep);
+}
+
+.goalName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.2;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.figures {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem var(--space-2);
+  font-size: 0.9375rem;
+  color: var(--color-ink-soft);
+}
+
+.figures strong {
+  color: var(--color-ink);
+}
+
+.last {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.editRow {
+  display: flex;
+}
+
+.confirm,
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.confirm {
+  color: var(--color-success);
+}
+
+.error {
+  color: var(--color-warn);
+}
+
+/* ---- Reached: the one dark card, with a single soft glow when it appears ---- */
+
+.reached {
+  background: var(--color-espresso);
+  border-color: var(--color-espresso);
+  color: #fff;
+  position: relative;
+}
+
+.reachedTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.reachedText {
+  margin: 0;
+  color: var(--color-on-espresso-soft);
+}
+
+.reachedActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reached .lightButton {
+  background: #fff;
+  border-color: #fff;
+  color: var(--color-espresso);
+}
+
+.reached .lightButton:hover {
+  background: var(--color-blush);
+  border-color: var(--color-blush);
+}
+
+.reached .quietOnDark {
+  min-height: 2.75rem;
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-on-espresso-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reached .quietOnDark:hover {
+  background: transparent;
+  border-color: transparent;
+  color: #fff;
+}
+
+.reached .confirm {
+  color: var(--color-on-espresso-soft);
+}
+
+.reached .error {
+  color: #ffd9d6;
+}
+
+@keyframes glowRing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(201, 138, 146, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(201, 138, 146, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Once, soft, and gone: no confetti, no loop. */
+  .reached {
+    animation: glowRing 1100ms ease-out 1;
+  }
+}
+
+/* ---- The sheet ---- */
+
+.sheet {
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: 0 24px 60px rgba(42, 18, 8, 0.28);
+}
+
+.sheet::backdrop {
+  background: rgba(42, 18, 8, 0.5);
+}
+
+.sheetForm {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.sheetTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.field small {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--color-ink-soft);
+}
+
+.sheetActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
