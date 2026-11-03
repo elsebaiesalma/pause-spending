@@ -1,0 +1,159 @@
+/* The collapse wrapper: grid rows 1fr -> 0fr lets the card fold away without
+   measuring its height. Without motion, a dismissed card is simply gone. */
+.wrap {
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.wrap.dismissed {
+  display: none;
+}
+
+.inner {
+  min-height: 0;
+  overflow: hidden;
+  /* Room for the focus ring the overflow would otherwise clip. */
+  padding: 3px;
+  margin: -3px;
+}
+
+.recap {
+  position: relative;
+  background: var(--color-blush);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  padding-right: 4rem;
+  display: grid;
+  gap: calc(var(--space-2) * 0.72);
+}
+
+/* Min 44px tap target in the top-right corner. */
+.recap .close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+}
+
+.recap .close:hover {
+  background: rgba(42, 18, 8, 0.06);
+  border-color: transparent;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-rose-deep);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+.metric {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: calc(var(--space-1) * 0.72) var(--space-2);
+  border-left: 1px solid var(--color-line-strong);
+}
+
+.metric dt {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.metric dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+
+.metric dd.text {
+  font-size: 1.125rem;
+  overflow-wrap: anywhere;
+}
+
+/* Deep rose: the small-text accent that passes contrast on blush. */
+.metric dd.accent {
+  color: var(--color-rose-deep);
+}
+
+.metric dd.note {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  color: var(--color-ink-soft);
+}
+
+/* Two columns on a phone: drop the divider at the start of each row. */
+.metric:nth-child(odd) {
+  border-left: 0;
+  padding-left: 0;
+}
+
+@media (min-width: 720px) {
+  .metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .metric:nth-child(odd) {
+    border-left: 1px solid var(--color-line-strong);
+    padding-left: var(--space-2);
+  }
+  .metric:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+
+@keyframes recapIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .recap {
+    animation: recapIn 280ms ease-out both;
+  }
+
+  .wrap {
+    transition: grid-template-rows 200ms ease, opacity 200ms ease, margin 200ms ease;
+  }
+
+  /* Folds away instead of vanishing; hidden from the tab order and the
+     accessibility tree by the markup (aria-hidden, tabIndex -1). */
+  .wrap.dismissed {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
