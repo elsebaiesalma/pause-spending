@@ -1,6 +1,8 @@
 import { assembleConsidering } from "@/lib/considering/assembleConsidering";
 import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
 import { requireUserIdOrRedirect } from "@/lib/session";
+import { ActionToast } from "@/components/ActionToast";
+import { EmptyState } from "@/components/EmptyState";
 import styles from "./page.module.css";
 
 const PAUSED_DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
@@ -19,11 +21,23 @@ export default async function ConsideringPage() {
     <div className="page">
       <span className="page__eyebrow">Considering</span>
       <h1>What you&apos;re thinking about</h1>
+      <ActionToast />
 
       <section className="section">
-        <p className={styles.sectionLabel}>01 / On pause</p>
+        <h2 className={styles.sectionTitle}>
+          On pause <span className="badge badge--neutral">{onPause.length}</span>
+        </h2>
         {onPause.length === 0 ? (
-          <p className={styles.emptyNote}>Nothing on pause right now.</p>
+          <EmptyState
+            title="Nothing on pause right now"
+            action={
+              <a href="/desired-items/new" className="btn btn-primary">
+                Pause a purchase
+              </a>
+            }
+          >
+            When something catches your eye, pause it here before you buy. The urge usually fades within a day.
+          </EmptyState>
         ) : (
           <div>
             {onPause.map(({ item, pausedAt, reflectionSummary }) => {
@@ -39,8 +53,11 @@ export default async function ConsideringPage() {
                     {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                   </div>
                   <p className={styles.rowMeta}>
-                    Paused {PAUSED_DATE_FORMAT.format(pausedAt)}
-                    {unlockLabel ? ` · ${unlockLabel}` : ""}
+                    <span className="badge badge--success">Paused</span>
+                    <span>
+                      Paused {PAUSED_DATE_FORMAT.format(pausedAt)}
+                      {unlockLabel ? ` · ${unlockLabel}` : ""}
+                    </span>
                   </p>
                   {reflectionSummary && <p className={styles.rowReflection}>{reflectionSummary}</p>}
                   <div className={styles.rowActions}>
@@ -58,7 +75,9 @@ export default async function ConsideringPage() {
 
       {undecided.length > 0 && (
         <section className="section">
-          <p className={styles.sectionLabel}>02 / Went to the store</p>
+          <h2 className={styles.sectionTitle}>
+            Went to the store <span className="badge badge--neutral">{undecided.length}</span>
+          </h2>
           <div>
             {undecided.map(({ item, wentToStoreAt }) => {
               const price = item.price ? Number(item.price) : null;
@@ -72,7 +91,8 @@ export default async function ConsideringPage() {
                     {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                   </div>
                   <p className={styles.rowMeta}>
-                    Went to the store · visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}
+                    <span className="badge badge--neutral">Went to the store</span>
+                    <span>Visited {PAUSED_DATE_FORMAT.format(wentToStoreAt)}</span>
                   </p>
                   <div className={styles.rowActions}>
                     <a href={`/desired-items/${item.id}/still-want-it`} className="btn-quiet">Decide now</a>
@@ -85,9 +105,11 @@ export default async function ConsideringPage() {
       )}
 
       <section className="section">
-        <p className={styles.sectionLabel}>03 / Undecided</p>
+        <h2 className={styles.sectionTitle}>
+          Undecided <span className="badge badge--neutral">{saved.length}</span>
+        </h2>
         {saved.length === 0 ? (
-          <p className={styles.emptyNote}>Nothing undecided.</p>
+          <p className={styles.emptyNote}>Nothing undecided. Items land here when a pause ends or you choose Decide later.</p>
         ) : (
           <div>
             {saved.map(({ item, savedDaysAgo, pauseEndedAt, reflectionSummary }) => {
@@ -102,7 +124,10 @@ export default async function ConsideringPage() {
                     {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                   </div>
                   <p className={styles.rowMeta}>
-                    {pauseEndedAt ? `Pause ended ${PAUSED_DATE_FORMAT.format(pauseEndedAt)}` : savedDaysAgoLabel(savedDaysAgo)}
+                    <span className="badge">Undecided</span>
+                    <span>
+                      {pauseEndedAt ? `Pause ended ${PAUSED_DATE_FORMAT.format(pauseEndedAt)}` : savedDaysAgoLabel(savedDaysAgo)}
+                    </span>
                   </p>
                   {reflectionSummary && <p className={styles.rowReflection}>{reflectionSummary}</p>}
                   <div className={styles.rowActions}>
@@ -120,7 +145,7 @@ export default async function ConsideringPage() {
       </section>
 
       <section className="section">
-        <p className={styles.sectionLabel}>04 / Let go</p>
+        <h2 className={styles.sectionTitle}>Let go</h2>
         <div className={styles.totals}>
           <div>
             <div className={styles.totalValue}>{letGo.itemsLetGo}</div>

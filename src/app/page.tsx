@@ -5,13 +5,114 @@ import { DemoButton } from "@/components/DemoButton";
 import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
 
+// Every figure on this page is from the research brief in the project
+// ("Pause Before You Purchase"), quoted with its source. No invented numbers,
+// no testimonials, no wear claims (there is no wear data).
+const STATS = [
+  {
+    value: "60%",
+    claim: "60% of Gen Z social media users have impulse-bought something they saw on social",
+    source: "Bankrate/YouGov, 2023",
+  },
+  {
+    value: "9%",
+    claim: "Only 9% of Gen Z say their social media purchases are planned",
+    source: "GoDaddy, 2024",
+  },
+  {
+    value: "62%",
+    claim: "62% of Gen Z BNPL users regret a BNPL purchase",
+    source: "LendingTree",
+  },
+  {
+    value: "~25h",
+    claim: "A ~25-hour wait lowered both the urge to buy and purchase intent",
+    source: "Moser, U. Michigan, 2020",
+  },
+] as const;
+
+const FINDINGS = [
+  {
+    title: "A day is long enough for the urge to cool",
+    body: "In shopping experiments, a wait of about 25 hours lowered both the urge to buy and the intent to buy. A 10-minute wait did not: people kept shopping while they waited.",
+    source: "Moser, University of Michigan, 2020",
+    feature: "So the default is Pause for 24 hours.",
+  },
+  {
+    title: "A few minutes of reflection helps too",
+    body: "Asking what an item would replace, how much it is needed, and one reason for and against was the prompt shoppers in their 20s found most helpful.",
+    source: "Han et al., WWW 2021",
+    feature: "So every pause starts with those questions.",
+  },
+  {
+    title: "Guilt doesn't work, and people don't want it",
+    body: "Frequent impulse buyers asked for tools that help them deliberate, and rejected tools built on guilt, regret or being watched.",
+    source: "Moser et al., CHI 2019",
+    feature: "So pauses end quietly, with no reminders or streaks.",
+  },
+] as const;
+
 export default function Home() {
   // While Gmail is parked, every "get started" CTA opens the demo instead.
   const gmail = isGmailEnabled();
+
+  const steps = [
+    {
+      title: "Add what caught your eye",
+      body: "Paste a link, upload a screenshot or type it in. Confirm the name, price and photo before anything else happens.",
+    },
+    {
+      title: "See it next to your closet",
+      body: gmail
+        ? "Your closet is built from real order confirmations. If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan."
+        : "If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan.",
+    },
+    {
+      title: "Pause, then decide",
+      body: "Wait 24 hours or 7 days. When the pause ends, the item moves quietly to Undecided. Still want it? Build an outfit from what you own first.",
+    },
+  ];
+
+  const faqs = [
+    {
+      q: "Does PAUSE stop me from buying things?",
+      a: "No. Nothing is blocked. PAUSE adds a moment between wanting something and buying it, and shows you what you already own. The decision stays yours.",
+    },
+    {
+      q: "What happens when a pause ends?",
+      a: "The item moves to Undecided without a notification. A reminder would bring the urge right back, so PAUSE stays quiet. You can come back to it whenever you like.",
+    },
+    {
+      q: "Where does my closet come from?",
+      a: gmail
+        ? "From the clothing, shoe and accessory order confirmations in your Gmail, read-only. You can also add pieces yourself."
+        : "In the demo, from a sample closet of 30 pieces, so you can try the whole flow right away. Each visitor gets their own copy.",
+    },
+    {
+      q: "Why clothing?",
+      a: "Clothes are where \"I already own something like this\" happens most. Seeing the near-duplicate next to the new thing is the most useful pause.",
+    },
+    {
+      q: "Is my data private?",
+      a: gmail
+        ? "PAUSE only reads order confirmations, never sends or deletes anything, and you can delete everything in one step."
+        : "Yes. The demo doesn't ask for an email or a password, and nothing you do there is shared with other visitors.",
+    },
+  ];
+
+  const cta = gmail ? (
+    <a href="/connect/gmail" className={styles.btnPrimary}>
+      Connect Gmail
+    </a>
+  ) : (
+    <DemoButton label="Try the demo" className={styles.btnPrimary} />
+  );
+
   return (
     <div className={`${styles.root} ${clashDisplay.variable}`}>
       <ScrollReveal />
-      {/* HERO */}
+
+      {/* Hero: what it is in one line, one primary action, the product itself. */}
       <section className={styles.hero}>
         <div>
           <span className={styles.eyebrow}>
@@ -24,14 +125,8 @@ export default function Home() {
             then gives you a moment to decide. Reflection, not restriction.
           </p>
           <div className={styles.heroActions}>
-            {gmail ? (
-              <a href="/connect/gmail" className={styles.btnPrimary}>
-                Connect Gmail
-              </a>
-            ) : (
-              <DemoButton label="Try the demo" className={styles.btnPrimary} />
-            )}
-            <a href="#mechanism" className={styles.btnGhost}>
+            {cta}
+            <a href="#how-it-works" className={styles.btnGhost}>
               See how it works
             </a>
           </div>
@@ -40,215 +135,131 @@ export default function Home() {
         <HeroPreview />
       </section>
 
-      {/* STATS */}
-      <div className={styles.statGrid}>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Impulse buying</span>
-          <div className={styles.statValue}>
-            60<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
+      {/* The problem, in numbers, on the dark band. */}
+      <section className={styles.band} aria-labelledby="stats-heading">
+        <div className={styles.bandInner}>
+          <h2 id="stats-heading" className={styles.bandHeading}>
+            Checkout is built to be fast. Deciding shouldn&apos;t be.
+          </h2>
+          <div className={styles.statGrid}>
+            {STATS.map((stat) => (
+              <div key={stat.source} className={`${styles.stat} reveal`} data-reveal>
+                <div className={styles.statValue}>{stat.value}</div>
+                <p className={styles.statNote}>{stat.claim}</p>
+                <span className={styles.statSource}>{stat.source}</span>
+              </div>
+            ))}
           </div>
-          <p className={styles.statNote}>
-            60% of Gen Z social media users have impulse-bought something they saw on social
-          </p>
-          <span className={styles.statSource}>Bankrate/YouGov, 2023</span>
         </div>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Planned purchases</span>
-          <div className={styles.statValue}>
-            9<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
-          </div>
-          <p className={styles.statNote}>Only 9% of Gen Z say their social media purchases are planned</p>
-          <span className={styles.statSource}>GoDaddy, 2024</span>
-        </div>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>Buy now, pay later</span>
-          <div className={styles.statValue}>
-            62<em style={{ fontStyle: "normal", color: "var(--color-accent-dim)" }}>%</em>
-          </div>
-          <p className={styles.statNote}>62% of Gen Z BNPL users regret a BNPL purchase</p>
-          <span className={styles.statSource}>LendingTree</span>
-        </div>
-        <div className={`${styles.stat} reveal`} data-reveal>
-          <span className={styles.statLabel}>The wait</span>
-          <div className={styles.statValue} style={{ color: "var(--color-accent-dim)" }}>
-            ~25h
-          </div>
-          <p className={styles.statNote}>A ~25-hour wait lowered both the urge to buy and purchase intent</p>
-          <span className={styles.statSource}>Moser, U. Michigan, 2020</span>
-        </div>
-      </div>
+      </section>
 
-      {/* PHILOSOPHY */}
-      <section className={styles.section} id="philosophy">
-        <div className={styles.contentGrid}>
-          <div>
-            <span className={styles.moduleLabel}>Module 01</span>
-            <h2 className={styles.moduleHeading}>
-              01 / <em>Philosophy</em>
+      {/* How it works */}
+      <section className={styles.section} id="how-it-works" aria-labelledby="how-heading">
+        <span className={styles.eyebrow}>How it works</span>
+        <h2 id="how-heading" className={styles.sectionHeading}>
+          Three steps, about a minute
+        </h2>
+        <ol className={styles.steps}>
+          {steps.map((step, i) => (
+            <li key={step.title} className={`${styles.step} reveal`} data-reveal>
+              <span className={styles.stepNumber} aria-hidden="true">
+                {i + 1}
+              </span>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepBody}>{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Why a pause works: each finding, and what PAUSE does because of it. */}
+      <section className={styles.sectionTinted} id="why" aria-labelledby="why-heading">
+        <div className={styles.sectionInner}>
+          <div className={styles.whyIntro}>
+            <span className={styles.eyebrow}>Why a pause works</span>
+            <h2 id="why-heading" className={styles.sectionHeading}>
+              Built on the research, not on willpower
             </h2>
-            <hr className={styles.moduleRule} />
-            <p className={styles.moduleSub}>The sanctity of hesitation</p>
-          </div>
-          <div className="reveal" data-reveal>
-            <p className={styles.lede}>
-              Impulsive spending isn&apos;t a moral failing - it&apos;s an engineered gap between seeing
-              something and living with it. One-click checkouts remove that gap entirely.
+            <p className={styles.sectionLede}>
+              The urge to buy is strong, short-lived and easy to misjudge in the moment. A pause gives
+              the calmer you a chance to weigh in.
             </p>
-            <div className={styles.twoCol}>
-              <p>
-                PAUSE restores it, gently. {gmail
-                  ? "When an order confirmation lands in your inbox, or you paste a link to something you're considering, we show your existing wardrobe alongside it - the coats, the boots, the bags you already reach for."
-                  : "When you paste a link to something you're considering, or just type what caught your eye, we show your existing wardrobe alongside it - the coats, the boots, the bags you already reach for."}
-              </p>
-              <p>
-                Converting a price tag into &quot;what this does to this month&apos;s budget&quot; brings
-                weight back to the decision. This isn&apos;t about buying less for its own sake - it&apos;s
-                about noticing, before you buy, what you&apos;d actually be adding.
-              </p>
-            </div>
-            <a href="#mechanism" className={styles.inlineLink}>
-              Inspect the pause chamber architecture &rarr;
-            </a>
           </div>
+          <div className={styles.findings}>
+            {FINDINGS.map((finding) => (
+              <article key={finding.title} className={`${styles.finding} reveal`} data-reveal>
+                <h3 className={styles.findingTitle}>{finding.title}</h3>
+                <p className={styles.findingBody}>{finding.body}</p>
+                <p className={styles.findingFeature}>{finding.feature}</p>
+                <span className={styles.statSourceLight}>{finding.source}</span>
+              </article>
+            ))}
+          </div>
+          <p className={styles.caveat}>
+            The research on shopping delays is promising but still early, so PAUSE measures its own
+            outcomes: how many paused items are let go, and how many are bought anyway.
+          </p>
         </div>
       </section>
 
-      {/* MECHANISM */}
-      <section className={styles.section} id="mechanism">
-        <div className={styles.contentGrid}>
-          <div>
-            <span className={styles.moduleLabel}>Module 02</span>
-            <h2 className={styles.moduleHeading}>
-              02 / <em>Mechanism</em>
-            </h2>
-            <hr className={styles.moduleRule} />
-            <p className={styles.moduleSub}>Three phases of the pause</p>
-          </div>
-          <div>
-            <div className={`${styles.phase} reveal`} data-reveal>
-              <span className={styles.phaseLabel}>Phase 01 // Confirm</span>
-              <div>
-                <h3>Tell us what you&apos;re considering</h3>
-                <p>
-                  Paste a product link, upload a screenshot, or just type it. We identify the item, its
-                  price, and its photo - and show it back to you to confirm before anything else happens.
-                </p>
-              </div>
-            </div>
-            <div className={`${styles.phase} reveal`} data-reveal>
-              <span className={styles.phaseLabel}>Phase 02 // Reflect</span>
-              <div>
-                <h3>See it next to what you own</h3>
-                <p>
-                  {gmail
-                    ? "Your wardrobe is built automatically from real order-confirmation emails, tagged by category, color and style. "
-                    : "Your wardrobe is the closet you've added, tagged by category, color and style. "}
-                  If something you already own overlaps, we say so - plainly, with the specific reason -
-                  alongside what this purchase does to your monthly budget.
-                </p>
-              </div>
-            </div>
-            <div className={`${styles.phase} reveal`} data-reveal>
-              <span className={styles.phaseLabel}>Phase 03 // Decide</span>
-              <div>
-                <h3>Wait it out, or move forward clearly</h3>
-                <p>
-                  Choose a 24-hour or 7-day wait. When it ends, the item quietly moves to Undecided, with
-                  no notifications. Still want it? Lay out a look from what you already own and see how
-                  it fits, in a lookbook built from your real wardrobe.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SYNC - Gmail only; parked while the demo is the way in */}
+      {/* Gmail sync, only when Gmail is on; parked while the demo is the way in. */}
       {gmail && (
-        <section className={styles.section} id="sync">
-          <div className={styles.contentGrid}>
-            <div>
-              <span className={styles.moduleLabel}>Module 03</span>
-              <h2 className={styles.moduleHeading}>
-                03 / <em>Sync</em>
-              </h2>
-              <hr className={styles.moduleRule} />
-              <p className={styles.moduleSub}>Built from your real inbox</p>
-            </div>
-            <div>
-              <p className={styles.lede}>
-                No manual spreadsheet logging. Connect Gmail once, and PAUSE reads clothing, shoe, and
-                accessory order confirmations - read-only, nothing sent or deleted - to build your wardrobe
-                automatically.
-              </p>
-              <div className={styles.featureGrid}>
-                <div className={`${styles.featurePoint} reveal`} data-reveal>
-                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                    <span className={styles.eyebrowDot} />
-                  </span>
-                  <h4>Read-only, always</h4>
-                  <p>We never send, delete, or modify anything in your inbox - and never share your data.</p>
-                </div>
-                <div className={`${styles.featurePoint} reveal`} data-reveal>
-                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                    <span className={styles.eyebrowDot} />
-                  </span>
-                  <h4>You decide what stays</h4>
-                  <p>Disconnect any time and keep your data, or permanently delete everything in one step.</p>
-                </div>
-                <div className={`${styles.featurePoint} reveal`} data-reveal>
-                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                    <span className={styles.eyebrowDot} />
-                  </span>
-                  <h4>Budget, on your terms</h4>
-                  <p>Set your own monthly number. We show spend and remaining - never adjust it for you.</p>
-                </div>
-              </div>
-              {gmail ? (
-                <a href="/connect/gmail" className={styles.inlineLink}>
-                  Connect Gmail to get started &rarr;
-                </a>
-              ) : (
-                <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
-              )}
-            </div>
-          </div>
+        <section className={styles.section} id="sync" aria-labelledby="sync-heading">
+          <span className={styles.eyebrow}>Your closet, automatically</span>
+          <h2 id="sync-heading" className={styles.sectionHeading}>
+            Built from your real inbox
+          </h2>
+          <p className={styles.sectionLede}>
+            Connect Gmail once, and PAUSE reads clothing, shoe and accessory order confirmations,
+            read-only, to build your closet. Nothing is sent or deleted.
+          </p>
         </section>
       )}
 
-      {/* FOOTER */}
-      <footer className={styles.footer} id="footer">
-        <div className={styles.footerInner}>
-          <span className={styles.footerEyebrow}>Start when you&apos;re ready</span>
-          <h2 className={styles.footerHeadline}>
-            Begin your first <em>pause</em>
-          </h2>
-          <p className={styles.footerSub}>
-            {gmail
-              ? "No waitlist, no account to create - connect Gmail and PAUSE starts building your wardrobe from your real order history."
-              : "No waitlist, no account to create. Try it now with a sample closet of 30 pieces."}
-          </p>
-          <div style={{ paddingBottom: "1rem" }}>
-            {gmail ? (
-              <a href="/connect/gmail" className={styles.footerCta}>
-                Connect Gmail &rarr;
-              </a>
-            ) : (
-              <DemoButton label="Try the demo →" className={`${styles.buttonReset} ${styles.footerCta}`} />
-            )}
+      {/* FAQ: native details/summary, so it works without JavaScript and with a keyboard. */}
+      <section className={styles.section} id="faq" aria-labelledby="faq-heading">
+        <div className={styles.faqGrid}>
+          <div>
+            <span className={styles.eyebrow}>Questions</span>
+            <h2 id="faq-heading" className={styles.sectionHeading}>
+              Good to know
+            </h2>
           </div>
-          <div className={styles.footerLinks}>
-            <a href="#philosophy">Philosophy</a>
-            <span>/</span>
-            <a href="#mechanism">Mechanism</a>
-          </div>
-          <div className={styles.footerMeta}>
-            <span>&copy; 2026 PAUSE.</span>
-            <span>Built for one wardrobe at a time.</span>
+          <div className={styles.faqList}>
+            {faqs.map((item) => (
+              <details key={item.q} className={styles.faq}>
+                <summary className={styles.faqQuestion}>{item.q}</summary>
+                <p className={styles.faqAnswer}>{item.a}</p>
+              </details>
+            ))}
           </div>
         </div>
-        <div className={styles.ghostMark} aria-hidden="true">
-          PAUSE
+      </section>
+
+      {/* Closing call to action, on the dark band. */}
+      <footer className={styles.footer} id="footer">
+        <div className={styles.footerInner}>
+          <h2 className={styles.footerHeadline}>Try your first pause</h2>
+          <p className={styles.footerSub}>
+            {gmail
+              ? "Connect Gmail and PAUSE builds your closet from your real order history."
+              : "No sign-up. Opens with a sample closet of 30 pieces, so you can try it in a minute."}
+          </p>
+          {gmail ? (
+            <a href="/connect/gmail" className={styles.btnLight}>
+              Connect Gmail
+            </a>
+          ) : (
+            <DemoButton label="Try the demo" className={styles.btnLight} />
+          )}
+          <div className={styles.footerMeta}>
+            <span>&copy; 2026 PAUSE</span>
+            <nav className={styles.footerLinks} aria-label="Footer">
+              <a href="#how-it-works">How it works</a>
+              <a href="#why">Why a pause works</a>
+              <a href="#faq">Questions</a>
+            </nav>
+          </div>
         </div>
       </footer>
     </div>

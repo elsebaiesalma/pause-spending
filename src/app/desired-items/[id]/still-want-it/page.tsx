@@ -92,7 +92,7 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
 
       <section className="section" aria-labelledby="wear-what-you-own">
         <p className={styles.sectionLabel} id="wear-what-you-own">
-          01 / Wear what you own
+          Wear what you own
         </p>
         <Suspense fallback={<OutfitSkeleton />}>
           <OutfitSection userId={userId} desiredItemId={id} />
@@ -101,7 +101,7 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
 
       <section className="section" aria-labelledby="build-from-closet">
         <p className={styles.sectionLabel} id="build-from-closet">
-          02 / Build it from your closet
+          Build it from your closet
         </p>
         <p className={styles.reflection}>
           {hasLook
@@ -120,7 +120,7 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
 
       <section className="section" aria-labelledby="one-last-check">
         <p className={styles.sectionLabel} id="one-last-check">
-          03 / One last check
+          One last check
         </p>
         <p className={styles.reflection}>
           {reflectionSummary ?? (hasLook ? "You built a look from your closet." : "No reflection answers were saved for this item.")}

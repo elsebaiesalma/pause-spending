@@ -40,6 +40,12 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Mock images go in `public/mock/` and must also be listed in `data/mock-images.json` (serverless functions can't see `public/`).
 - The pause screen's two model calls (tagging, redundancy explanation) are non-fatal: a failed call logs and the screen renders without it. The redundancy explanation is generated but not shown anywhere yet; decide whether to show it or drop the call.
 
+## Design system (2026-11-02, "Espresso and Rose")
+
+- White pages; espresso `#2A1208` for text, buttons and dark bands; soft rose `#C98A92` as the one accent (fills, and text only on espresso); deep rose `#8E4752` for small accent text on white; blush `#F6EAE3` tints; taupe `#6B5A52` secondary text; warn `#A12B2B` always with an icon. Tokens and contrast notes are at the top of `src/app/globals.css`.
+- Polaris rules followed: one button style in sentence case (primary, secondary, quiet link), one primary per section, badges for status, plain-language copy, empty states with one action. Small caps only for eyebrows above titles.
+- Shared pieces: `EmptyState`, `ActionToast` (`?done=let-go|undecided` from the resolve route), `DemoBanner` (demo accounts), Home's `SetupGuide` (progress from real data, `src/lib/dashboard/setupGuide.ts`), and the pause screen's attribute grid (`src/lib/pauseScreen/attributeMatch.ts`, a band, never a percentage).
+
 ## Pre-deploy checklist
 
 - Fix the 3 lint errors listed under "Resume here".

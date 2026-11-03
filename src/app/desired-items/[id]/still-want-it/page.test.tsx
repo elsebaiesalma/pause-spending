@@ -43,8 +43,8 @@ describe("StillWantItPage", () => {
       const { userA } = fixture;
       const html = await render(userA);
 
-      expect(html).toContain("02 / Build it from your closet");
-      expect(html).toContain("03 / One last check");
+      expect(html).toContain("Build it from your closet");
+      expect(html).toContain("One last check");
       expect(html).not.toContain("Lower-priced");
       expect(html).not.toContain("Secondhand");
       expect(html).not.toContain("Search on ");

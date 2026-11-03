@@ -3,6 +3,7 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { listLooks } from "@/lib/looks/looks";
 import { BigNumeral } from "@/components/kit/BigNumeral";
 import { PageHero } from "@/components/kit/PageHero";
+import { EmptyState } from "@/components/EmptyState";
 import { LookCard, type LookCardData } from "./LookCard";
 import styles from "./lookbook.module.css";
 
@@ -32,12 +33,16 @@ export default async function LookbookPage() {
       </div>
 
       {cards.length === 0 ? (
-        <section className={styles.empty}>
-          <p className={styles.emptyText}>No looks yet. Start from a suggestion and rearrange it however you like.</p>
-          <Link href="/lookbook/board" className="btn btn-primary action">
-            Start from a suggestion
-          </Link>
-        </section>
+        <EmptyState
+          title="Build your first look"
+          action={
+            <Link href="/lookbook/board" className="btn btn-primary">
+              Start from a suggestion
+            </Link>
+          }
+        >
+          No looks yet. Start from a suggestion and rearrange it however you like, using only pieces you own.
+        </EmptyState>
       ) : (
         <ul className={styles.grid} role="list">
           {cards.map((card) => (

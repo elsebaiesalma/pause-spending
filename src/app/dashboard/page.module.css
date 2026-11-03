@@ -61,24 +61,107 @@
   text-decoration-color: var(--color-accent);
 }
 
-/* ---------- Numerals ---------- */
+/* ---------- At a glance: the espresso band ---------- */
 
-.numerals {
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+@media (min-width: 900px) {
+  .metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem;
+  background: var(--color-espresso);
+  color: #fff;
+}
+
+.metricLink:hover .metricValue {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.metricLabel {
+  font-size: 0.8125rem;
+  color: var(--color-on-espresso-soft);
+}
+
+.metricValue {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* Soft rose passes on espresso (6.3:1); money saved is the one accent here. */
+.metricValueAccent {
+  color: var(--color-rose);
+}
+
+.metricNote {
+  font-size: 0.8125rem;
+  color: var(--color-on-espresso-soft);
+}
+
+/* ---------- Cards ---------- */
+
+.cards {
   display: grid;
   gap: var(--space-3);
   align-items: start;
 }
 
 @media (min-width: 900px) {
-  .numerals {
+  .cards {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.column {
+.card {
   display: grid;
   gap: var(--space-2);
   min-width: 0;
+  padding: 1.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.cardText {
+  color: var(--color-ink-soft);
+}
+
+.planBar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-blush);
+  overflow: hidden;
+}
+
+.planBar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-espresso);
 }
 
 .keptLine {
@@ -90,24 +173,8 @@
 }
 
 .keptLine:hover {
-  color: var(--color-accent);
+  color: var(--color-ink);
 }
-
-
-/* The plan link under "No plan set for October yet". */
-.planLink {
-  font-size: 1rem;
-  color: var(--color-ink-soft);
-  text-decoration: underline;
-  text-decoration-color: var(--color-line-strong);
-  text-underline-offset: 3px;
-}
-
-.planLink:hover {
-  color: var(--color-accent);
-}
-
-/* ---------- Wardrobe column ---------- */
 
 .closetLink,
 .quietLink {
@@ -121,7 +188,7 @@
 
 .closetLink:hover,
 .quietLink:hover {
-  color: var(--color-accent);
+  color: var(--color-ink);
 }
 
 /* ---------- Loading skeleton ---------- */
@@ -163,14 +230,4 @@
 
 .skelReceipt {
   height: 11rem;
-}
-
-/* Demo accounts only: one-click path to the pause screen. */
-.sampleRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  color: var(--color-ink-soft);
 }

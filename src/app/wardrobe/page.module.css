@@ -52,7 +52,7 @@
   border-radius: 999px;
   background: none;
   color: var(--color-ink-soft);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -113,7 +113,7 @@
 }
 
 .count {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 1.188rem;
   color: var(--color-ink-faint);
 }
@@ -148,7 +148,7 @@
   align-items: center;
   min-height: 44px;
   padding: 0 0.9rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -163,7 +163,7 @@
   padding: 0.1rem 0.4rem;
   background: var(--color-fill);
   color: var(--color-fill-ink);
-  border-radius: 2px;
+  border-radius: 999px;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
 }
@@ -189,7 +189,7 @@
   display: flex;
   align-items: center;
   gap: calc(var(--space-2) * 0.72) var(--space-2);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -255,7 +255,7 @@
 .card {
   position: relative;
   border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
+  border-radius: 12px;
   background: var(--color-bg);
 }
 
@@ -293,11 +293,11 @@
 }
 
 .imagePlaceholderLabel {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   color: var(--color-fill-ink);
 }
 
@@ -313,7 +313,7 @@
 }
 
 .cardBrand {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -397,9 +397,9 @@
   min-width: 9.5rem;
   background: var(--color-bg);
   border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(30, 38, 34, 0.12);
+  box-shadow: 0 4px 16px rgba(42, 18, 8, 0.12);
 }
 
 .menuPanel a,

@@ -4,6 +4,8 @@ import { clashDisplay } from "./fonts";
 import { auth } from "@/lib/auth";
 import { initialsFor } from "@/lib/initials";
 import { DevViewBanner } from "@/components/DevViewBanner";
+import { DemoBanner } from "@/components/DemoBanner";
+import { isDemoEmail } from "@/lib/demo";
 import { SiteHeader, SiteMain, SiteTabBar } from "@/components/SiteNav";
 import "./globals.css";
 
@@ -38,6 +40,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body style={{ display: "flex", flexDirection: "column" }} suppressHydrationWarning>
         <SiteHeader initials={initials} />
         <DevViewBanner />
+        {isDemoEmail(session?.user?.email) && <DemoBanner />}
         <SiteMain signedIn={initials !== null}>{children}</SiteMain>
         <SiteTabBar signedIn={initials !== null} />
       </body>

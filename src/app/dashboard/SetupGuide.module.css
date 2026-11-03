@@ -1,0 +1,103 @@
+.guide {
+  padding: 1.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.count {
+  flex: none;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.progress {
+  height: 6px;
+  margin-top: 0.875rem;
+  border-radius: 999px;
+  background: var(--color-blush);
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-espresso);
+}
+
+.steps {
+  list-style: none;
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 12px;
+}
+
+.stepOpen {
+  background: var(--color-bg-alt);
+}
+
+.check {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.0625rem;
+  border-radius: 50%;
+  border: 1.5px dashed var(--color-line-strong);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.checkDone {
+  border: none;
+  background: var(--color-espresso);
+}
+
+.stepBody {
+  min-width: 0;
+}
+
+.stepTitle {
+  font-weight: 600;
+}
+
+.stepTitleDone {
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.stepText {
+  margin-top: 0.25rem;
+  color: var(--color-ink-soft);
+}
+
+.stepAction {
+  margin-top: 0.75rem;
+}
+
+.stepAction form {
+  max-width: none;
+}

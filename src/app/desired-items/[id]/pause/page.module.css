@@ -2,11 +2,11 @@
    shared tokens (globals.css) as the rest of the app. */
 
 .sectionLabel {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   color: var(--color-ink-soft);
   margin-bottom: calc(var(--space-2) * 0.72);
 }
@@ -63,7 +63,182 @@
   color: var(--color-ink-soft);
 }
 
-/* ---------- 1. Wanted item ---------- */
+/* ---------- 1. You want / you own ---------- */
+
+.compare {
+  margin-top: calc(var(--space-2) * 0.72);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+}
+
+/* Desktop: the match grid sits beside the pair instead of under it. */
+@media (min-width: 1024px) {
+  .compare {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    column-gap: var(--space-5);
+    align-items: center;
+  }
+
+  .compare .matchGrid {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .compare .others {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Two columns even on a phone: the side-by-side is the point of the screen. */
+.comparePair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .comparePair {
+    gap: var(--space-4);
+    max-width: 40rem;
+  }
+}
+
+.compareItem {
+  min-width: 0;
+}
+
+.compareKicker {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-rose-deep);
+}
+
+.compareImage {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  background: var(--color-blush);
+  margin-bottom: 0.75rem;
+}
+
+.compareImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.compareTitle {
+  margin: 0.125rem 0 0;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.compareName {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 2.6vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.compareEmpty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-3);
+  border: 1.5px dashed var(--color-line-strong);
+  border-radius: var(--radius-tile);
+}
+
+.compareEmpty .compareKicker {
+  margin-bottom: auto;
+}
+
+.compareEmptyText {
+  margin-top: var(--space-3);
+  font-weight: 600;
+}
+
+/* Which attributes match: a grid, optionally summarised as a band. Never a
+   percentage (rule-based matching can't justify one). */
+.matchGrid {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-line);
+  max-width: 40rem;
+}
+
+.matchHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.matchReason {
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.matchTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.matchTable th,
+.matchTable td {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.matchTable thead th {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.matchTable tbody th {
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.matchTable td:last-child {
+  text-align: right;
+  padding-right: 0;
+}
+
+.matchYes {
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.matchNo {
+  color: var(--color-ink-soft);
+}
+
+.others {
+  margin-top: var(--space-4);
+}
+
+.othersTitle {
+  margin: 0 0 var(--space-2);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* ---------- (old) Wanted item ---------- */
 
 .wantedItem {
   display: flex;
@@ -105,11 +280,11 @@
 }
 
 .wantedPlaceholderLabel {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   color: var(--color-fill-ink);
 }
 
@@ -119,7 +294,7 @@
 }
 
 .brand {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -285,8 +460,8 @@
   justify-content: center;
   min-height: 44px;
   border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
-  font-family: var(--font-mono);
+  border-radius: 10px;
+  font-family: var(--font-body);
   font-size: 1rem;
   color: var(--color-ink-soft);
   cursor: pointer;
@@ -384,7 +559,35 @@
 
 .actions {
   margin-top: calc(var(--space-5) * 0.72);
-  max-width: 24rem;
+  display: grid;
+  gap: 0.75rem;
+  max-width: 32rem;
+}
+
+.actionMain {
+  display: grid;
+  gap: 0.625rem;
+}
+
+@media (min-width: 640px) {
+  .actionMain {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* The quieter choices, as text links in one row. */
+.actionLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0 1.25rem;
+}
+
+.actionLinks :global(.action) {
+  width: auto;
+  justify-self: start;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Holds the Buy anyway button and its warning in one grid cell. */
@@ -394,10 +597,8 @@
 }
 
 .buyAnywayWarning {
-  margin-top: 0.288rem;
-  font-size: 0.8rem;
-  color: var(--color-accent);
-  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-warn);
 }
 
 /* ---------- Skeleton (loading.tsx) ---------- */
@@ -405,7 +606,7 @@
 .skel {
   background: var(--color-bg-alt);
   animation: skeleton-pulse 1.2s ease-in-out infinite;
-  border-radius: 2px;
+  border-radius: 12px;
 }
 
 .skelWantedItem {

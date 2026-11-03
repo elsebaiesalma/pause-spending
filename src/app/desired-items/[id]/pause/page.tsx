@@ -7,6 +7,7 @@ import { ColorDot } from "@/components/ColorDot";
 import { GarmentSilhouette, silhouetteForItem } from "@/app/wardrobe/GarmentSilhouette";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
 import { hasReflectionAnswer } from "@/lib/pauseScreen/reflectionGate";
+import { compareAttributes, similarityBand } from "@/lib/pauseScreen/attributeMatch";
 import { BuildLookButton } from "./BuildLookButton";
 import { BuyAnywayButton } from "./BuyAnywayButton";
 import styles from "./page.module.css";
@@ -14,14 +15,28 @@ import styles from "./page.module.css";
 const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 const NEED_SCALE = [1, 2, 3, 4, 5, 6, 7];
 
-// Items without a photo (the sample closet) get the app's garment drawing
-// instead of an empty gray box.
-function SimilarArt({ item }: { item: { category: string | null; itemName: string; colorFamily: string | null } }) {
-  const shape = silhouetteForItem(item.category, item.itemName);
-  if (!shape) return null;
+// The item's photo, or for items without one (the sample closet) the app's
+// garment drawing, or a labelled tile, never an empty gray box.
+function ItemArt({
+  item,
+}: {
+  item: { category: string | null; itemName: string | null; colorFamily: string | null; imageUrl: string | null };
+}) {
+  if (item.imageUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={item.imageUrl} alt={item.itemName ?? "Item"} />;
+  }
+  const shape = silhouetteForItem(item.category, item.itemName ?? "");
+  if (shape) {
+    return (
+      <div className={styles.silhouette}>
+        <GarmentSilhouette shape={shape} colorFamily={item.colorFamily} />
+      </div>
+    );
+  }
   return (
-    <div className={styles.silhouette}>
-      <GarmentSilhouette shape={shape} colorFamily={item.colorFamily} />
+    <div className={styles.wantedPlaceholder}>
+      <span className={styles.wantedPlaceholderLabel}>{item.category || "Item"}</span>
     </div>
   );
 }
@@ -44,67 +59,113 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
   // A look built from the closet for this item counts as a reflection answer.
   const hasLook = await hasLookForDesiredItem(userId, desiredItem.id);
 
-  const wantedShape = silhouetteForItem(desiredItem.category, desiredItem.itemName ?? "");
   const price = desiredItem.price ? Number(desiredItem.price) : null;
   const waitAction = `/api/desired-items/${desiredItem.id}/wait`;
   const resolveAction = `/api/desired-items/${desiredItem.id}/resolve`;
+
+  // The closest owned piece goes side by side with the wanted one; the
+  // rest are listed below it. "Closest" is the database's own order, since
+  // matching is rule-based and has no finer ranking.
+  const [closest, ...others] = similarItems;
+  const rows = closest ? compareAttributes(desiredItem, closest) : [];
 
   return (
     <div className="page">
       <span className="page__eyebrow">Before you buy</span>
 
-      {/* 1. The wanted item */}
-      <div className={styles.wantedItem}>
-        <div className={styles.wantedImage}>
-          {desiredItem.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={desiredItem.imageUrl} alt={desiredItem.itemName ?? "Item"} />
-          ) : wantedShape ? (
-            <div className={styles.silhouette}>
-              <GarmentSilhouette shape={wantedShape} colorFamily={desiredItem.colorFamily} />
+      {/* 1. You want / you own */}
+      <section className={styles.compare} aria-label="What you want next to what you own">
+        <div className={styles.comparePair}>
+          <div className={styles.compareItem}>
+            <p className={styles.compareKicker}>You want</p>
+            <div className={styles.compareImage}>
+              <ItemArt item={desiredItem} />
+            </div>
+            {desiredItem.brand && <p className={styles.brand}>{desiredItem.brand}</p>}
+            <h1 className={styles.compareTitle}>{desiredItem.itemName || "This item"}</h1>
+            <div className={styles.metaLine}>
+              <ColorDot colorFamily={desiredItem.colorFamily} />
+              <span>{price !== null ? `$${price.toFixed(0)}` : "Price not set"}</span>
+            </div>
+          </div>
+
+          {closest ? (
+            <div className={styles.compareItem}>
+              <p className={styles.compareKicker}>You own</p>
+              <div className={styles.compareImage}>
+                <ItemArt item={closest} />
+              </div>
+              <p className={styles.compareName}>{closest.itemName}</p>
+              {closest.ownedSince && (
+                <p className={styles.metaLine}>Bought {MONTH_YEAR_FORMAT.format(closest.ownedSince)}</p>
+              )}
             </div>
           ) : (
-            <div className={styles.wantedPlaceholder}>
-              <span className={styles.wantedPlaceholderLabel}>{desiredItem.category || "Item"}</span>
+            <div className={`${styles.compareItem} ${styles.compareEmpty}`}>
+              <p className={styles.compareKicker}>You own</p>
+              <p className={styles.compareEmptyText}>Nothing like this in your wardrobe.</p>
+              <p className={styles.emptyNote}>It would be new to your closet. The questions below still help.</p>
             </div>
           )}
         </div>
-        <div className={styles.wantedDetails}>
-          {desiredItem.brand && <p className={styles.brand}>{desiredItem.brand}</p>}
-          <h1>{desiredItem.itemName || "This item"}</h1>
-          <div className={styles.metaLine}>
-            <ColorDot colorFamily={desiredItem.colorFamily} />
-            {desiredItem.colorName && <span>{desiredItem.colorName}</span>}
-            {desiredItem.category && <span>{desiredItem.category}</span>}
-            <span>{price !== null ? `$${price.toFixed(0)}` : "Price not set"}</span>
-          </div>
-        </div>
-      </div>
 
-      {/* 2. Already in your wardrobe */}
-      <section className={`section ${styles.card}`}>
-        <h2 className={styles.cardTitle}>Already in your closet</h2>
-        {similarItems.length === 0 ? (
-          <p className={styles.emptyNote}>Nothing like this in your wardrobe.</p>
-        ) : (
-          <div className={styles.similarTrack}>
-            {similarItems.map((item) => (
-              <div key={item.id} className={styles.similarCard}>
-                <div className={styles.similarImage}>
-                  {item.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={item.imageUrl} alt={item.itemName} />
-                  ) : (
-                    <SimilarArt item={item} />
+        {rows.length > 0 && (
+          <div className={styles.matchGrid}>
+            <div className={styles.matchHeader}>
+              <span className={`badge ${rows.filter((r) => r.match).length >= 2 ? "badge--dark" : ""}`}>
+                {similarityBand(rows)}
+              </span>
+              <span className={styles.matchReason}>{similarItemReasons[closest.id]}</span>
+            </div>
+            <table className={styles.matchTable}>
+              <caption className="sr-only">How the two items compare</caption>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <span className="sr-only">Attribute</span>
+                  </th>
+                  <th scope="col">You want</th>
+                  <th scope="col">You own</th>
+                  <th scope="col">
+                    <span className="sr-only">Match</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    <td>{row.wanted}</td>
+                    <td>{row.owned}</td>
+                    <td>
+                      <span className={row.match ? styles.matchYes : styles.matchNo}>
+                        {row.match ? "✓ Same" : "Different"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {others.length > 0 && (
+          <div className={styles.others}>
+            <h2 className={styles.othersTitle}>Also in your closet</h2>
+            <div className={styles.similarTrack}>
+              {others.map((item) => (
+                <div key={item.id} className={styles.similarCard}>
+                  <div className={styles.similarImage}>
+                    <ItemArt item={item} />
+                  </div>
+                  <p className={styles.similarName}>{item.itemName}</p>
+                  {item.ownedSince && (
+                    <p className={styles.similarMeta}>Bought {MONTH_YEAR_FORMAT.format(item.ownedSince)}</p>
                   )}
+                  <p className={styles.similarReason}>{similarItemReasons[item.id]}</p>
                 </div>
-                <p className={styles.similarName}>{item.itemName}</p>
-                {item.ownedSince && (
-                  <p className={styles.similarMeta}>bought {MONTH_YEAR_FORMAT.format(item.ownedSince)}</p>
-                )}
-                <p className={styles.similarReason}>{similarItemReasons[item.id]}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </section>
@@ -248,21 +309,26 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         </div>
 
         {/* 5. Actions */}
-        {/* Same labels, order and styles as every other screen with these actions. */}
-        <div className={`action-group ${styles.actions}`}>
-          <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary action">
-            Pause for 24 hours
-          </button>
-          <button type="submit" formAction={waitAction} name="duration" value="7d" className="action">
-            Pause for 7 days
-          </button>
-          <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action">
-            Decide later
-          </button>
-          <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
-            Let it go
-          </button>
-          <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
+        {/* Same labels and order as every other screen with these actions: one
+            primary, one secondary, and the rest as quiet links (Polaris). */}
+        <div className={styles.actions}>
+          <div className={styles.actionMain}>
+            <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary action">
+              Pause for 24 hours
+            </button>
+            <button type="submit" formAction={waitAction} name="duration" value="7d" className="action">
+              Pause for 7 days
+            </button>
+          </div>
+          <div className={styles.actionLinks}>
+            <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action action--quiet">
+              Decide later
+            </button>
+            <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action action--quiet">
+              Let it go
+            </button>
+            <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
+          </div>
         </div>
       </form>
     </div>

@@ -51,7 +51,7 @@ export function GarmentSilhouette({
   colorFamily: string | null;
 }) {
   const swatch = swatchFor(colorFamily);
-  const detailStroke = isLightSwatch(colorFamily) ? "rgba(30, 38, 34, 0.35)" : "rgba(255, 255, 255, 0.4)";
+  const detailStroke = isLightSwatch(colorFamily) ? "rgba(42, 18, 8, 0.35)" : "rgba(255, 255, 255, 0.4)";
 
   const fill =
     swatch === null

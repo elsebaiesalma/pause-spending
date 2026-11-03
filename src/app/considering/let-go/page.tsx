@@ -1,5 +1,6 @@
 import { listLetGoItems } from "@/lib/considering/letGoList";
 import { requireUserIdOrRedirect } from "@/lib/session";
+import { EmptyState } from "@/components/EmptyState";
 import styles from "../page.module.css";
 
 export default async function LetGoListPage() {
@@ -12,7 +13,11 @@ export default async function LetGoListPage() {
       <h1>What you let go</h1>
 
       {rows.length === 0 ? (
-        <p className={`${styles.emptyNote} section`}>Nothing let go yet.</p>
+        <div className="section">
+          <EmptyState title="Nothing let go yet">
+            Things you decide against end up here, with the money you kept by not buying them.
+          </EmptyState>
+        </div>
       ) : (
         <div className="section">
           {rows.map(({ item, automatic }) => {
@@ -26,7 +31,7 @@ export default async function LetGoListPage() {
                   </div>
                   {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
                 </div>
-                {automatic && <p className={styles.rowAutoTag}>Moved automatically</p>}
+                {automatic && <p className={styles.rowMeta}><span className="badge badge--neutral">Moved automatically</span></p>}
                 <div className={styles.rowActions}>
                   <form action={`/api/desired-items/${item.id}/mark-purchased`} method="POST">
                     <button type="submit" className="btn-quiet">I bought this after all</button>

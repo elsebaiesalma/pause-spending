@@ -1,25 +1,5 @@
-/* Scoped to the home/landing page. It uses the same light Sage and Cream
-   tokens as the rest of the app (globals.css), so going from the landing
-   page into the app doesn't look like switching products. */
-
-/* Strips native button chrome so the demo CTA (a form button, since it
-   POSTs) looks exactly like the link classes it's paired with. Kept first so
-   .display, .inlineLink and .footerCta all override it. */
-.buttonReset {
-  appearance: none;
-  background: none;
-  border: 0;
-  padding: 0;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-}
-
-.buttonReset:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
+/* Landing page. Same tokens as the app (globals.css): white page, espresso
+   for text, buttons and the two dark bands, soft rose as the one accent. */
 
 .root {
   font-family: var(--font-body);
@@ -27,54 +7,73 @@
   background: var(--color-bg);
 }
 
-/* The shared site-main (globals.css) adds top padding to clear the fixed
-   header, but paints no background of its own - without this, the app's
-   own background shows through that gap above this page's content. */
-
-/* No blend mode: on the near-black page a plain low-opacity rose blob
-   reads as a soft light leak. (Multiply was only right for the old
-   white-background variant, where it needed to darken/tint instead.) */
-
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+.display {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
-/* ---------- Layout ---------- */
+/* ---------- Shared section parts ---------- */
 
 .section {
   max-width: var(--width-container);
   margin: 0 auto;
-  padding: 3.6rem 1.5rem;
+  padding: 4rem var(--gutter);
+}
+
+.sectionTinted {
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
+}
+
+.sectionInner {
+  max-width: var(--width-container);
+  margin: 0 auto;
+  padding: 4rem var(--gutter);
+}
+
+@media (min-width: 900px) {
+  .section,
+  .sectionInner {
+    padding-top: 5.5rem;
+    padding-bottom: 5.5rem;
+  }
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.36rem 0.5rem;
-  font-family: var(--font-mono);
+  gap: 0.5rem;
   font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--color-accent-dim);
-  font-weight: 700;
-  margin-bottom: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--color-rose-deep);
+  margin-bottom: 0.75rem;
 }
 
 .eyebrowDot {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 50%;
-  background: var(--color-accent-dim);
+  background: var(--color-rose);
 }
 
-.display {
-  font-family: var(--font-display), sans-serif;
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+.sectionHeading {
+  composes: display;
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  line-height: 1.08;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.sectionLede {
+  margin-top: 1rem;
+  max-width: 36rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--color-ink-soft);
 }
 
 /* ---------- Hero ---------- */
@@ -82,7 +81,7 @@
 .hero {
   max-width: var(--width-container);
   margin: 0 auto;
-  padding: 3rem 1.5rem 3.5rem;
+  padding: 3rem var(--gutter) 4rem;
   display: grid;
   gap: 2.5rem;
   align-items: center;
@@ -92,8 +91,8 @@
   .hero {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: 4rem;
-    padding-top: 5rem;
-    padding-bottom: 5rem;
+    padding-top: 4.5rem;
+    padding-bottom: 5.5rem;
   }
 }
 
@@ -124,14 +123,15 @@
 .heroNote {
   margin-top: 1rem;
   font-size: 0.875rem;
-  color: var(--color-ink-faint);
+  color: var(--color-ink-soft);
 }
 
 /* ---------- Buttons ---------- */
 
-/* One primary action per view (Polaris), sentence case for readability,
-   and at least 48px tall so it is an easy tap target on a phone. */
-.btnPrimary {
+/* One primary action per view, sentence case, at least 48px tall. */
+.btnPrimary,
+.btnGhost,
+.btnLight {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -141,11 +141,14 @@
   font-size: 1rem;
   font-weight: 600;
   border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.btnPrimary {
   background: var(--color-primary);
   color: #fff;
   border: 1px solid var(--color-primary);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
 .btnPrimary:hover {
@@ -153,379 +156,347 @@
   border-color: var(--color-primary-hover);
 }
 
-.btnPrimary:active {
-  transform: translateY(1px);
-}
-
-.btnPrimary:disabled {
-  cursor: progress;
-  opacity: 0.75;
-}
-
 .btnGhost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 999px;
   background: transparent;
   color: var(--color-ink);
   border: 1px solid var(--color-line-strong);
-  transition: border-color 0.2s ease, transform 0.1s ease;
 }
 
 .btnGhost:hover {
   border-color: var(--color-ink);
+  background: var(--color-bg-alt);
 }
 
-.btnGhost:active {
+/* The primary action on the espresso band: white, so it stays the one
+   strongest thing on that surface. */
+.btnLight {
+  background: #fff;
+  color: var(--color-espresso);
+  border: 1px solid #fff;
+}
+
+.btnLight:hover {
+  background: var(--color-blush);
+  border-color: var(--color-blush);
+}
+
+.btnPrimary:active,
+.btnGhost:active,
+.btnLight:active {
   transform: translateY(1px);
+}
+
+.btnPrimary:disabled,
+.btnLight:disabled {
+  cursor: progress;
+  opacity: 0.75;
 }
 
 .btnPrimary:focus-visible,
 .btnGhost:focus-visible {
-  outline: 2px solid var(--color-primary);
+  outline: 2px solid var(--color-rose-deep);
   outline-offset: 3px;
 }
 
-/* ---------- Stat grid ---------- */
+.btnLight:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 3px;
+}
 
-.statGrid {
+/* ---------- Dark band: the problem in numbers ---------- */
+
+.band {
+  background: var(--color-espresso);
+  color: #fff;
+}
+
+.bandInner {
   max-width: var(--width-container);
   margin: 0 auto;
+  padding: 3.5rem var(--gutter);
+}
+
+@media (min-width: 900px) {
+  .bandInner {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+.bandHeading {
+  composes: display;
+  font-size: clamp(1.625rem, 3vw, 2.25rem);
+  line-height: 1.1;
+  margin: 0 0 2.5rem;
+  max-width: 30ch;
+  color: #fff;
+  text-wrap: balance;
+}
+
+.statGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  border-bottom: 1px solid var(--color-line);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem 1.5rem;
 }
 
 @media (min-width: 900px) {
   .statGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 .stat {
-  padding: 1.8rem 2rem;
-  border-top: 1px solid var(--color-line);
-  border-right: 1px solid var(--color-line);
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.stat:nth-child(2n) {
-  border-right: none;
-}
-
-@media (min-width: 900px) {
-  .stat:nth-child(2n) {
-    border-right: 1px solid var(--color-line);
-  }
-  .stat:nth-child(4n) {
-    border-right: none;
-  }
-}
-
-.statLabel {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--color-accent-dim);
-  margin-bottom: 0.54rem;
-}
-
+/* Soft rose is 6.3:1 on espresso, so it can carry the big numbers here. */
 .statValue {
   composes: display;
-  font-size: clamp(1.89rem, 3vw, 2.7rem);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  color: var(--color-rose);
 }
 
 .statNote {
-  margin-top: 0.432rem;
-  font-size: 1rem;
-  font-weight: 300;
+  margin-top: 0.625rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.statSource {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-on-espresso-soft);
+}
+
+.statSourceLight {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
   color: var(--color-ink-soft);
 }
 
-/* Where the figure comes from - small, so it reads as a citation. */
-.statSource {
-  display: block;
-  margin-top: 0.54rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
-  color: var(--color-ink-faint);
-}
+/* ---------- How it works ---------- */
 
-/* ---------- Editorial content blocks ---------- */
-
-.contentGrid {
+.steps {
+  list-style: none;
   display: grid;
-  gap: 2.16rem 3rem;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-@media (min-width: 1024px) {
-  .contentGrid {
-    grid-template-columns: 3fr 8fr;
-    gap: 3.6rem 5rem;
+@media (min-width: 800px) {
+  .steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 }
 
-.moduleLabel {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--color-accent-dim);
-  display: block;
-  margin-bottom: 0.54rem;
+.step {
+  padding: 1.5rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
 }
 
-.moduleHeading {
+.stepNumber {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-blush);
+  color: var(--color-rose-deep);
+  font-weight: 700;
+}
+
+.stepTitle {
   composes: display;
-  font-size: clamp(2.43rem, 4vw, 3.24rem);
+  font-size: 1.375rem;
+  line-height: 1.15;
+  margin: 1rem 0 0.5rem;
 }
 
-.moduleHeading em {
-  font-style: normal;
-  color: var(--color-accent-dim);
-}
-
-.moduleRule {
-  width: 3rem;
-  height: 1px;
-  background: var(--color-accent-dim);
-  margin: 0.72rem 0;
-  border: none;
-}
-
-.moduleSub {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-ink-faint);
-}
-
-.lede {
-  font-size: clamp(1.242rem, 2vw, 1.728rem);
-  color: color-mix(in srgb, var(--color-ink) 88%, transparent);
-  font-weight: 300;
-  line-height: 1.55;
-  max-width: 62ch;
-  margin-bottom: 1.44rem;
-}
-
-.twoCol {
-  display: grid;
-  gap: 1.44rem 2rem;
+.stepBody {
   color: var(--color-ink-soft);
-  font-size: 1.134rem;
   line-height: 1.6;
 }
 
-@media (min-width: 700px) {
-  .twoCol {
-    grid-template-columns: 1fr 1fr;
+/* ---------- Why a pause works ---------- */
+
+.whyIntro {
+  max-width: 40rem;
+}
+
+.findings {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 900px) {
+  .findings {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 }
 
-.inlineLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.54rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 1rem;
+.finding {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+}
+
+.findingTitle {
+  composes: display;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  margin: 0 0 0.625rem;
+}
+
+.findingBody {
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+}
+
+/* What PAUSE does because of the finding: the link between research and
+   product, so it gets the accent. */
+.findingFeature {
+  margin-top: auto;
+  padding-top: 1rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  border-bottom: 1px solid var(--color-line-strong);
-  padding-bottom: 0.288rem;
-  margin-top: 1.08rem;
-  transition: border-color 0.2s ease, color 0.2s ease;
+  color: var(--color-rose-deep);
 }
 
-.inlineLink:hover {
-  color: var(--color-accent-dim);
-  border-color: var(--color-accent-dim);
+.caveat {
+  margin-top: 2rem;
+  max-width: 44rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
 }
 
-/* The slot for a real screenshot of our Pause screen. Never cropped or
-   recolored (see ImageSlot's "contain"). */
+/* ---------- FAQ ---------- */
 
-/* ---------- Mechanism phases ---------- */
-
-.phase {
+.faqGrid {
   display: grid;
-  gap: 0.72rem 1rem;
-  padding-bottom: 1.8rem;
-  margin-bottom: 1.8rem;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .faqGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 4rem;
+  }
+}
+
+.faqList {
+  border-top: 1px solid var(--color-line);
+}
+
+.faq {
   border-bottom: 1px solid var(--color-line);
 }
 
-.phase:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-@media (min-width: 700px) {
-  .phase {
-    grid-template-columns: 1fr 3fr;
-    align-items: baseline;
-  }
-}
-
-.phaseLabel {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-accent-dim);
-}
-
-.phase h3 {
-  font-family: var(--font-display), sans-serif;
+.faqQuestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.5rem;
+  padding: 1rem 0;
+  font-size: 1.0625rem;
   font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  font-size: clamp(1.62rem, 2.5vw, 2.16rem);
-  margin-bottom: 0.432rem;
+  cursor: pointer;
+  list-style: none;
 }
 
-.phase p {
+.faqQuestion::-webkit-details-marker {
+  display: none;
+}
+
+.faqQuestion::after {
+  content: "+";
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--color-blush);
+  color: var(--color-rose-deep);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.faq[open] .faqQuestion::after {
+  content: "\2212";
+}
+
+.faqQuestion:focus-visible {
+  outline: 2px solid var(--color-rose-deep);
+  outline-offset: 2px;
+}
+
+.faqAnswer {
+  padding: 0 0 1.25rem;
   color: var(--color-ink-soft);
-  font-size: 1rem;
   line-height: 1.6;
 }
 
-/* ---------- Feature points ---------- */
-
-.featureGrid {
-  display: grid;
-  gap: 1.08rem 1.5rem;
-  margin-top: 1.44rem;
-}
-
-@media (min-width: 700px) {
-  .featureGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.featurePoint {
-  padding: 1.08rem 1.5rem;
-  border: 1px solid var(--color-line);
-  background: var(--color-bg-alt);
-}
-
-.featurePoint h4 {
-  font-family: var(--font-display), sans-serif;
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  font-size: 1.242rem;
-  margin: 0.54rem 0 0.36rem 0;
-}
-
-.featurePoint p {
-  font-size: 1rem;
-  color: var(--color-ink-faint);
-  line-height: 1.5;
-}
-
-/* ---------- Footer ---------- */
+/* ---------- Footer: closing call to action on the dark band ---------- */
 
 .footer {
-  background: var(--color-bg-alt);
-  color: var(--color-ink);
-  padding: 4.32rem 1.5rem 2.16rem 1.5rem;
-  position: relative;
-  overflow: hidden;
+  background: var(--color-espresso);
+  color: #fff;
+  padding: 4.5rem var(--gutter) 2rem;
 }
 
 .footerInner {
   max-width: var(--width-container);
   margin: 0 auto;
   text-align: center;
-  position: relative;
-  z-index: 1;
-}
-
-.footerEyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  color: var(--color-accent-dim);
-  font-weight: 700;
-  display: block;
-  margin-bottom: 0.54rem;
 }
 
 .footerHeadline {
   composes: display;
-  font-size: clamp(2.052rem, 5vw, 3.51rem);
-  margin-bottom: 0.72rem;
-}
-
-.footerHeadline em {
-  font-style: normal;
-  color: var(--color-accent-dim);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1.05;
+  margin: 0 0 0.75rem;
+  color: #fff;
 }
 
 .footerSub {
-  color: var(--color-ink-soft);
-  font-size: 1rem;
-  max-width: 26rem;
-  margin: 0 auto 1.8rem auto;
+  color: var(--color-on-espresso-soft);
+  max-width: 28rem;
+  margin: 0 auto 1.75rem;
 }
 
-.footerCta {
-  composes: display;
-  display: inline-block;
-  font-size: clamp(1.89rem, 5vw, 3.78rem);
-  color: var(--color-ink);
-  transition: color 0.2s ease;
-  position: relative;
-  margin-bottom: 1.8rem;
+.footerInner form {
+  margin: 0 auto;
+  justify-items: center;
 }
 
-.footerCta:hover {
-  color: var(--color-accent);
-}
-
-.footerLinks {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1.08rem 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-ink-soft);
-  margin-bottom: 2.16rem;
-}
-
-.footerLinks a:hover {
-  color: var(--color-ink);
+/* The global button rule pins buttons to the start of a grid cell. */
+.footerInner form button {
+  justify-self: center;
 }
 
 .footerMeta {
   display: flex;
   flex-direction: column;
-  gap: 0.72rem 1rem;
+  gap: 1rem;
   align-items: center;
-  padding-top: 1.8rem;
-  border-top: 1px solid var(--color-line-strong);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-ink-faint);
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.875rem;
+  color: var(--color-on-espresso-soft);
 }
 
 @media (min-width: 700px) {
@@ -535,13 +506,14 @@
   }
 }
 
-.ghostMark {
-  composes: display;
-  font-size: 20vw;
-  line-height: 1;
-  text-align: center;
-  color: color-mix(in srgb, var(--color-ink) 5%, transparent);
-  white-space: nowrap;
-  margin-top: 2.16rem;
-  overflow: hidden;
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+}
+
+.footerLinks a:hover {
+  color: #fff;
+  text-decoration: underline;
 }

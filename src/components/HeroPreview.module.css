@@ -1,5 +1,5 @@
-/* Colors come from the shared tokens (globals.css). Text on the sage-tinted
-   art tiles uses ink-soft, which keeps 4.5:1 there; ink-faint does not. */
+/* Colors come from the shared tokens (globals.css). Art tiles use the blush
+   tint; text on them stays espresso or taupe, both above 4.5:1. */
 
 .card {
   width: 100%;
@@ -9,7 +9,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-line-strong);
   border-radius: 20px;
-  box-shadow: 0 18px 48px rgba(30, 38, 34, 0.1);
+  box-shadow: 0 18px 48px rgba(42, 18, 8, 0.1);
 }
 
 .top {
@@ -20,11 +20,11 @@
 }
 
 .label {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--color-accent-dim);
+  letter-spacing: 0.1em;
+  color: var(--color-rose-deep);
   font-weight: 700;
 }
 
@@ -55,7 +55,7 @@
 
 .kicker {
   margin-top: 0.75rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -89,8 +89,7 @@
   border-top: 1px solid var(--color-line);
 }
 
-/* Spent so far in sage-dark, the part this purchase adds beyond the plan in
-   clay; the sentence below says the same thing, so color is never the only cue. */
+/* Spent so far in espresso, the part this purchase adds in soft rose; the sentence below says the same thing, so color is never the only cue. */
 .bar {
   display: flex;
   height: 0.75rem;
@@ -100,11 +99,11 @@
 }
 
 .barSpent {
-  background: var(--color-accent-dim);
+  background: var(--color-espresso);
 }
 
 .barOver {
-  background: var(--color-clay);
+  background: var(--color-rose);
 }
 
 .budgetLine {
