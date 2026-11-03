@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
+import { PageHeader } from "@/components/PageHeader";
 
 export default async function EditWardrobeItemPage({
   params,
@@ -15,9 +16,8 @@ export default async function EditWardrobeItemPage({
 
   return (
     <div className="page">
-      <span className="page__eyebrow">Wardrobe</span>
-      <h1>Edit item</h1>
-      <form action={`/api/wardrobe/${item.id}/update`} method="POST" className="section">
+      <PageHeader back={{ href: "/wardrobe", label: "Closet" }} title="Edit piece" subtitle={item.itemName} />
+      <form action={`/api/wardrobe/${item.id}/update`} method="POST">
         <label htmlFor="itemName">Name</label>
         <input id="itemName" name="itemName" defaultValue={item.itemName} required />
         <label htmlFor="category">Category</label>

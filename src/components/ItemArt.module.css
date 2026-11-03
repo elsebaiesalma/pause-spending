@@ -1,0 +1,26 @@
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.drawing {
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem;
+  background: var(--color-blush);
+}
+
+.label {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  background: var(--color-blush);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+}

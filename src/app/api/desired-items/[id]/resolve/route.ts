@@ -66,10 +66,10 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
   // ?done= lets Considering show a short confirmation toast (ActionToast).
   const destination =
     outcome === "saved_for_later"
-      ? "/considering?done=undecided"
+      ? "/considering?tab=undecided&done=undecided"
       : outcome === "proceeded"
         ? `/desired-items/${id}/still-want-it`
-        : "/considering?done=let-go";
+        : "/considering?tab=let-go&done=let-go";
 
   return NextResponse.redirect(new URL(destination, request.url));
 }

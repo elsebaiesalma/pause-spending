@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { listLooks } from "@/lib/looks/looks";
-import { BigNumeral } from "@/components/kit/BigNumeral";
-import { PageHero } from "@/components/kit/PageHero";
+import { prisma } from "@/lib/prisma";
+import { devWardrobeWhere } from "@/lib/devWardrobeView";
+import { PageHeader } from "@/components/PageHeader";
+import { ClosetTabs } from "@/components/ClosetTabs";
 import { EmptyState } from "@/components/EmptyState";
 import { LookCard, type LookCardData } from "./LookCard";
 import styles from "./lookbook.module.css";
@@ -11,7 +13,10 @@ const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "num
 
 export default async function LookbookPage() {
   const userId = await requireUserIdOrRedirect();
-  const looks = await listLooks(userId);
+  const [looks, pieceCount] = await Promise.all([
+    listLooks(userId),
+    prisma.wardrobeItem.count({ where: { userId, status: { not: "returned" }, ...devWardrobeWhere() } }),
+  ]);
 
   const cards: LookCardData[] = looks.map((look) => ({
     id: look.id,
@@ -23,14 +28,16 @@ export default async function LookbookPage() {
 
   return (
     <div className={`page ${styles.page}`}>
-      <PageHero eyebrow="Lookbook" title="Something new, from what you own." />
-
-      <div className={styles.top}>
-        <BigNumeral label="Looks" value={looks.length} />
-        <Link href="/lookbook/board" className={`btn btn-primary ${styles.newLook}`}>
-          New look
-        </Link>
-      </div>
+      <PageHeader
+        title="Closet"
+        subtitle="Something new, from what you own."
+        action={
+          <Link href="/lookbook/board" className="btn btn-primary">
+            New look
+          </Link>
+        }
+      />
+      <ClosetTabs current="looks" pieces={pieceCount} looks={looks.length} />
 
       {cards.length === 0 ? (
         <EmptyState

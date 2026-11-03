@@ -4,7 +4,7 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
-import { GarmentSilhouette, silhouetteForItem } from "@/app/wardrobe/GarmentSilhouette";
+import { ItemArt } from "@/components/ItemArt";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
 import { hasReflectionAnswer } from "@/lib/pauseScreen/reflectionGate";
 import { compareAttributes, similarityBand } from "@/lib/pauseScreen/attributeMatch";
@@ -14,32 +14,6 @@ import styles from "./page.module.css";
 
 const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 const NEED_SCALE = [1, 2, 3, 4, 5, 6, 7];
-
-// The item's photo, or for items without one (the sample closet) the app's
-// garment drawing, or a labelled tile, never an empty gray box.
-function ItemArt({
-  item,
-}: {
-  item: { category: string | null; itemName: string | null; colorFamily: string | null; imageUrl: string | null };
-}) {
-  if (item.imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={item.imageUrl} alt={item.itemName ?? "Item"} />;
-  }
-  const shape = silhouetteForItem(item.category, item.itemName ?? "");
-  if (shape) {
-    return (
-      <div className={styles.silhouette}>
-        <GarmentSilhouette shape={shape} colorFamily={item.colorFamily} />
-      </div>
-    );
-  }
-  return (
-    <div className={styles.wantedPlaceholder}>
-      <span className={styles.wantedPlaceholderLabel}>{item.category || "Item"}</span>
-    </div>
-  );
-}
 
 export default async function PauseScreenPage({ params }: PageProps<"/desired-items/[id]/pause">) {
   const userId = await requireUserIdOrRedirect();
@@ -103,7 +77,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           ) : (
             <div className={`${styles.compareItem} ${styles.compareEmpty}`}>
               <p className={styles.compareKicker}>You own</p>
-              <p className={styles.compareEmptyText}>Nothing like this in your wardrobe.</p>
+              <p className={styles.compareEmptyText}>Nothing like this in your closet.</p>
               <p className={styles.emptyNote}>It would be new to your closet. The questions below still help.</p>
             </div>
           )}

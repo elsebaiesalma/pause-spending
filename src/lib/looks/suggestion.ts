@@ -10,7 +10,7 @@ export type SuggestionResult =
   | { status: "too_small" | "unavailable" | "none" };
 
 export const SUGGESTION_NOTICES: Record<Exclude<SuggestionResult["status"], "ok">, string> = {
-  too_small: "Not enough pieces yet for a suggestion. Add some from your wardrobe.",
+  too_small: "Not enough pieces yet for a suggestion. Add some from your closet.",
   unavailable: "A suggestion couldn't load just now.",
   none: "No suggestion this time.",
 };

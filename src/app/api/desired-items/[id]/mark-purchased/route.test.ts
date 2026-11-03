@@ -54,7 +54,7 @@ describe("POST /api/desired-items/[id]/mark-purchased", () => {
 
     expect(response.status).toBeGreaterThanOrEqual(300);
     expect(response.status).toBeLessThan(400);
-    expect(response.headers.get("location")).toContain("/considering/let-go");
+    expect(response.headers.get("location")).toContain("/considering?tab=let-go");
     expect(response.headers.get("location")).not.toContain("recommendations");
 
     const updated = await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } });

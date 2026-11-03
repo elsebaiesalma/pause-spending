@@ -9,23 +9,39 @@ function isPublicPath(pathname: string): boolean {
   return pathname === "/" || pathname === "/login";
 }
 
+// Three destinations plus the Pause action (Polaris: few, task-shaped
+// top-level items). Lookbook lives inside Closet; each item page lives
+// inside Decisions.
 const LINKS = [
-  { href: "/dashboard", label: "Home" },
-  { href: "/wardrobe", label: "Wardrobe" },
-  { href: "/considering", label: "Considering" },
-  { href: "/lookbook", label: "Lookbook" },
+  { href: "/dashboard", label: "Home", match: ["/dashboard"] },
+  { href: "/wardrobe", label: "Closet", match: ["/wardrobe", "/lookbook"] },
+  { href: "/considering", label: "Decisions", match: ["/considering", "/desired-items"] },
 ] as const;
 
 const PAUSE_HREF = "/desired-items/new";
 
-function isActive(pathname: string, href: string): boolean {
+function isUnder(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ initials }: { initials: string | null }) {
+function isActive(pathname: string, link: (typeof LINKS)[number]): boolean {
+  if (pathname === PAUSE_HREF) return false;
+  return link.match.some((href) => isUnder(pathname, href));
+}
+
+type HeaderProps = {
+  initials: string | null;
+  isDemo: boolean;
+  gmailEnabled: boolean;
+  signOutAction: () => Promise<void>;
+};
+
+export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: HeaderProps) {
   const pathname = usePathname();
   const isLanding = pathname === "/";
   const showNav = initials !== null && !isPublicPath(pathname);
+  // Home has its own add box, so the header doesn't repeat the action there.
+  const showCta = showNav && pathname !== "/dashboard" && pathname !== PAUSE_HREF;
 
   return (
     <header className={`site-header${isLanding ? " site-header--overlay" : ""}`}>
@@ -43,7 +59,7 @@ export function SiteHeader({ initials }: { initials: string | null }) {
                 key={link.href}
                 href={link.href}
                 className="site-nav__link"
-                aria-current={isActive(pathname, link.href) ? "page" : undefined}
+                aria-current={isActive(pathname, link) ? "page" : undefined}
               >
                 {link.label}
               </Link>
@@ -52,8 +68,8 @@ export function SiteHeader({ initials }: { initials: string | null }) {
         )}
 
         <div className="site-header__account">
-          {showNav && (
-            <Link href={PAUSE_HREF} className="btn btn-primary site-header__cta">
+          {showCta && (
+            <Link href={PAUSE_HREF} className="btn site-header__cta">
               Pause a purchase
             </Link>
           )}
@@ -64,19 +80,12 @@ export function SiteHeader({ initials }: { initials: string | null }) {
                   Open app
                 </Link>
               )}
-              <Link
-                href="/account"
-                className="avatar"
-                aria-label="Account"
-                aria-current={isActive(pathname, "/account") ? "page" : undefined}
-              >
-                {initials}
-              </Link>
+              <AccountMenu initials={initials} isDemo={isDemo} signOutAction={signOutAction} current={isUnder(pathname, "/account") || isUnder(pathname, "/budget")} />
             </>
           ) : (
             pathname !== "/login" && (
               <Link href="/login" className="site-header__link">
-                Sign in
+                {gmailEnabled ? "Sign in" : "Try the demo"}
               </Link>
             )
           )}
@@ -86,34 +95,80 @@ export function SiteHeader({ initials }: { initials: string | null }) {
   );
 }
 
-// Home · Wardrobe · (+) Pause · Considering · Lookbook
+// The initials circle opens a small menu (Polaris user menu). A native
+// <details>, so it works with a keyboard and without JavaScript; it closes
+// when a link is followed because the page changes.
+function AccountMenu({
+  initials,
+  isDemo,
+  signOutAction,
+  current,
+}: {
+  initials: string;
+  isDemo: boolean;
+  signOutAction: () => Promise<void>;
+  current: boolean;
+}) {
+  const pathname = usePathname();
+  return (
+    <details className="account-menu" key={pathname}>
+      <summary className="avatar" aria-label="Account menu" data-current={current || undefined}>
+        {initials}
+      </summary>
+      <div className="account-menu__panel" role="menu">
+        <Link href="/account" className="account-menu__item" role="menuitem">
+          Settings
+        </Link>
+        <Link href="/budget" className="account-menu__item" role="menuitem">
+          Monthly plan
+        </Link>
+        {isDemo && (
+          <form action="/api/demo" method="POST">
+            <button type="submit" className="account-menu__item" role="menuitem">
+              Start over with a fresh closet
+            </button>
+          </form>
+        )}
+        <form action={signOutAction}>
+          <button type="submit" className="account-menu__item" role="menuitem">
+            Sign out
+          </button>
+        </form>
+      </div>
+    </details>
+  );
+}
+
+// Home · Closet · (+) Pause · Decisions
 export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   if (!signedIn || isPublicPath(pathname)) return null;
+  const [home, closet, decisions] = LINKS;
 
   return (
     <nav className="tab-bar" aria-label="Primary">
-      <Link href="/dashboard" className="tab-bar__item" aria-current={isActive(pathname, "/dashboard") ? "page" : undefined}>
-        Home
+      <Link href={home.href} className="tab-bar__item" aria-current={isActive(pathname, home) ? "page" : undefined}>
+        {home.label}
       </Link>
-      <Link href="/wardrobe" className="tab-bar__item" aria-current={isActive(pathname, "/wardrobe") ? "page" : undefined}>
-        Wardrobe
+      <Link href={closet.href} className="tab-bar__item" aria-current={isActive(pathname, closet) ? "page" : undefined}>
+        {closet.label}
       </Link>
-      <Link href={PAUSE_HREF} className="tab-bar__item tab-bar__item--pause">
+      <Link
+        href={PAUSE_HREF}
+        className="tab-bar__item tab-bar__item--pause"
+        aria-current={pathname === PAUSE_HREF ? "page" : undefined}
+      >
         <span className="tab-bar__plus" aria-hidden="true">
           +
         </span>
         Pause
       </Link>
       <Link
-        href="/considering"
+        href={decisions.href}
         className="tab-bar__item"
-        aria-current={isActive(pathname, "/considering") ? "page" : undefined}
+        aria-current={isActive(pathname, decisions) ? "page" : undefined}
       >
-        Considering
-      </Link>
-      <Link href="/lookbook" className="tab-bar__item" aria-current={isActive(pathname, "/lookbook") ? "page" : undefined}>
-        Lookbook
+        {decisions.label}
       </Link>
     </nav>
   );

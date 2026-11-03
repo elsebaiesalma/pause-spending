@@ -64,9 +64,20 @@
   color: var(--color-ink-faint);
 }
 
+.list {
+  display: grid;
+}
+
 .rowName {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.rowName:hover {
+  text-decoration-color: var(--color-ink);
 }
 
 /* Deliberately plain - same size/weight as the surrounding text, never the
@@ -114,6 +125,7 @@
 /* ---------- Let go totals (main Considering page) ---------- */
 
 .totals {
+  margin-bottom: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-card);
   background: var(--color-espresso);

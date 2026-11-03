@@ -13,7 +13,7 @@ type SyncState = { status: "syncing" } | { status: "error"; message: string };
 const PHASES = [
   "Reading recent order confirmations…",
   "Matching items to clothing, shoes, and accessories…",
-  "Building your wardrobe…",
+  "Building your closet…",
 ];
 
 export function SyncProgress() {

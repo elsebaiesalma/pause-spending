@@ -115,7 +115,7 @@ describe("WardrobePage", () => {
       expect(html).toContain("example.com/tee.jpg");
     });
 
-    it("puts Add to wardrobe in the page header, with a 15-color dropdown and an optional color name", async () => {
+    it("puts Add a piece in the page header, with a 15-color dropdown and an optional color name", async () => {
       const html = await renderFor((await prisma.user.findFirstOrThrow()).id);
       expect(html).toContain('href="#add-to-wardrobe"');
       const options = html.match(/<select id="colorFamily"[\s\S]*?<\/select>/)?.[0] ?? "";

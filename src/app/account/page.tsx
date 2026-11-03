@@ -5,6 +5,7 @@ import { csrfTokenForUser } from "@/lib/csrf";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { signOut } from "@/lib/auth";
 import { isDemoEmail, isGmailEnabled } from "@/lib/demo";
+import { PageHeader } from "@/components/PageHeader";
 import styles from "./page.module.css";
 
 export default async function AccountPage() {
@@ -20,15 +21,16 @@ export default async function AccountPage() {
 
   return (
     <div className="page">
-      <span className="page__eyebrow">Account</span>
-      <h1>{user.name ?? user.email}</h1>
-      {demo ? (
-        <p className="page__lede">
-          This is a demo account with a sample closet. Signing out ends it, and its items aren&apos;t kept.
-        </p>
-      ) : (
-        user.name && <p className="page__lede">{user.email}</p>
-      )}
+      <PageHeader
+        title="Settings"
+        subtitle={
+          demo
+            ? "This is a demo account with a sample closet. Signing out ends it, and its items aren't kept."
+            : user.name
+              ? `${user.name} · ${user.email}`
+              : user.email
+        }
+      />
 
       {/* Parked with Google sign-in until GMAIL_ENABLED=true (src/lib/demo.ts). */}
       {isGmailEnabled() && (
@@ -102,7 +104,7 @@ export default async function AccountPage() {
         )}
         <div className="row">
           <a href="/budget" className="btn">
-            {budget ? "Edit plan" : "Set plan"}
+            {budget ? "Change plan" : "Set a plan"}
           </a>
         </div>
       </section>

@@ -37,5 +37,19 @@ describe("ConsideringPage", () => {
       expect(html).toContain(fixture.userA.desiredItem.itemName);
       expect(html).not.toContain(fixture.userB.desiredItem.itemName);
     });
+
+    it("never lists another user's let-go items on the Let go tab", async () => {
+      fixture = await createTwoTenantFixture();
+      const letGo = { pauseStatus: "proceeded", decisionOutcome: "dropped", userConfirmed: true, price: "80" };
+      await prisma.desiredItem.update({ where: { id: fixture.userA.desiredItem.id }, data: letGo });
+      await prisma.desiredItem.update({ where: { id: fixture.userB.desiredItem.id }, data: letGo });
+      vi.mocked(auth).mockResolvedValueOnce({ user: { id: fixture.userA.user.id } } as never);
+
+      const html = renderToStaticMarkup(await ConsideringPage({ searchParams: Promise.resolve({ tab: "let-go" }) }));
+
+      expect(html).toContain(fixture.userA.desiredItem.itemName);
+      expect(html).not.toContain(fixture.userB.desiredItem.itemName);
+      expect(html).toContain(`href="/desired-items/${fixture.userA.desiredItem.id}"`);
+    });
   });
 });

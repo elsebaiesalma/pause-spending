@@ -12,7 +12,8 @@ import styles from "./page.module.css";
 //
 // Laid out like the Add item page: one 24rem column, a 3rem input and the
 // shared action buttons, with the two buttons side by side under the box.
-export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
+// `primary` is false while Home's setup guide holds the one primary action.
+export function SmartAdd({ searchAvailable, primary = true }: { searchAvailable: boolean; primary?: boolean }) {
   const [value, setValue] = useState("");
   const screenshotForm = useRef<HTMLFormElement>(null);
   const input = classifySmartAddInput(value);
@@ -46,7 +47,7 @@ export function SmartAdd({ searchAvailable }: { searchAvailable: boolean }) {
           autoComplete="off"
           className={styles.smartAddInput}
         />
-        <button type="submit" className="btn-primary action" disabled={input.kind === "empty"}>
+        <button type="submit" className={primary ? "btn-primary action" : "action"} disabled={input.kind === "empty"}>
           {input.kind === "url" ? "Look it up" : "Continue"}
         </button>
       </form>

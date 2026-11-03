@@ -30,5 +30,5 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
 
   await markSaved(id, userId, new Date());
 
-  return NextResponse.redirect(new URL("/considering/let-go", request.url));
+  return NextResponse.redirect(new URL("/considering?tab=let-go", request.url));
 }

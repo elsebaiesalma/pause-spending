@@ -72,7 +72,7 @@ export default async function DashboardPage() {
 
       {showGuide && <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />}
 
-      <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} />
+      <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
 
       {needsReviewCount > 0 && (
         <div className={styles.statusLines}>
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
           <span className={styles.metricNote}>{pausedCount === 1 ? "item" : "items"} waiting it out</span>
         </div>
         <a href="/wardrobe" className={`${styles.metric} ${styles.metricLink}`}>
-          <span className={styles.metricLabel}>Your wardrobe</span>
+          <span className={styles.metricLabel}>Your closet</span>
           <span className={styles.metricValue}>{pieceCount}</span>
           <span className={styles.metricNote}>{`${pieceCount === 1 ? "piece" : "pieces"} you already own`}</span>
         </a>
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
             </>
           )}
           {kept.itemsLetGo > 0 && (
-            <a href="/considering/let-go" className={styles.keptLine}>
+            <a href="/considering?tab=let-go" className={styles.keptLine}>
               {dollars(kept.totalKept)} saved by letting {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"}{" "}
               go &rarr;
             </a>

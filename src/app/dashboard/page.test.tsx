@@ -165,11 +165,11 @@ describe("DashboardPage (Home)", () => {
       const html = await render();
 
       expect(html).toContain("$120 saved by letting 2 things");
-      expect(html).toContain('href="/considering/let-go"');
+      expect(html).toContain('href="/considering?tab=let-go"');
     });
   });
 
-  describe("Your wardrobe", () => {
+  describe("Your closet", () => {
     it("shows the real piece count and links to the wardrobe", async () => {
       vi.mocked(prisma.wardrobeItem.findMany).mockResolvedValueOnce([
         wardrobeRow("a", "Tee", "tops", "2026-03-01"),

@@ -4,11 +4,11 @@ export default function ConnectGmailPage() {
   return (
     <div className="page">
       <WelcomeIntro />
-      <span className="page__eyebrow">Connect your wardrobe</span>
+      <span className="page__eyebrow">Connect your closet</span>
       <h1>Build it from what you&apos;ve already bought</h1>
       <p className="page__lede">
         Instead of logging every item by hand, PAUSE reads your Gmail order confirmations and turns
-        them into a wardrobe automatically. Here is exactly what that means:
+        them into a closet automatically. Here is exactly what that means:
       </p>
 
       <div className="section stack">
