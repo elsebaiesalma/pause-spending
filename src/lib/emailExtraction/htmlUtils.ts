@@ -111,7 +111,7 @@ function isTinyImage(tag: string): boolean {
   );
 }
 
-function isPlausibleProductImage(src: string, imgTag: string): boolean {
+export function isPlausibleProductImage(src: string, imgTag: string): boolean {
   if (!src.startsWith("http")) return false;
   if (NON_PRODUCT_IMAGE_PATTERNS.some((pattern) => pattern.test(src))) return false;
   if (isTinyImage(imgTag)) return false;

@@ -253,7 +253,7 @@ export async function searchForItem(query: string): Promise<SearchResult> {
   );
 
   const extracted = await mapWithConcurrency(rankedResults, EXTRACTION_CONCURRENCY, async (result) => {
-    const extraction = await extractFromUrl(result.url).catch(() => null);
+    const extraction = await extractFromUrl(result.url, { aiFallback: false }).catch(() => null);
     const extractionUsable = extraction !== null && !looksLikeWrongPage(extraction.itemName, result.title);
 
     // Direct fetch failed outright (bot-blocked retailer, common for

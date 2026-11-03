@@ -24,3 +24,7 @@ export const SCREENSHOT_MODEL = modelFromEnv("ANTHROPIC_MODEL_SCREENSHOT", "clau
 
 // Pause-screen explanation of why an item overlaps with what you own.
 export const REDUNDANCY_MODEL = modelFromEnv("ANTHROPIC_MODEL_REDUNDANCY", "claude-opus-5");
+
+// Reading a pasted product link when the page has no usable structured
+// product data (name, price and main photo picked from the page's text).
+export const URL_EXTRACTION_MODEL = modelFromEnv("ANTHROPIC_MODEL_URL_EXTRACTION", "claude-sonnet-5-5");
