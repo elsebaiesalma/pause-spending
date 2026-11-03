@@ -1,4 +1,6 @@
 import { signIn } from "@/lib/auth";
+import { isGmailEnabled } from "@/lib/demo";
+import { DemoButton } from "@/components/DemoButton";
 
 // Google's own "neutral" identity-branding button: white surface, #747775
 // hairline border, the four-color "G" mark, #1f1f1f label in a
@@ -29,15 +31,26 @@ export default function LoginPage() {
         considering is really something new.
       </p>
 
-      <form
-        action={async () => {
-          "use server";
-          await signIn("google", { redirectTo: "/dashboard" });
-        }}
-        className="section"
-      >
-        <GoogleSignInButton />
-      </form>
+      <div className="section">
+        <DemoButton label="Try PAUSE with a sample closet" />
+        <p className="page__note">
+          No account needed. You get a ready-made wardrobe of 30 pieces to try it with.
+        </p>
+      </div>
+
+      {/* Google sign-in (and the Gmail sync behind it) is parked until
+          GMAIL_ENABLED=true; see src/lib/demo.ts. */}
+      {isGmailEnabled() && (
+        <form
+          action={async () => {
+            "use server";
+            await signIn("google", { redirectTo: "/dashboard" });
+          }}
+          className="section"
+        >
+          <GoogleSignInButton />
+        </form>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
 vi.mock("./fonts", () => ({
@@ -44,10 +44,23 @@ describe("Home (landing page)", () => {
     expect(html).toContain("/images/sample-2.jpg");
   });
 
-  it("points every real CTA at the actual Gmail connect flow, not a fake signup", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("points every real CTA at the actual Gmail connect flow when Gmail is enabled, not a fake signup", () => {
+    vi.stubEnv("GMAIL_ENABLED", "true");
     const html = renderToStaticMarkup(Home());
 
     expect(html).toContain('href="/connect/gmail"');
+    expect(html).not.toContain("mailto:");
+  });
+
+  it("points the CTAs at the demo while Gmail is parked, with no dead Gmail links", () => {
+    const html = renderToStaticMarkup(Home());
+
+    expect(html).toContain('action="/api/demo"');
+    expect(html).not.toContain('href="/connect/gmail"');
     expect(html).not.toContain("mailto:");
   });
 

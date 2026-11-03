@@ -1,9 +1,13 @@
 import { clashDisplay } from "./fonts";
 import { ScrollReveal } from "./ScrollReveal";
 import { ImageSlot } from "@/components/ImageSlot";
+import { DemoButton } from "@/components/DemoButton";
+import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
 
 export default function Home() {
+  // While Gmail is parked, every "get started" CTA opens the demo instead.
+  const gmail = isGmailEnabled();
   return (
     <div className={`${styles.root} theme-dark ${clashDisplay.variable}`}>
       <ScrollReveal />
@@ -45,6 +49,7 @@ export default function Home() {
               <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Avg. reflection window</span>
               <span style={{ fontFamily: "var(--font-display)", fontSize: "0.8rem", color: "var(--color-accent-dim)", fontWeight: 700 }}>24H - 7 DAYS</span>
             </div>
+            <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
             <a href="#philosophy" className={styles.inlineLink} style={{ marginTop: 0 }}>
               Discover the protocol &rarr;
             </a>
@@ -285,9 +290,13 @@ export default function Home() {
                 <p>Set your own monthly number. We show spend and remaining - never adjust it for you.</p>
               </div>
             </div>
-            <a href="/connect/gmail" className={styles.inlineLink}>
-              Connect Gmail to get started &rarr;
-            </a>
+            {gmail ? (
+              <a href="/connect/gmail" className={styles.inlineLink}>
+                Connect Gmail to get started &rarr;
+              </a>
+            ) : (
+              <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
+            )}
           </div>
         </div>
       </section>
@@ -300,13 +309,18 @@ export default function Home() {
             Begin your first <em>pause</em>
           </h2>
           <p className={styles.footerSub}>
-            No waitlist, no account to create - connect Gmail and PAUSE starts building your wardrobe
-            from your real order history.
+            {gmail
+              ? "No waitlist, no account to create - connect Gmail and PAUSE starts building your wardrobe from your real order history."
+              : "No waitlist, no account to create. Try it now with a sample closet of 30 pieces."}
           </p>
           <div style={{ paddingBottom: "1rem" }}>
-            <a href="/connect/gmail" className={styles.footerCta}>
-              Connect Gmail &rarr;
-            </a>
+            {gmail ? (
+              <a href="/connect/gmail" className={styles.footerCta}>
+                Connect Gmail &rarr;
+              </a>
+            ) : (
+              <DemoButton label="Try the demo →" className={`${styles.buttonReset} ${styles.footerCta}`} />
+            )}
           </div>
           <div className={styles.footerLinks}>
             <a href="#philosophy">Philosophy</a>

@@ -87,6 +87,57 @@ describe("assemblePauseScreen", () => {
     });
   });
 
+  it("still assembles the screen when both model calls fail (no key, outage, rate limit)", async () => {
+    const userId = (await prisma.user.findFirstOrThrow()).id;
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const owned = await prisma.wardrobeItem.create({
+      data: {
+        userId,
+        itemName: "Navy Blazer",
+        category: "outerwear",
+        colorFamily: "navy",
+        styleTags: ["business-casual"],
+        tagsExtractedAt: new Date(),
+      },
+    });
+    wardrobeItemIds.push(owned.id);
+
+    // Already categorised by the user, so tagging is skipped; the explanation
+    // call is the one that fails here...
+    const confirmed = await prisma.desiredItem.create({
+      data: {
+        userId,
+        sourceType: "typed",
+        itemName: "Navy Wool Coat",
+        category: "outerwear",
+        colorFamily: "navy",
+        price: "80.00",
+        userConfirmed: true,
+      },
+    });
+    desiredItemIds.push(confirmed.id);
+    parseMock.mockRejectedValueOnce(new Error("Could not resolve authentication method"));
+
+    const payload = await assemblePauseScreen(userId, confirmed.id);
+    expect(payload.similarItems.map((i) => i.id)).toEqual([owned.id]);
+    expect(payload.similarItemReasons[owned.id]).toContain("same color");
+    expect(payload.redundancyExplanation).toBeNull();
+
+    // ...and here tagging itself fails on an uncategorised item.
+    const untagged = await prisma.desiredItem.create({
+      data: { userId, sourceType: "typed", itemName: "Something", price: "20.00", userConfirmed: true },
+    });
+    desiredItemIds.push(untagged.id);
+    vi.mocked(extractWardrobeItemTags).mockRejectedValueOnce(new Error("overloaded"));
+
+    const fallback = await assemblePauseScreen(userId, untagged.id);
+    expect(fallback.desiredItem.id).toBe(untagged.id);
+    expect(fallback.budget).toBeDefined();
+
+    errorSpy.mockRestore();
+  });
+
   it("renders gracefully with an empty shortlist and no explanation call", async () => {
     const userId = (await prisma.user.findFirstOrThrow()).id;
 
