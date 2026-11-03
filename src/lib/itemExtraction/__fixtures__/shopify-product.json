@@ -1,0 +1,47 @@
+{
+  "id": 7421983375411,
+  "title": "The Cloud Hoodie &amp; Jogger Set",
+  "handle": "the-cloud-hoodie-set",
+  "vendor": "Nuuvo Studio",
+  "price": 8900,
+  "price_min": 8900,
+  "price_max": 12900,
+  "available": true,
+  "featured_image": "//cdn.shopify.com/s/files/1/0042/1234/products/cloud-hoodie-oat.jpg?v=1698765432",
+  "images": [
+    "//cdn.shopify.com/s/files/1/0042/1234/products/cloud-hoodie-oat.jpg?v=1698765432",
+    "//cdn.shopify.com/s/files/1/0042/1234/products/cloud-hoodie-black.jpg?v=1698765432"
+  ],
+  "variants": [
+    {
+      "id": 41230000000001,
+      "title": "Oat / S",
+      "option1": "Oat",
+      "option2": "S",
+      "price": 8900,
+      "available": true,
+      "featured_image": null
+    },
+    {
+      "id": 41230000000002,
+      "title": "Black / S",
+      "option1": "Black",
+      "option2": "S",
+      "price": 12900,
+      "available": true,
+      "featured_image": {
+        "id": 99100000001,
+        "src": "https://cdn.shopify.com/s/files/1/0042/1234/products/cloud-hoodie-black.jpg?v=1698765432"
+      }
+    },
+    {
+      "id": 41230000000003,
+      "title": "Sage / M",
+      "option1": "Sage",
+      "option2": "M",
+      "price": 7500,
+      "available": false,
+      "featured_image": null
+    }
+  ]
+}
