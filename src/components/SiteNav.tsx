@@ -33,7 +33,7 @@ export function SiteHeader({ initials }: { initials: string | null }) {
         {/* Signed-in pages keep the logo inside the app; only the landing page and
             signed-out visitors go to "/". */}
         <Link href={initials !== null && !isLanding ? "/dashboard" : "/"} className="site-header__brand">
-          PAUSE.
+          PAUSE<span className="site-header__dot">.</span>
         </Link>
 
         {showNav && (
@@ -86,7 +86,7 @@ export function SiteHeader({ initials }: { initials: string | null }) {
   );
 }
 
-// Home · Wardrobe · (+) Pause a purchase · Considering · Lookbook
+// Home · Wardrobe · (+) Pause · Considering · Lookbook
 export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   if (!signedIn || isPublicPath(pathname)) return null;
@@ -103,7 +103,7 @@ export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
         <span className="tab-bar__plus" aria-hidden="true">
           +
         </span>
-        Pause a purchase
+        Pause
       </Link>
       <Link
         href="/considering"

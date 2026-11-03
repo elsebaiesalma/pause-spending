@@ -1,0 +1,34 @@
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1.25rem;
+  border: 1.5px dashed var(--color-line-strong);
+  border-radius: var(--radius-card);
+  text-align: center;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-blush);
+  color: var(--color-rose-deep);
+}
+
+.title {
+  margin: 0.25rem 0 0;
+  font-size: 1.125rem;
+  line-height: 1.2;
+}
+
+.text {
+  max-width: 28rem;
+  color: var(--color-ink-soft);
+}
+
+.action {
+  margin-top: 0.5rem;
+}

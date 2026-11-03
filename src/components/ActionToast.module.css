@@ -1,0 +1,56 @@
+/* Bottom-centred, above the phone tab bar. Espresso with white text. */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  z-index: 60;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: calc(100vw - 2rem);
+  padding: 0.75rem 0.75rem 0.75rem 1.125rem;
+  border-radius: 12px;
+  background: var(--color-espresso);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  font-size: 0.9375rem;
+  box-shadow: 0 12px 32px rgba(42, 18, 8, 0.25);
+  animation: toast-in 0.25s ease-out;
+}
+
+@media (min-width: 900px) {
+  .toast {
+    bottom: 2rem;
+  }
+}
+
+.close {
+  min-height: 2rem;
+  width: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.close:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border: none;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

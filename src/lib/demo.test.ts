@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { currentMonthKey } from "@/lib/budget";
 import { parseMockWardrobe } from "@/lib/mockWardrobe";
 import mockWardrobeJson from "../../data/mock-wardrobe.json";
-import { createDemoSession, DEMO_EMAIL_DOMAIN, isDemoEmail, shiftToCurrentMonth } from "./demo";
+import { cleanForDemo, createDemoSession, DEMO_EMAIL_DOMAIN, isDemoEmail, shiftToCurrentMonth } from "./demo";
 
 const items = parseMockWardrobe(mockWardrobeJson);
 
@@ -32,6 +32,23 @@ describe("shiftToCurrentMonth", () => {
   it("leaves dates alone when they're already current", () => {
     const now = new Date("2026-09-30T12:00:00Z");
     expect(shiftToCurrentMonth(items, now).map((i) => i.purchasedAt)).toEqual(items.map((i) => i.purchasedAt));
+  });
+});
+
+describe("cleanForDemo", () => {
+  it("leaves no unknown prices and nothing flagged for review, so the demo shows no Gmail leftovers", () => {
+    expect(items.some((i) => i.price === null || i.needsReview)).toBe(true);
+    const cleaned = cleanForDemo(items);
+    expect(cleaned).toHaveLength(items.length);
+    expect(cleaned.every((i) => typeof i.price === "number" && i.price > 0)).toBe(true);
+    expect(cleaned.every((i) => !i.needsReview)).toBe(true);
+  });
+
+  it("keeps known prices as they were", () => {
+    const cleaned = cleanForDemo(items);
+    items.forEach((item, idx) => {
+      if (item.price !== null) expect(cleaned[idx].price).toBe(item.price);
+    });
   });
 });
 

@@ -1,32 +1,49 @@
 /*
-  Design system: "Midnight Editorial" - grayscale, high-contrast, editorial-
-  brutalist bones (hairline borders, sticky module headers, small mono
-  tags) with a single rose accent. Two themes share one token set:
+  Design system: "Espresso and Rose" - white pages, espresso for text,
+  buttons and dark bands, one soft rose accent, warm blush tints.
 
-  - .theme-dark (the landing page): near-black bg, white text, white-
-    opacity borders, pale rose for text/numbers.
-  - :root (everywhere else - auth, onboarding, dashboard, wardrobe,
-    budget, wishlist): white bg, near-black text, ink-opacity borders.
-    Pale rose is reserved for FILLS (tags, highlights, selected states)
-    only here - pale-on-white text fails contrast, so text accents and
-    links use a deep rose instead.
+    White     #FFFFFF  page background      Espresso  #2A1208  text, buttons, dark bands
+    Taupe     #6B5A52  secondary text       Blush     #F6EAE3  image tiles, tags, tints
+    Soft rose #C98A92  accent FILLS only    Deep rose #8E4752  accent TEXT (labels, links)
+    Warn      #A12B2B  warnings, always with an icon so colour is never the only cue
 
-  Every component below reads color through these variables so nothing
-  breaks when a subtree switches theme.
+  Soft rose is 2.8:1 on white, so it is never text on a light surface; it is
+  text only on espresso (6.3:1). Deep rose (6.6:1), taupe (6.5:1) and warn
+  (7.3:1) pass WCAG AA on white. Check any new pair before using it. Every
+  component reads colour through these variables, so a palette change is a
+  token change.
 */
 
 :root {
   --color-bg: #ffffff;
-  --color-bg-alt: #f7f5f5;
-  --color-ink: #1f1a1a;
-  --color-ink-soft: #524344;
-  --color-ink-faint: rgba(31, 26, 26, 0.45);
-  --color-line: rgba(31, 26, 26, 0.08);
-  --color-line-strong: rgba(31, 26, 26, 0.15);
-  --color-fill: #fecdd3;
-  --color-fill-ink: #1f1a1a;
-  --color-accent: #874e54;
-  --color-accent-dim: #874e54;
+  --color-bg-alt: #faf6f3;
+  --color-surface: #ffffff;
+  --color-ink: #2a1208;
+  --color-ink-soft: #6b5a52;
+  --color-ink-faint: #6b5a52;
+  --color-line: rgba(42, 18, 8, 0.1);
+  --color-line-strong: rgba(42, 18, 8, 0.2);
+  --color-fill: #f6eae3;
+  --color-fill-ink: #2a1208;
+  --color-accent: #8e4752;
+  --color-accent-dim: #8e4752;
+  --color-primary: #2a1208;
+  --color-primary-hover: #44241a;
+  --color-espresso: #2a1208;
+  --color-on-espresso-soft: #e3cfd2;
+  --color-rose: #c98a92;
+  --color-rose-deep: #8e4752;
+  --color-blush: #f6eae3;
+  --color-sage: #c98a92;
+  --color-clay: #c98a92;
+  --color-warn: #a12b2b;
+  --color-warn-fill: #fbe3e1;
+  --color-success: #3f6b45;
+  --color-success-fill: #e6f0e7;
+
+  --radius-control: 999px;
+  --radius-card: 16px;
+  --radius-tile: 12px;
 
   --font-display: var(--font-clash), "Clash Display", sans-serif;
   --font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
@@ -49,22 +66,6 @@
   :root {
     --gutter: 1rem;
   }
-}
-
-.theme-dark {
-  --color-bg: #050505;
-  --color-bg-alt: #0a0a0a;
-  --color-ink: #ffffff;
-  --color-ink-soft: rgba(255, 255, 255, 0.6);
-  --color-ink-faint: rgba(255, 255, 255, 0.35);
-  --color-line: rgba(255, 255, 255, 0.05);
-  --color-line-strong: rgba(255, 255, 255, 0.15);
-  --color-fill: #fecdd3;
-  --color-fill-ink: #050505;
-  --color-accent: #fecdd3;
-  --color-accent-dim: #fdb3b9;
-
-  color-scheme: dark;
 }
 
 * {
@@ -158,10 +159,8 @@ p {
 }
 
 .site-nav__link {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-size: 0.9375rem;
+  font-weight: 500;
   color: var(--color-ink-soft);
 }
 
@@ -170,7 +169,11 @@ p {
 }
 
 .site-nav__link[aria-current="page"] {
-  color: var(--color-accent);
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-rose);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
 }
 
 .site-header__account {
@@ -180,15 +183,19 @@ p {
   gap: var(--space-3);
 }
 
-.site-header__cta {
+/* Specific enough to beat .btn's display, which is declared later. Phones
+   use the tab bar's + button instead. */
+.site-header .site-header__cta {
   display: none;
 }
 
+.site-header__dot {
+  color: var(--color-rose);
+}
+
 .site-header__link {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  font-size: 0.9375rem;
+  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -203,48 +210,32 @@ p {
   border-radius: 50%;
   background: var(--color-fill);
   color: var(--color-fill-ink);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-size: 0.8125rem;
+  font-weight: 600;
   border: 1px solid transparent;
 }
 
 .avatar:hover,
 .avatar[aria-current="page"] {
-  border-color: var(--color-accent);
+  border-color: var(--color-rose-deep);
 }
 
 @media (min-width: 900px) {
   .site-nav,
-  .site-header__cta {
+  .site-header .site-header__cta {
     display: flex;
   }
 }
 
-/* The landing page keeps its transparent, fixed header: white text
-   difference-blended against whatever sits beneath it, so it reads on the
-   near-black page. Its contents still sit in the shared container. */
+/* The landing page's header stays fixed over the full-bleed page, on a
+   white bar so the logo, links and the rose dot keep their real colours. */
 .site-header--overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: transparent;
-  border-bottom: none;
-  mix-blend-mode: difference;
-  color: #fff;
-}
-
-.site-header--overlay .site-header__brand,
-.site-header--overlay .site-header__link {
-  color: #fff;
-}
-
-.site-header--overlay .avatar {
-  background: transparent;
-  color: #fff;
-  border-color: #fff;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: saturate(1.2) blur(8px);
 }
 
 .site-main {
@@ -299,17 +290,16 @@ p {
   justify-content: center;
   gap: 0.2rem;
   min-height: 3rem;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   line-height: 1.15;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--color-ink-soft);
   text-align: center;
 }
 
 .tab-bar__item[aria-current="page"] {
-  color: var(--color-accent);
+  color: var(--color-ink);
+  font-weight: 600;
 }
 
 .tab-bar__plus {
@@ -319,8 +309,8 @@ p {
   width: 2.1rem;
   height: 2.1rem;
   border-radius: 50%;
-  background: var(--color-ink);
-  color: var(--color-bg);
+  background: var(--color-espresso);
+  color: #fff;
   font-size: 1.4rem;
   line-height: 1;
   letter-spacing: 0;
@@ -374,12 +364,13 @@ p {
   .item-entry-flow__url { order: 3; }
 }
 
+/* The one place small caps are used: a short label above a page title. */
 .page__eyebrow {
   display: block;
-  font-family: var(--font-mono);
   font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
   color: var(--color-accent);
   margin-bottom: calc(var(--space-1) * 0.72);
 }
@@ -437,11 +428,9 @@ form.row {
 }
 
 label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-ink-soft);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
 }
 
 input,
@@ -451,9 +440,9 @@ select {
   font-size: 1rem;
   padding: 0.7rem 0.85rem;
   border: 1px solid var(--color-line-strong);
-  background: var(--color-bg-alt);
+  background: var(--color-surface);
   color: var(--color-ink);
-  border-radius: 1px;
+  border-radius: 10px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -467,8 +456,8 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
+  border-color: var(--color-ink);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-rose) 35%, transparent);
 }
 
 input[type="file"] {
@@ -519,14 +508,53 @@ input[type="file"] {
   padding: 0.35rem var(--gutter);
   background: var(--color-fill);
   color: var(--color-fill-ink);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- Demo banner (demo accounts only) ---------- */
+
+.demo-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem var(--gutter);
+  background: var(--color-blush);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.demo-banner p {
+  max-width: none;
+}
+
+.demo-banner form {
+  max-width: none;
+}
+
+.demo-banner__action {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.demo-banner__action:hover {
+  background: transparent;
+  border: none;
+}
+
+/* ---------- Buttons ----------
+   One button, three weights (Polaris): primary (espresso fill, one per
+   screen section), secondary (outlined, the default) and quiet (a text link).
+   Sentence case, rounded, at least 44px tall so they are easy to tap. */
 
 button,
 .btn,
@@ -535,14 +563,16 @@ button,
   align-items: center;
   justify-content: center;
   justify-self: start;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.75rem 1.5rem;
-  border: 1px solid var(--color-ink);
-  border-radius: 1px;
-  background: transparent;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
   color: var(--color-ink);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
@@ -550,8 +580,8 @@ button,
 
 button:hover,
 .btn:hover {
-  background: var(--color-ink);
-  color: var(--color-bg);
+  background: var(--color-bg-alt);
+  border-color: var(--color-ink);
 }
 
 button:active,
@@ -559,27 +589,33 @@ button:active,
   transform: translateY(1px);
 }
 
+button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
 button:focus-visible,
 .btn:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-rose-deep);
   outline-offset: 2px;
 }
 
 .btn-primary {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
-  color: var(--color-bg);
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
 }
-
 .btn-primary:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
   color: #fff;
 }
 
 .btn-quiet {
+  min-height: auto;
   border-color: transparent;
+  background: transparent;
   padding-left: 0;
   padding-right: 0;
   text-decoration: underline;
@@ -589,17 +625,15 @@ a:focus-visible {
 
 .btn-quiet:hover {
   background: transparent;
-  color: var(--color-accent);
-  text-decoration-color: var(--color-accent);
+  border-color: transparent;
+  color: var(--color-ink);
+  text-decoration-color: var(--color-ink);
 }
 
 /* ---------- Action groups ----------
    The pause / let go / save / buy actions, wherever they appear. One width,
-   one left edge, one gap, one typeface (the button base above: Space Mono
-   caps). Stacked full width of the content column on every screen size,
-   capped so a desktop button is not absurdly wide. Variants differ only in
-   fill, border and weight: primary (filled), secondary (outlined, the
-   default button look) and quiet (no border, softer colour, underlined). */
+   one left edge, one gap. Stacked full width of the content column, capped
+   so a desktop button is not absurdly wide. */
 
 .action-group {
   display: grid;
@@ -628,10 +662,11 @@ a:focus-visible {
 }
 
 .action--quiet {
+  min-height: 2.5rem;
   border-color: transparent;
   background: transparent;
   color: var(--color-ink-soft);
-  font-weight: 400;
+  font-weight: 500;
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: var(--color-line-strong);
@@ -639,19 +674,20 @@ a:focus-visible {
 
 .action--quiet:hover {
   background: transparent;
+  border-color: transparent;
   color: var(--color-ink);
   text-decoration-color: var(--color-ink);
 }
 
 .btn-danger {
   border-color: var(--color-line-strong);
-  color: var(--color-ink-soft);
+  color: var(--color-warn);
 }
 
 .btn-danger:hover {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
-  color: var(--color-bg);
+  background: var(--color-warn-fill);
+  border-color: var(--color-warn);
+  color: var(--color-warn);
 }
 
 /* ---------- Links (inline, in prose) ---------- */
@@ -660,7 +696,7 @@ a:focus-visible {
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: var(--color-fill);
+  text-decoration-color: var(--color-rose);
   transition: text-decoration-color 0.2s ease;
 }
 
@@ -689,9 +725,9 @@ a:focus-visible {
   width: 56px;
   height: 56px;
   object-fit: cover;
-  border-radius: 1px;
+  border-radius: 10px;
   flex-shrink: 0;
-  background: var(--color-bg-alt);
+  background: var(--color-blush);
 }
 
 .item-row__body {
@@ -728,34 +764,46 @@ a:focus-visible {
   50% { opacity: 1; }
 }
 
-/* ---------- Tags / badges ---------- */
-/* The one place pale rose is used as a fill rather than text, per the
-   design's "pink = fills only" rule - dark ink/near-black text keeps it
-   readable regardless of which theme's --color-fill-ink resolves. */
+/* ---------- Tags / badges ----------
+   Polaris-style badges: a pale tint with darker text from the same family.
+   Tones: default (blush), success (paused/kept), warning (needs attention),
+   info (neutral status). Sentence case. */
 
-.tag {
+.tag,
+.badge,
+.badge-review {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
+  gap: 0.25rem;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-fill-ink);
-  background: var(--color-fill);
-  padding: 0.2rem 0.55rem;
-  border-radius: 1px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-rose-deep);
+  background: var(--color-blush);
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
-.badge-review {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-fill-ink);
-  background: var(--color-fill);
-  padding: 0.2rem 0.55rem;
-  border-radius: 1px;
+.badge--success {
+  color: var(--color-success);
+  background: var(--color-success-fill);
+}
+
+.badge--warning {
+  color: var(--color-warn);
+  background: var(--color-warn-fill);
+}
+
+.badge--neutral {
+  color: var(--color-ink-soft);
+  background: var(--color-bg-alt);
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}
+
+.badge--dark {
+  color: #fff;
+  background: var(--color-espresso);
 }
 
 /* ---------- Sync progress ---------- */
@@ -791,7 +839,7 @@ a:focus-visible {
 /* ---------- Callout / note block ---------- */
 
 .note {
-  border-left: 2px solid var(--color-fill);
+  border-left: 2px solid var(--color-rose);
   padding: var(--space-2) var(--space-3);
   background: var(--color-bg-alt);
   color: var(--color-ink-soft);

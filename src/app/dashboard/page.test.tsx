@@ -19,6 +19,8 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {
     purchase: { count: vi.fn().mockResolvedValue(0) },
     wardrobeItem: { findMany: vi.fn().mockResolvedValue([]) },
+    desiredItem: { count: vi.fn().mockResolvedValue(0) },
+    look: { count: vi.fn().mockResolvedValue(0) },
   },
 }));
 
@@ -204,6 +206,36 @@ describe("DashboardPage (Home)", () => {
 
       expect(html).toContain("Add your first piece");
       expect(html).not.toContain("Recently added pieces");
+    });
+  });
+
+  describe("setup guide and at a glance", () => {
+    it("shows the setup guide with the first step open for a new account", async () => {
+      const html = await render();
+
+      expect(html).toContain("Get to know PAUSE");
+      expect(html).toContain("0 of 3 done");
+      expect(html).toContain('href="/desired-items/new"');
+    });
+
+    it("hides the setup guide once every step is done", async () => {
+      vi.mocked(prisma.desiredItem.count).mockResolvedValue(1);
+      vi.mocked(prisma.look.count).mockResolvedValueOnce(1);
+
+      const html = await render();
+
+      expect(html).not.toContain("Get to know PAUSE");
+      vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
+    });
+
+    it("counts paused items without naming any of them", async () => {
+      vi.mocked(prisma.desiredItem.count).mockResolvedValue(2);
+
+      const html = await render();
+
+      expect(html).toContain("Paused right now");
+      expect(html).toContain("items waiting it out");
+      vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
     });
   });
 

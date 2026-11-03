@@ -17,8 +17,8 @@
   background: var(--color-bg);
   border: 1px solid var(--color-line-strong);
   border-left: 3px solid var(--color-fill);
-  border-radius: 2px;
-  box-shadow: 0 4px 16px rgba(31, 26, 26, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(42, 18, 8, 0.12);
   animation: toast-in 0.25s ease-out;
 }
 

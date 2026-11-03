@@ -15,9 +15,9 @@
   gap: 0.35rem;
   background: color-mix(in srgb, var(--color-ink) 6%, transparent);
   color: var(--color-ink-faint);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-align: center;
   padding: 1rem;
 }
