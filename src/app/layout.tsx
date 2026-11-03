@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Space_Mono } from "next/font/google";
 import { clashDisplay } from "./fonts";
-import { auth } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth";
 import { initialsFor } from "@/lib/initials";
 import { DevViewBanner } from "@/components/DevViewBanner";
 import { DemoBanner } from "@/components/DemoBanner";
-import { isDemoEmail } from "@/lib/demo";
+import { isDemoEmail, isGmailEnabled } from "@/lib/demo";
 import { SiteHeader, SiteMain, SiteTabBar } from "@/components/SiteNav";
 import "./globals.css";
 
@@ -29,6 +29,12 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const session = await auth();
   const initials = session?.user ? initialsFor(session.user.name, session.user.email) : null;
+  const isDemo = isDemoEmail(session?.user?.email);
+
+  async function signOutAction() {
+    "use server";
+    await signOut({ redirectTo: "/" });
+  }
 
   return (
     <html lang="en" className={`${clashDisplay.variable} ${inter.variable} ${spaceMono.variable}`}>
@@ -38,9 +44,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           caused by anything in this app. Scoped to this one element only;
           it does not suppress mismatches in children. */}
       <body style={{ display: "flex", flexDirection: "column" }} suppressHydrationWarning>
-        <SiteHeader initials={initials} />
+        <SiteHeader initials={initials} isDemo={isDemo} gmailEnabled={isGmailEnabled()} signOutAction={signOutAction} />
         <DevViewBanner />
-        {isDemoEmail(session?.user?.email) && <DemoBanner />}
+        {isDemo && <DemoBanner />}
         <SiteMain signedIn={initials !== null}>{children}</SiteMain>
         <SiteTabBar signedIn={initials !== null} />
       </body>

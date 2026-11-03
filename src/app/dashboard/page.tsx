@@ -17,6 +17,12 @@ import { SmartAdd } from "./SmartAdd";
 import { isDemoEmail } from "@/lib/demo";
 import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGuide";
 import { SetupGuide } from "./SetupGuide";
+import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
+import { loadPausePattern } from "@/lib/dashboard/pausePattern";
+import { getSavingsGoal } from "@/lib/goals/savingsGoal";
+import { MonthlyRecap } from "./MonthlyRecap";
+import { GoalCard } from "./GoalCard";
+import { PatternCard } from "./PatternCard";
 import styles from "./page.module.css";
 
 const RACK_SLICE_ITEMS = 4;
@@ -39,7 +45,8 @@ export default async function DashboardPage() {
 
   const monthKey = currentMonthKey();
 
-  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress] = await Promise.all([
+  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, pattern] =
+    await Promise.all([
     getBudgetForMonth(userId, monthKey),
     getMonthSpend(userId, monthKey),
     prisma.purchase.count({ where: { userId, status: "needs_review" } }),
@@ -51,6 +58,9 @@ export default async function DashboardPage() {
     }),
     prisma.desiredItem.count({ where: { userId, pauseStatus: "waiting" } }),
     getSetupProgress(userId),
+    loadMonthlyRecap(userId),
+    getSavingsGoal(userId),
+    loadPausePattern(userId),
   ]);
 
   const planAmount = budget ? Number(budget.amount) : null;
@@ -63,6 +73,7 @@ export default async function DashboardPage() {
 
   const steps = setupSteps(setupProgress);
   const showGuide = nextStep(steps) !== null;
+  const showPattern = pattern !== null && pattern.decided > 0;
   const spentShare = planAmount ? Math.min(100, (spend / planAmount) * 100) : 0;
 
   return (
@@ -70,9 +81,11 @@ export default async function DashboardPage() {
       <LocalGreeting firstName={firstName} />
       <PauseConfirmation />
 
+      {recap && <MonthlyRecap recap={recap} />}
+
       {showGuide && <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />}
 
-      <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} />
+      <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
 
       {needsReviewCount > 0 && (
         <div className={styles.statusLines}>
@@ -105,11 +118,18 @@ export default async function DashboardPage() {
           <span className={styles.metricNote}>{pausedCount === 1 ? "item" : "items"} waiting it out</span>
         </div>
         <a href="/wardrobe" className={`${styles.metric} ${styles.metricLink}`}>
-          <span className={styles.metricLabel}>Your wardrobe</span>
+          <span className={styles.metricLabel}>Your closet</span>
           <span className={styles.metricValue}>{pieceCount}</span>
           <span className={styles.metricNote}>{`${pieceCount === 1 ? "piece" : "pieces"} you already own`}</span>
         </a>
       </section>
+
+      {/* Goal and pattern side by side; the goal takes the full width when
+          there is no pattern to show yet (no finished pauses, or it can't be read). */}
+      <div className={`${styles.insights} ${showPattern ? "" : styles.insightsSingle}`}>
+        <GoalCard goal={goal} />
+        {pattern && showPattern && <PatternCard pattern={pattern} />}
+      </div>
 
       <div className={styles.cards}>
         <section className={styles.card} aria-labelledby="month-heading">
@@ -144,7 +164,7 @@ export default async function DashboardPage() {
             </>
           )}
           {kept.itemsLetGo > 0 && (
-            <a href="/considering/let-go" className={styles.keptLine}>
+            <a href="/considering?tab=let-go" className={styles.keptLine}>
               {dollars(kept.totalKept)} saved by letting {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"}{" "}
               go &rarr;
             </a>

@@ -80,21 +80,18 @@ export function WardrobeBrowser({
       <div className={styles.toolbar}>
         <div className={styles.search}>
           <label htmlFor="wardrobe-search" className={styles.srOnly}>
-            Search your wardrobe
+            Search your closet
           </label>
           <input
             id="wardrobe-search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search your wardrobe"
+            placeholder="Search your closet"
             autoComplete="off"
           />
         </div>
         <div className={styles.toolbarActions}>
-          <a href="#add-to-wardrobe" className={`btn ${styles.addButton}`}>
-            Add to wardrobe
-          </a>
           <div className={styles.viewToggle} role="group" aria-label="View">
             <button type="button" aria-pressed={view === "grid"} onClick={() => setView("grid")}>
               Grid

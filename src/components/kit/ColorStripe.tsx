@@ -8,7 +8,7 @@ export function ColorStripe({ segments }: { segments: StripeSegment[] }) {
 
   const summary = drawable.map((segment) => `${segment.count} ${segment.colorFamily}`).join(", ");
   return (
-    <div className={styles.stripe} role="img" aria-label={`Wardrobe colours: ${summary}`}>
+    <div className={styles.stripe} role="img" aria-label={`Closet colours: ${summary}`}>
       {drawable.map((segment) => {
         const swatch = swatchFor(segment.colorFamily)!;
         const background =

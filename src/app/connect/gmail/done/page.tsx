@@ -10,12 +10,12 @@ export default async function GmailSyncDonePage() {
 
   return (
     <div className="page">
-      <span className="page__eyebrow">Wardrobe ready</span>
+      <span className="page__eyebrow">Closet ready</span>
       <h1>{items.length > 0 ? "Here's what we found" : "Nothing matched yet"}</h1>
       <p className="page__lede">
         {items.length > 0
-          ? `${items.length} item${items.length === 1 ? "" : "s"} in your wardrobe so far, built from your order confirmations.`
-          : "No order confirmations matched clothing, shoes, or accessories in the last six months. You can add items by hand any time from your wardrobe."}
+          ? `${items.length} item${items.length === 1 ? "" : "s"} in your closet so far, built from your order confirmations.`
+          : "No order confirmations matched clothing, shoes, or accessories in the last six months. You can add items by hand any time from your closet."}
       </p>
 
       {preview.length > 0 && (

@@ -216,8 +216,68 @@ p {
 }
 
 .avatar:hover,
-.avatar[aria-current="page"] {
+.avatar[aria-current="page"],
+.avatar[data-current] {
   border-color: var(--color-rose-deep);
+}
+
+/* ---------- Account menu (initials circle) ---------- */
+
+.account-menu {
+  position: relative;
+}
+
+.account-menu > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.account-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-menu[open] > summary {
+  border-color: var(--color-ink);
+}
+
+.account-menu__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  z-index: 60;
+  display: grid;
+  min-width: 15rem;
+  padding: 0.375rem;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgba(42, 18, 8, 0.14);
+}
+
+.account-menu__panel form {
+  display: block;
+  max-width: none;
+}
+
+.account-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  text-align: left;
+}
+
+.account-menu__item:hover {
+  background: var(--color-bg-alt);
+  border: none;
 }
 
 @media (min-width: 900px) {
@@ -262,7 +322,7 @@ p {
   }
 }
 
-/* Phone navigation: Home · Wardrobe · (+) Pause a purchase · Considering · Lookbook */
+/* Phone navigation: Home · Closet · (+) Pause · Decisions */
 .tab-bar {
   position: fixed;
   left: 0;
@@ -270,7 +330,7 @@ p {
   bottom: 0;
   z-index: 40;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   align-items: end;
   background: var(--color-bg);
   border-top: 1px solid var(--color-line-strong);

@@ -6,8 +6,8 @@ import { capitalizeFirst } from "@/lib/wardrobeDisplay";
 import { toWardrobeEntry } from "@/lib/wardrobeEntries";
 import { buildConcentration } from "@/lib/wardrobeClusters";
 import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
-import { BigNumeral } from "@/components/kit/BigNumeral";
-import { PageHero } from "@/components/kit/PageHero";
+import { PageHeader } from "@/components/PageHeader";
+import { ClosetTabs } from "@/components/ClosetTabs";
 import { ClosetConcentration } from "./ClosetConcentration";
 import { WardrobeBrowser } from "./WardrobeBrowser";
 import styles from "./page.module.css";
@@ -33,10 +33,13 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   // own tag) for that state to ever be reachable. "returned" items are the
   // only ones excluded, matching what this page has always considered "in the
   // wardrobe".
-  const rows = await prisma.wardrobeItem.findMany({
-    where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
-    include: { sourcePurchase: { select: { merchant: true, price: true } } },
-  });
+  const [rows, lookCount] = await Promise.all([
+    prisma.wardrobeItem.findMany({
+      where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
+      include: { sourcePurchase: { select: { merchant: true, price: true } } },
+    }),
+    prisma.look.count({ where: { userId } }),
+  ]);
 
   const items: WardrobeEntry[] = rows.map(toWardrobeEntry);
 
@@ -54,7 +57,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
 
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
-      <h2>Add to wardrobe</h2>
+      <h2>Add a piece</h2>
       <form action="/api/wardrobe" method="POST">
         <input name="itemName" placeholder="Item name (required)" required />
         <input name="category" placeholder="Category, e.g. tops" />
@@ -74,7 +77,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
         <input id="ownedSince" name="ownedSince" type="date" />
         <div className="row">
           <button type="submit" className="btn-primary">
-            Add to wardrobe
+            Add to closet
           </button>
           <a href="#" className="btn-quiet">
             Cancel
@@ -86,10 +89,16 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
 
   return (
     <div className="page">
-      <PageHero eyebrow="What you own" title="What you already own is the starting point." />
-      <div className={styles.numeral}>
-        <BigNumeral label="Pieces" value={items.length} />
-      </div>
+      <PageHeader
+        title="Closet"
+        subtitle="What you already own is the starting point."
+        action={
+          <a href="#add-to-wardrobe" className="btn btn-primary">
+            Add a piece
+          </a>
+        }
+      />
+      <ClosetTabs current="pieces" pieces={items.length} looks={lookCount} />
       <ClosetConcentration rows={concentration} />
       <WardrobeBrowser items={items} wellStocked={wellStocked} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={addPanel} />
     </div>

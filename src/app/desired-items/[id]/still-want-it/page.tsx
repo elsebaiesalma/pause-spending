@@ -43,7 +43,9 @@ export default async function StillWantItPage({ params }: PageProps<"/desired-it
 
   return (
     <div className="page">
-      <span className="page__eyebrow">Still want it</span>
+      <Link href={`/desired-items/${item.id}`} className={styles.backLink}>
+        <span aria-hidden="true">&larr;</span> Item details
+      </Link>
 
       <header className={styles.header}>
         {item.imageUrl && (

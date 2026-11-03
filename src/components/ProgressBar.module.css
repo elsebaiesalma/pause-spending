@@ -1,0 +1,36 @@
+.track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-blush, #f6eae3);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--color-espresso, #2a1208);
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left;
+}
+
+.rose {
+  background: var(--color-rose, #c98a92);
+}
+
+@keyframes fillBar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(var(--fill, 0));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fill {
+    animation: fillBar 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--step, 0) * 80ms);
+  }
+}

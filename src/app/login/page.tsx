@@ -24,7 +24,7 @@ function GoogleSignInButton() {
 export default function LoginPage() {
   return (
     <div className="page">
-      <span className="page__eyebrow">Sign in</span>
+      <span className="page__eyebrow">Try PAUSE</span>
       <h1>A quiet moment before you buy</h1>
       <p className="page__lede">
         See what you already own, what this month has cost so far, and whether the thing you&apos;re
@@ -34,7 +34,7 @@ export default function LoginPage() {
       <div className="section">
         <DemoButton label="Try PAUSE with a sample closet" />
         <p className="page__note">
-          No account needed. You get a ready-made wardrobe of 30 pieces to try it with.
+          No account needed. You get a ready-made closet of 30 pieces to try it with.
         </p>
       </div>
 

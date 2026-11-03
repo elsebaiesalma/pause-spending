@@ -234,7 +234,7 @@ export function Board({
           >
             {pieces.length === 0 && (
               <p className={styles.emptyBoard} role="status">
-                {pending ? "Styling a suggestion…" : "Add a piece from your wardrobe to begin."}
+                {pending ? "Styling a suggestion…" : "Add a piece from your closet to begin."}
               </p>
             )}
             {suggestion && pending && (
@@ -604,23 +604,23 @@ function Drawer({
   }, [items, query, category]);
 
   return (
-    <section className={styles.drawer} data-open={open} aria-label="Your wardrobe">
+    <section className={styles.drawer} data-open={open} aria-label="Your closet">
       <div className={styles.drawerHead}>
-        <h2 className={styles.drawerTitle}>Your wardrobe</h2>
+        <h2 className={styles.drawerTitle}>Your closet</h2>
         <button type="button" className={`btn-sized ${styles.drawerClose}`} onClick={onClose}>
           Done
         </button>
       </div>
 
       <label htmlFor="drawer-search" className="sr-only">
-        Search your wardrobe
+        Search your closet
       </label>
       <input
         id="drawer-search"
         type="search"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="Search your wardrobe"
+        placeholder="Search your closet"
         autoComplete="off"
         className={styles.drawerSearch}
       />

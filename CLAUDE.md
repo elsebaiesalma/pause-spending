@@ -46,6 +46,13 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Polaris rules followed: one button style in sentence case (primary, secondary, quiet link), one primary per section, badges for status, plain-language copy, empty states with one action. Small caps only for eyebrows above titles.
 - Shared pieces: `EmptyState`, `ActionToast` (`?done=let-go|undecided` from the resolve route), `DemoBanner` (demo accounts), Home's `SetupGuide` (progress from real data, `src/lib/dashboard/setupGuide.ts`), and the pause screen's attribute grid (`src/lib/pauseScreen/attributeMatch.ts`, a band, never a percentage).
 
+## Information architecture (2026-11-02)
+
+- Nav: Home · Closet · (+) Pause · Decisions. URLs are unchanged (`/wardrobe`, `/lookbook`, `/considering`); only labels moved. "Closet" is the user-facing word everywhere; code keeps `wardrobe` names.
+- Closet has two tabs, Pieces (`/wardrobe`) and Looks (`/lookbook`) (`ClosetTabs`). Decisions has four tabs via `?tab=`: On pause, Undecided (includes "Not sure yet" store visits and items left on the pause screen without a choice), Let go, Bought (`listBoughtItems`). `/considering/let-go` redirects to the Let go tab.
+- One status per item: `itemStatus()` in `src/lib/considering/itemStatus.ts`. Every item has a page at `/desired-items/[id]` with actions for its status; a paused item shows only name, brand and unlock time.
+- Every page uses `PageHeader` (title, optional back link, one primary action). The header's "Pause a purchase" is outlined and hidden on Home, so each screen has one filled primary. The initials circle opens a menu: Settings (`/account`), Monthly plan (`/budget`), Start over (demo), Sign out.
+
 ## Pre-deploy checklist
 
 - Fix the 3 lint errors listed under "Resume here".

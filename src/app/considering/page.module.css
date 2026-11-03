@@ -64,9 +64,20 @@
   color: var(--color-ink-faint);
 }
 
+.list {
+  display: grid;
+}
+
 .rowName {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+}
+
+.rowName:hover {
+  text-decoration-color: var(--color-ink);
 }
 
 /* Deliberately plain - same size/weight as the surrounding text, never the
@@ -114,6 +125,7 @@
 /* ---------- Let go totals (main Considering page) ---------- */
 
 .totals {
+  margin-bottom: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-card);
   background: var(--color-espresso);
@@ -134,4 +146,62 @@
   margin-top: 0.144rem;
   font-size: 1rem;
   color: var(--color-on-espresso-soft);
+}
+
+/* ---------- Let go: the piece you kept ---------- */
+
+.kept {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: fit-content;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+  border-radius: var(--radius-tile);
+  background: var(--color-bg-alt);
+}
+
+.keptArt {
+  flex: none;
+  width: 2.5rem;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.keptLabel {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-rose-deep);
+}
+
+.keptName {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.intro {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink-soft);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .kept {
+    animation: keptIn 360ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes keptIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }

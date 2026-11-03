@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PageHeader } from "@/components/PageHeader";
 import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
@@ -61,8 +63,11 @@ export default async function ConfirmDesiredItemPage({
 
   return (
     <div className="page">
-      <span className="page__eyebrow">One more look</span>
-      <h1>Confirm this item</h1>
+      <PageHeader
+        back={{ href: "/desired-items/new", label: "Pause a purchase" }}
+        title="Confirm this item"
+        subtitle="Check the details, then see it next to your closet."
+      />
 
       {extractionFailed ? (
         <p className="page__lede">
@@ -158,9 +163,9 @@ export default async function ConfirmDesiredItemPage({
       </form>
 
       <p className="section">
-        <a href="/desired-items/new" className="btn-quiet">
+        <Link href="/desired-items/new" className="btn-quiet">
           Cancel, start over
-        </a>
+        </Link>
       </p>
     </div>
   );

@@ -29,5 +29,5 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
     throw error;
   }
 
-  return NextResponse.redirect(new URL("/considering/let-go", request.url));
+  return NextResponse.redirect(new URL("/considering?tab=let-go", request.url));
 }

@@ -15,6 +15,22 @@ vi.mock("@/lib/dashboard/kept", () => ({
   getKeptSummary: vi.fn().mockResolvedValue({ totalKept: 0, itemsLetGo: 0 }),
 }));
 
+// Only the database readers are replaced; the pure helpers stay real.
+vi.mock("@/lib/dashboard/monthlyRecap", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/dashboard/monthlyRecap")>()),
+  loadMonthlyRecap: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/lib/dashboard/pausePattern", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/dashboard/pausePattern")>()),
+  loadPausePattern: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/lib/goals/savingsGoal", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/goals/savingsGoal")>()),
+  getSavingsGoal: vi.fn().mockResolvedValue(null),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     purchase: { count: vi.fn().mockResolvedValue(0) },
@@ -33,6 +49,9 @@ import { auth } from "@/lib/auth";
 import { sweepEndedPauses } from "@/lib/considering/consideringMeta";
 import { getBudgetForMonth, getMonthSpend } from "@/lib/budget";
 import { getKeptSummary } from "@/lib/dashboard/kept";
+import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
+import { buildPausePattern, loadPausePattern } from "@/lib/dashboard/pausePattern";
+import { getSavingsGoal } from "@/lib/goals/savingsGoal";
 import DashboardPage from "./page";
 
 const SIGNED_IN = { user: { id: "u1", name: "Salma Elsebaie" } } as never;
@@ -165,11 +184,11 @@ describe("DashboardPage (Home)", () => {
       const html = await render();
 
       expect(html).toContain("$120 saved by letting 2 things");
-      expect(html).toContain('href="/considering/let-go"');
+      expect(html).toContain('href="/considering?tab=let-go"');
     });
   });
 
-  describe("Your wardrobe", () => {
+  describe("Your closet", () => {
     it("shows the real piece count and links to the wardrobe", async () => {
       vi.mocked(prisma.wardrobeItem.findMany).mockResolvedValueOnce([
         wardrobeRow("a", "Tee", "tops", "2026-03-01"),
@@ -236,6 +255,74 @@ describe("DashboardPage (Home)", () => {
       expect(html).toContain("Paused right now");
       expect(html).toContain("items waiting it out");
       vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
+    });
+  });
+
+  describe("recap, goal and pattern", () => {
+    const START = new Date("2026-10-01T12:00:00Z");
+    const finished = (hours: number, outcome: "dropped" | "proceeded") => ({
+      pausedAt: START,
+      waitUntil: new Date(START.getTime() + hours * 3_600_000),
+      outcome,
+    });
+
+    afterEach(() => {
+      vi.mocked(loadMonthlyRecap).mockResolvedValue(null);
+      vi.mocked(loadPausePattern).mockResolvedValue(null);
+      vi.mocked(getSavingsGoal).mockResolvedValue(null);
+    });
+
+    it("shows no recap outside the first week, and the recap right under the greeting when there is one", async () => {
+      expect(await render()).not.toContain("in PAUSE");
+
+      vi.mocked(loadMonthlyRecap).mockResolvedValueOnce({
+        monthKey: "2026-09",
+        monthLabel: "September",
+        comparison: null,
+        stats: { confirmed: 3, paused: 3, letGo: 1, saved: 120, mostResisted: { label: "Shoes", count: 1 } },
+      });
+      const html = await render();
+
+      expect(html).toContain("Your September in PAUSE");
+      expect(html).toContain("See September’s decisions");
+      expect(html.indexOf("Your September in PAUSE")).toBeLessThan(html.indexOf("Get to know PAUSE"));
+    });
+
+    it("gives an empty goal card the full row when there is no pattern", async () => {
+      const html = await render();
+
+      expect(html).toContain("Give your savings somewhere to go");
+      expect(html).toContain("insightsSingle");
+      expect(html).not.toContain("What works for you");
+    });
+
+    it("shows the goal beside the pattern once there are finished pauses", async () => {
+      vi.mocked(getSavingsGoal).mockResolvedValueOnce({ name: "Winter boots", target: 800, saved: 540, lastAdded: null });
+      vi.mocked(loadPausePattern).mockResolvedValueOnce(
+        buildPausePattern([
+          finished(24, "dropped"),
+          finished(24, "proceeded"),
+          finished(168, "dropped"),
+          finished(168, "dropped"),
+          finished(168, "proceeded"),
+        ])
+      );
+
+      const html = await render();
+
+      expect(html).toContain("Winter boots");
+      expect(html).toContain("$260 to go");
+      expect(html).toContain("What works for you");
+      expect(html).not.toContain("insightsSingle");
+    });
+
+    it("hides the pattern when it can't be read", async () => {
+      vi.mocked(loadPausePattern).mockResolvedValueOnce(null);
+
+      const html = await render();
+
+      expect(html).not.toContain("What works for you");
+      expect(html).not.toContain("Your pattern shows up");
     });
   });
 

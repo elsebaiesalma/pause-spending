@@ -50,7 +50,7 @@ describe("LookbookPage", () => {
       expect(html).toContain("New look");
       expect(html).toContain("Start from a suggestion");
       expect(html).toContain('href="/lookbook/board"');
-      expect(html).toMatch(/Looks<\/span><span[^>]*>0</);
+      expect(html).toMatch(/Looks<span[^>]*>0</);
     },
     SLOW
   );
@@ -68,7 +68,7 @@ describe("LookbookPage", () => {
       expect(html).toContain("Dinner");
       expect(html).not.toContain("Secret look");
       expect(html).toContain(`href="/lookbook/board?look=${aLook}"`);
-      expect(html).toMatch(/Looks<\/span><span[^>]*>1</);
+      expect(html).toMatch(/Looks<span[^>]*>1</);
       expect(html).not.toContain("Start from a suggestion");
       // The ⋯ menu offers rename and delete.
       expect(html).toContain("Rename");

@@ -1,4 +1,5 @@
 import { requireUserIdOrRedirect } from "@/lib/session";
+import { PageHeader } from "@/components/PageHeader";
 import SearchBox from "./SearchBox";
 
 export default async function NewDesiredItemPage({ searchParams }: PageProps<"/desired-items/new">) {
@@ -10,8 +11,7 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
 
   return (
     <div className="page">
-      <span className="page__eyebrow">Before you buy</span>
-      <h1>I want to buy this</h1>
+      <PageHeader title="Pause a purchase" subtitle="Add what caught your eye. You'll see it next to your closet before deciding." />
 
       <div className="item-entry-flow">
         {searchAvailable && (

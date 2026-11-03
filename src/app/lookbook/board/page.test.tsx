@@ -53,7 +53,7 @@ describe("BoardPage", () => {
 
       expect(html).toContain(userA.wardrobeItem.itemName);
       expect(html).not.toContain(userB.wardrobeItem.itemName);
-      expect(html).toContain("Add a piece from your wardrobe to begin.");
+      expect(html).toContain("Add a piece from your closet to begin.");
       expect(html).toContain("Add pieces");
       expect(html).toContain('placeholder="Look 01"');
       // Nothing to save yet.
