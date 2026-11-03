@@ -2,6 +2,9 @@ import Link from "next/link";
 import { assembleConsidering } from "@/lib/considering/assembleConsidering";
 import { listLetGoItems } from "@/lib/considering/letGoList";
 import { listBoughtItems } from "@/lib/considering/boughtList";
+import { getKeptPairs } from "@/lib/considering/keptPairs";
+import { pauseLengthLabel } from "@/lib/considering/pauseLength";
+import { getConsideringMeta } from "@/lib/considering/consideringMeta";
 import { parseDecisionsTab, type DecisionsTab } from "@/lib/considering/itemStatus";
 import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
 import { requireUserIdOrRedirect } from "@/lib/session";
@@ -49,6 +52,11 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
       orderBy: { createdAt: "desc" },
     }),
   ]);
+
+  // Only the tab being shown needs these (the let-go pairing reads the closet;
+  // the bought badge reads when each pause started).
+  const keptPairs = tab === "let-go" ? await getKeptPairs(userId, letGoRows.map((row) => row.item)) : {};
+  const boughtMeta = tab === "bought" ? await getConsideringMeta(bought.map((item) => item.id)) : {};
 
   const counts: Record<DecisionsTab, number> = {
     paused: onPause.length,
@@ -184,6 +192,8 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
                   key={item.id}
                   item={item}
                   meta={automatic ? "Moved automatically after 60 days" : undefined}
+                  kept={keptPairs[item.id]}
+                  note={keptPairs[item.id] ? undefined : "Would have been new to your closet"}
                   actions={
                     <>
                       <form action={`/api/desired-items/${item.id}/restore`} method="POST">
@@ -211,11 +221,26 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
             When you decide something is worth it, it lands here. Buying after a pause is a decision too.
           </EmptyState>
         ) : (
-          <div className={styles.list}>
-            {bought.map((item) => (
-              <DecisionRow key={item.id} item={item} />
-            ))}
-          </div>
+          <>
+            <p className={styles.intro}>Buying something you thought through is a good decision too.</p>
+            <div className={styles.list}>
+              {bought.map((item) => {
+                const pausedAt = boughtMeta[item.id]?.pausedAt ?? null;
+                return (
+                  <DecisionRow
+                    key={item.id}
+                    item={item}
+                    badge={
+                      pausedAt
+                        ? { label: "✓ Bought after a pause", className: "badge badge--success" }
+                        : { label: "Bought", className: "badge badge--neutral" }
+                    }
+                    meta={pauseLengthLabel(pausedAt, item.waitUntil) ?? (pausedAt ? undefined : "Bought without a pause")}
+                  />
+                );
+              })}
+            </div>
+          </>
         ))}
     </div>
   );

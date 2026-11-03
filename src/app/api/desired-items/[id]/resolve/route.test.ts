@@ -81,12 +81,12 @@ describe("POST /api/desired-items/[id]/resolve", () => {
     expect(updated.decisionOutcome).toBe("dropped");
   });
 
-  it("redirects a 'dropped' outcome to the Considering tab", async () => {
+  it("redirects a 'dropped' outcome to the let-go moment", async () => {
     const item = await makeWaitingItem();
 
     const response = await POST(buildRequest({ outcome: "dropped" }), await ctxFor(item.id));
 
-    expect(response.headers.get("location")).toContain("/considering");
+    expect(response.headers.get("location")).toContain(`/desired-items/${item.id}/let-go`);
   });
 
   it("records 'saved_for_later' as its own pause_status, distinct from 'proceeded'", async () => {

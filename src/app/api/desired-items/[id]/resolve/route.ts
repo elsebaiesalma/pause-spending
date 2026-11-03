@@ -69,7 +69,7 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/desired
       ? "/considering?tab=undecided&done=undecided"
       : outcome === "proceeded"
         ? `/desired-items/${id}/still-want-it`
-        : "/considering?tab=let-go&done=let-go";
+        : `/desired-items/${id}/let-go`;
 
   return NextResponse.redirect(new URL(destination, request.url));
 }
