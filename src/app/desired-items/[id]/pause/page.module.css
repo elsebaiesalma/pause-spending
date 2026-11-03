@@ -11,6 +11,54 @@
   margin-bottom: calc(var(--space-2) * 0.72);
 }
 
+/* Each part of the screen is a card with its own heading, so the three
+   questions (what do I own, what do I think, what does it cost) read as steps. */
+.card {
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 16px;
+}
+
+/* The global form width (26rem) suits the small forms; this one holds the
+   whole decision, so it spans the page. */
+.form {
+  max-width: none;
+}
+
+/* Reflection and the month's budget sit side by side on desktop, so the
+   decision and its cost are visible together. */
+.columns {
+  margin-top: var(--space-3);
+  display: grid;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+.columns > .card {
+  margin-top: 0;
+}
+
+.cardTitle {
+  margin-top: 0;
+  margin-bottom: var(--space-2);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.silhouette {
+  width: 100%;
+  height: 100%;
+  padding: 1.25rem;
+  background: var(--color-fill);
+}
+
 .emptyNote {
   color: var(--color-ink-soft);
 }
@@ -29,7 +77,7 @@
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
+  border-radius: 12px;
   background: var(--color-bg-alt);
 }
 
@@ -95,9 +143,7 @@
   overflow-x: auto;
   scroll-snap-type: x proximity;
   padding-bottom: 0.36rem;
-  margin: 0 calc(var(--space-4) * -1);
-  padding-left: var(--space-4);
-  padding-right: var(--space-4);
+  margin: 0;
 }
 
 @media (min-width: 900px) {
@@ -125,7 +171,7 @@
 .similarImage {
   aspect-ratio: 4 / 5;
   border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--color-bg-alt);
 }
@@ -289,7 +335,7 @@
 /* ---------- 4. This month ---------- */
 
 .budgetSection {
-  margin-top: calc(var(--space-5) * 0.72);
+  margin-top: 0;
 }
 
 .budgetBar {
@@ -330,14 +376,15 @@
 .overPlan {
   margin-top: 0.216rem;
   font-size: 1rem;
-  font-weight: 500;
-  color: var(--color-accent);
+  font-weight: 600;
+  color: var(--color-warn);
 }
 
 /* ---------- 5. Actions ---------- */
 
 .actions {
   margin-top: calc(var(--space-5) * 0.72);
+  max-width: 24rem;
 }
 
 /* Holds the Buy anyway button and its warning in one grid cell. */

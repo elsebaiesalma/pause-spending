@@ -4,6 +4,7 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
+import { GarmentSilhouette, silhouetteForItem } from "@/app/wardrobe/GarmentSilhouette";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
 import { hasReflectionAnswer } from "@/lib/pauseScreen/reflectionGate";
 import { BuildLookButton } from "./BuildLookButton";
@@ -12,6 +13,18 @@ import styles from "./page.module.css";
 
 const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 const NEED_SCALE = [1, 2, 3, 4, 5, 6, 7];
+
+// Items without a photo (the sample closet) get the app's garment drawing
+// instead of an empty gray box.
+function SimilarArt({ item }: { item: { category: string | null; itemName: string; colorFamily: string | null } }) {
+  const shape = silhouetteForItem(item.category, item.itemName);
+  if (!shape) return null;
+  return (
+    <div className={styles.silhouette}>
+      <GarmentSilhouette shape={shape} colorFamily={item.colorFamily} />
+    </div>
+  );
+}
 
 export default async function PauseScreenPage({ params }: PageProps<"/desired-items/[id]/pause">) {
   const userId = await requireUserIdOrRedirect();
@@ -31,6 +44,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
   // A look built from the closet for this item counts as a reflection answer.
   const hasLook = await hasLookForDesiredItem(userId, desiredItem.id);
 
+  const wantedShape = silhouetteForItem(desiredItem.category, desiredItem.itemName ?? "");
   const price = desiredItem.price ? Number(desiredItem.price) : null;
   const waitAction = `/api/desired-items/${desiredItem.id}/wait`;
   const resolveAction = `/api/desired-items/${desiredItem.id}/resolve`;
@@ -45,6 +59,10 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           {desiredItem.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={desiredItem.imageUrl} alt={desiredItem.itemName ?? "Item"} />
+          ) : wantedShape ? (
+            <div className={styles.silhouette}>
+              <GarmentSilhouette shape={wantedShape} colorFamily={desiredItem.colorFamily} />
+            </div>
           ) : (
             <div className={styles.wantedPlaceholder}>
               <span className={styles.wantedPlaceholderLabel}>{desiredItem.category || "Item"}</span>
@@ -64,8 +82,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
       </div>
 
       {/* 2. Already in your wardrobe */}
-      <section className="section">
-        <p className={styles.sectionLabel}>01 / Already in your wardrobe</p>
+      <section className={`section ${styles.card}`}>
+        <h2 className={styles.cardTitle}>Already in your closet</h2>
         {similarItems.length === 0 ? (
           <p className={styles.emptyNote}>Nothing like this in your wardrobe.</p>
         ) : (
@@ -76,7 +94,9 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                   {item.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={item.imageUrl} alt={item.itemName} />
-                  ) : null}
+                  ) : (
+                    <SimilarArt item={item} />
+                  )}
                 </div>
                 <p className={styles.similarName}>{item.itemName}</p>
                 {item.ownedSince && (
@@ -93,9 +113,10 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           saves whatever reflection has been filled in, via that button's
           own formAction/name/value (see BuyAnywayButton.tsx and
           src/lib/pauseScreen/reflection.ts). */}
-      <form method="POST">
-        <section className="section" id="reflection">
-          <p className={styles.sectionLabel}>02 / A moment to think</p>
+      <form method="POST" className={styles.form}>
+        <div className={styles.columns}>
+        <section className={`section ${styles.card}`} id="reflection">
+          <h2 className={styles.cardTitle}>A moment to think</h2>
           <div className={styles.reflectionForm}>
             <div className={styles.question}>
               <p className={styles.questionLabel}>What would this replace?</p>
@@ -180,8 +201,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         </section>
 
         {/* 4. This month */}
-        <section className={`section ${styles.budgetSection}`}>
-          <p className={styles.sectionLabel}>03 / This month</p>
+        <section className={`section ${styles.card} ${styles.budgetSection}`}>
+          <h2 className={styles.cardTitle}>This month</h2>
           {!budget.hasBudget ? (
             <p className={styles.emptyNote}>
               No plan set yet -{" "}
@@ -223,6 +244,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
             </>
           )}
         </section>
+
+        </div>
 
         {/* 5. Actions */}
         {/* Same labels, order and styles as every other screen with these actions. */}

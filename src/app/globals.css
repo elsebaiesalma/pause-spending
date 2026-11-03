@@ -1,32 +1,37 @@
 /*
-  Design system: "Midnight Editorial" - grayscale, high-contrast, editorial-
-  brutalist bones (hairline borders, sticky module headers, small mono
-  tags) with a single rose accent. Two themes share one token set:
+  Design system: "Sage and Cream" - a calm, light palette with hairline
+  borders, small mono tags and white card surfaces on a cream page.
 
-  - .theme-dark (the landing page): near-black bg, white text, white-
-    opacity borders, pale rose for text/numbers.
-  - :root (everywhere else - auth, onboarding, dashboard, wardrobe,
-    budget, wishlist): white bg, near-black text, ink-opacity borders.
-    Pale rose is reserved for FILLS (tags, highlights, selected states)
-    only here - pale-on-white text fails contrast, so text accents and
-    links use a deep rose instead.
+    Cream  #FAF7F0  page background        Forest #2F4A3C  buttons, links
+    Ink    #1E2622  text                   Sage   #6F8F7B  fills, borders, icons
+    Clay   #D98B6A  warning fills/icons    Warn   #9A4F2F  warning TEXT
 
-  Every component below reads color through these variables so nothing
-  breaks when a subtree switches theme.
+  Sage and Clay are too light for text on cream (3.3:1 and 2.5:1), so they are
+  only ever fills, borders and icons; text uses Forest / Warn, which pass
+  WCAG AA (4.5:1). Check any new pair before using it. Every component reads
+  color through these variables, so a palette change is a token change.
 */
 
 :root {
-  --color-bg: #ffffff;
-  --color-bg-alt: #f7f5f5;
-  --color-ink: #1f1a1a;
-  --color-ink-soft: #524344;
-  --color-ink-faint: rgba(31, 26, 26, 0.45);
-  --color-line: rgba(31, 26, 26, 0.08);
-  --color-line-strong: rgba(31, 26, 26, 0.15);
-  --color-fill: #fecdd3;
-  --color-fill-ink: #1f1a1a;
-  --color-accent: #874e54;
-  --color-accent-dim: #874e54;
+  --color-bg: #faf7f0;
+  --color-bg-alt: #f1ede2;
+  --color-surface: #ffffff;
+  --color-ink: #1e2622;
+  --color-ink-soft: #4a5650;
+  /* Solid, not translucent: the old 45% ink failed contrast (2.7:1). */
+  --color-ink-faint: #626c66;
+  --color-line: rgba(30, 38, 34, 0.1);
+  --color-line-strong: rgba(30, 38, 34, 0.2);
+  --color-fill: #dce6df;
+  --color-fill-ink: #1e2622;
+  --color-accent: #2f4a3c;
+  --color-accent-dim: #4f6f5c;
+  --color-primary: #2f4a3c;
+  --color-primary-hover: #243a2e;
+  --color-sage: #6f8f7b;
+  --color-clay: #d98b6a;
+  --color-warn: #9a4f2f;
+  --color-warn-fill: #f6e1d6;
 
   --font-display: var(--font-clash), "Clash Display", sans-serif;
   --font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
@@ -49,22 +54,6 @@
   :root {
     --gutter: 1rem;
   }
-}
-
-.theme-dark {
-  --color-bg: #050505;
-  --color-bg-alt: #0a0a0a;
-  --color-ink: #ffffff;
-  --color-ink-soft: rgba(255, 255, 255, 0.6);
-  --color-ink-faint: rgba(255, 255, 255, 0.35);
-  --color-line: rgba(255, 255, 255, 0.05);
-  --color-line-strong: rgba(255, 255, 255, 0.15);
-  --color-fill: #fecdd3;
-  --color-fill-ink: #050505;
-  --color-accent: #fecdd3;
-  --color-accent-dim: #fdb3b9;
-
-  color-scheme: dark;
 }
 
 * {
@@ -567,14 +556,13 @@ a:focus-visible {
 }
 
 .btn-primary {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
-  color: var(--color-bg);
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
 }
-
 .btn-primary:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
   color: #fff;
 }
 

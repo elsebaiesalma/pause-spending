@@ -222,7 +222,7 @@
   border: 1px solid var(--color-line-strong);
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(31, 26, 26, 0.12);
+  box-shadow: 0 4px 16px rgba(30, 38, 34, 0.12);
 }
 
 .menuPanel button {

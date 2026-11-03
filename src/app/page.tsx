@@ -1,6 +1,6 @@
 import { clashDisplay } from "./fonts";
 import { ScrollReveal } from "./ScrollReveal";
-import { ImageSlot } from "@/components/ImageSlot";
+import { HeroPreview } from "@/components/HeroPreview";
 import { DemoButton } from "@/components/DemoButton";
 import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
@@ -9,56 +9,35 @@ export default function Home() {
   // While Gmail is parked, every "get started" CTA opens the demo instead.
   const gmail = isGmailEnabled();
   return (
-    <div className={`${styles.root} theme-dark ${clashDisplay.variable}`}>
+    <div className={`${styles.root} ${clashDisplay.variable}`}>
       <ScrollReveal />
-      <div className={styles.backdrop} aria-hidden="true" />
-      <div className={styles.glow} aria-hidden="true">
-        <div className={styles.glowBlob} />
-        <div className={styles.glowBlob} />
-      </div>
-
       {/* HERO */}
       <section className={styles.hero}>
-        <div className={styles.heroTopBar}>
+        <div>
           <span className={styles.eyebrow}>
             <span className={styles.eyebrowDot} />
-            FOR THE MOMENT BEFORE CHECKOUT
+            For the moment before checkout
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--color-ink-faint)" }}>
-            Reflection, not restriction
-          </span>
-        </div>
-
-        <div className={styles.heroGrid}>
-          <div className={styles.heroImage}>
-            <ImageSlot name="hero" alt="Hero image" />
-            <span className={styles.heroImageTag}>Fig. 001 / Redundancy Vector</span>
-          </div>
-          <div className={styles.heroNarrative}>
-            <div>
-              <span className={styles.eyebrow}>
-                <span className={styles.eyebrowDot} />
-                The premise
-              </span>
-              <p>
-                We build a little distance between wanting and buying - not by blocking the cart, but by
-                showing you what you already own before you get there.
-              </p>
-            </div>
-            <div style={{ borderTop: "1px solid var(--color-line)", paddingTop: "1rem", display: "flex", justifyContent: "space-between", color: "var(--color-ink-faint)" }}>
-              <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>Avg. reflection window</span>
-              <span style={{ fontFamily: "var(--font-display)", fontSize: "0.8rem", color: "var(--color-accent-dim)", fontWeight: 700 }}>24H - 7 DAYS</span>
-            </div>
-            <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
-            <a href="#philosophy" className={styles.inlineLink} style={{ marginTop: 0 }}>
-              Discover the protocol &rarr;
+          <h1 className={styles.heroHeadline}>Before you buy it, see what you already own.</h1>
+          <p className={styles.heroSub}>
+            PAUSE puts the thing you&apos;re about to buy next to the pieces already in your closet,
+            then gives you a moment to decide. Reflection, not restriction.
+          </p>
+          <div className={styles.heroActions}>
+            {gmail ? (
+              <a href="/connect/gmail" className={styles.btnPrimary}>
+                Connect Gmail
+              </a>
+            ) : (
+              <DemoButton label="Try the demo" className={styles.btnPrimary} />
+            )}
+            <a href="#mechanism" className={styles.btnGhost}>
+              See how it works
             </a>
           </div>
+          {!gmail && <p className={styles.heroNote}>No account needed. Opens with a sample closet of 30 pieces.</p>}
         </div>
-
-        <h1 className={styles.heroHeadline}>
-          PA<em>U</em>SE
-        </h1>
+        <HeroPreview />
       </section>
 
       {/* STATS */}
@@ -117,9 +96,9 @@ export default function Home() {
             </p>
             <div className={styles.twoCol}>
               <p>
-                PAUSE restores it, gently. When an order confirmation lands in your inbox, or you paste
-                a link to something you&apos;re considering, we show your existing wardrobe alongside
-                it - the coats, the boots, the bags you already reach for.
+                PAUSE restores it, gently. {gmail
+                  ? "When an order confirmation lands in your inbox, or you paste a link to something you're considering, we show your existing wardrobe alongside it - the coats, the boots, the bags you already reach for."
+                  : "When you paste a link to something you're considering, or just type what caught your eye, we show your existing wardrobe alongside it - the coats, the boots, the bags you already reach for."}
               </p>
               <p>
                 Converting a price tag into &quot;what this does to this month&apos;s budget&quot; brings
@@ -133,29 +112,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* PAUSE SCREEN PREVIEW - a slot for a real screenshot of our Pause screen */}
-      <div className={styles.banner}>
-        <div className={`${styles.bannerCard} reveal`} data-reveal>
-          <span className={styles.footerEyebrow} style={{ marginBottom: 0 }}>
-            Pause screen preview
-          </span>
-          <h3>A wool overcoat vs. 4 existing silhouettes</h3>
-          <p>
-            &quot;You already own four long, heavy outerwear pieces - including the espresso trench
-            you&apos;ve worn three times this month. Same category, same weight, similar use.&quot;
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "var(--color-ink-faint)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              Budget impact
-            </span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", color: "var(--color-accent-dim)" }}>+$1,150.00</span>
-          </div>
-        </div>
-        <div className={styles.bannerShot}>
-          <ImageSlot name="pause-screen" alt="Screenshot of the PAUSE pause screen" fit="contain" />
-        </div>
-      </div>
 
       {/* MECHANISM */}
       <section className={styles.section} id="mechanism">
@@ -184,9 +140,11 @@ export default function Home() {
               <div>
                 <h3>See it next to what you own</h3>
                 <p>
-                  Your wardrobe is built automatically from real order-confirmation emails, tagged by
-                  category, color and style. If something you already own overlaps, we say so - plainly,
-                  with the specific reason - alongside what this purchase does to your monthly budget.
+                  {gmail
+                    ? "Your wardrobe is built automatically from real order-confirmation emails, tagged by category, color and style. "
+                    : "Your wardrobe is the closet you've added, tagged by category, color and style. "}
+                  If something you already own overlaps, we say so - plainly, with the specific reason -
+                  alongside what this purchase does to your monthly budget.
                 </p>
               </div>
             </div>
@@ -201,105 +159,62 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <a href="#archive" className={styles.inlineLink}>
-              View the wardrobe archive &rarr;
-            </a>
           </div>
         </div>
       </section>
 
-      {/* GALLERY */}
-      <section className={styles.section} id="archive">
-        <div className={styles.galleryHeader}>
-          <div>
-            <span className={styles.eyebrow}>
-              <span className={styles.eyebrowDot} />
-              Curated dossier
-            </span>
-            <h2 className={styles.moduleHeading}>
-              Sartorial redundancy <em>mappings</em>
-            </h2>
-          </div>
-          <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--color-ink-faint)", maxWidth: "18rem" }}>
-            A sample of what a wardrobe match actually looks like.
-          </p>
-        </div>
-        <div className={styles.galleryGrid}>
-          <div className={`${styles.galleryItem} reveal`} data-reveal>
-            <ImageSlot name="sample-1" alt="Sample image: belted coat" />
-            <span className={styles.galleryTag}>Archive // 01</span>
-            <div className={styles.galleryCaption}>
-              <div className={styles.galleryCaptionTop}>
-                <strong>Belted Wool Coat</strong>
-                <span>$12.05 / wear</span>
+      {/* SYNC - Gmail only; parked while the demo is the way in */}
+      {gmail && (
+        <section className={styles.section} id="sync">
+          <div className={styles.contentGrid}>
+            <div>
+              <span className={styles.moduleLabel}>Module 03</span>
+              <h2 className={styles.moduleHeading}>
+                03 / <em>Sync</em>
+              </h2>
+              <hr className={styles.moduleRule} />
+              <p className={styles.moduleSub}>Built from your real inbox</p>
+            </div>
+            <div>
+              <p className={styles.lede}>
+                No manual spreadsheet logging. Connect Gmail once, and PAUSE reads clothing, shoe, and
+                accessory order confirmations - read-only, nothing sent or deleted - to build your wardrobe
+                automatically.
+              </p>
+              <div className={styles.featureGrid}>
+                <div className={`${styles.featurePoint} reveal`} data-reveal>
+                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
+                    <span className={styles.eyebrowDot} />
+                  </span>
+                  <h4>Read-only, always</h4>
+                  <p>We never send, delete, or modify anything in your inbox - and never share your data.</p>
+                </div>
+                <div className={`${styles.featurePoint} reveal`} data-reveal>
+                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
+                    <span className={styles.eyebrowDot} />
+                  </span>
+                  <h4>You decide what stays</h4>
+                  <p>Disconnect any time and keep your data, or permanently delete everything in one step.</p>
+                </div>
+                <div className={`${styles.featurePoint} reveal`} data-reveal>
+                  <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
+                    <span className={styles.eyebrowDot} />
+                  </span>
+                  <h4>Budget, on your terms</h4>
+                  <p>Set your own monthly number. We show spend and remaining - never adjust it for you.</p>
+                </div>
               </div>
-              <p>68 documented wears. Same silhouette and weight as the coat you&apos;re considering.</p>
+              {gmail ? (
+                <a href="/connect/gmail" className={styles.inlineLink}>
+                  Connect Gmail to get started &rarr;
+                </a>
+              ) : (
+                <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
+              )}
             </div>
           </div>
-          <div className={`${styles.galleryItem} reveal`} data-reveal>
-            <ImageSlot name="sample-2" alt="Sample image: high-collar styling" />
-            <span className={styles.galleryTag}>Styling // 02</span>
-            <div className={styles.galleryCaption}>
-              <div className={styles.galleryCaptionTop}>
-                <strong>The High-Collar Form</strong>
-                <span>$0 net outflow</span>
-              </div>
-              <p>Pair your espresso trench, buttoned to the lapel, with the cream knit you already own.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SYNC */}
-      <section className={styles.section} id="sync">
-        <div className={styles.contentGrid}>
-          <div>
-            <span className={styles.moduleLabel}>Module 03</span>
-            <h2 className={styles.moduleHeading}>
-              03 / <em>Sync</em>
-            </h2>
-            <hr className={styles.moduleRule} />
-            <p className={styles.moduleSub}>Built from your real inbox</p>
-          </div>
-          <div>
-            <p className={styles.lede}>
-              No manual spreadsheet logging. Connect Gmail once, and PAUSE reads clothing, shoe, and
-              accessory order confirmations - read-only, nothing sent or deleted - to build your wardrobe
-              automatically.
-            </p>
-            <div className={styles.featureGrid}>
-              <div className={`${styles.featurePoint} reveal`} data-reveal>
-                <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                  <span className={styles.eyebrowDot} />
-                </span>
-                <h4>Read-only, always</h4>
-                <p>We never send, delete, or modify anything in your inbox - and never share your data.</p>
-              </div>
-              <div className={`${styles.featurePoint} reveal`} data-reveal>
-                <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                  <span className={styles.eyebrowDot} />
-                </span>
-                <h4>You decide what stays</h4>
-                <p>Disconnect any time and keep your data, or permanently delete everything in one step.</p>
-              </div>
-              <div className={`${styles.featurePoint} reveal`} data-reveal>
-                <span className={styles.eyebrow} style={{ marginBottom: 0 }}>
-                  <span className={styles.eyebrowDot} />
-                </span>
-                <h4>Budget, on your terms</h4>
-                <p>Set your own monthly number. We show spend and remaining - never adjust it for you.</p>
-              </div>
-            </div>
-            {gmail ? (
-              <a href="/connect/gmail" className={styles.inlineLink}>
-                Connect Gmail to get started &rarr;
-              </a>
-            ) : (
-              <DemoButton label="Try it with a sample closet →" className={`${styles.buttonReset} ${styles.inlineLink}`} />
-            )}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* FOOTER */}
       <footer className={styles.footer} id="footer">
@@ -326,8 +241,6 @@ export default function Home() {
             <a href="#philosophy">Philosophy</a>
             <span>/</span>
             <a href="#mechanism">Mechanism</a>
-            <span>/</span>
-            <a href="#archive">Archive</a>
           </div>
           <div className={styles.footerMeta}>
             <span>&copy; 2026 PAUSE.</span>

@@ -164,3 +164,13 @@
 .skelReceipt {
   height: 11rem;
 }
+
+/* Demo accounts only: one-click path to the pause screen. */
+.sampleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  color: var(--color-ink-soft);
+}

@@ -262,7 +262,7 @@
   padding: 0.75rem var(--gutter) calc(0.75rem + env(safe-area-inset-bottom));
   background: var(--color-bg);
   border-top: 1px solid var(--color-line-strong);
-  box-shadow: 0 -4px 16px rgba(31, 26, 26, 0.12);
+  box-shadow: 0 -4px 16px rgba(30, 38, 34, 0.12);
 }
 
 .drawer[data-open="true"] {
@@ -452,7 +452,7 @@
 }
 
 .dialog::backdrop {
-  background: rgba(31, 26, 26, 0.45);
+  background: rgba(30, 38, 34, 0.45);
 }
 
 .dialogTitle {

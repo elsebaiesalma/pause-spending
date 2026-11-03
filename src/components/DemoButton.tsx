@@ -2,21 +2,25 @@
 
 import { useState } from "react";
 
-// Posts to /api/demo with a plain form (works before hydration too). Creating
-// the account and its sample wardrobe takes a moment, so once submitted the
-// button says so and can't be pressed twice.
+// A plain POST form (works before hydration too). Creating a demo account or
+// a sample item takes a moment, so once submitted the button says so and can't
+// be pressed twice.
 export function DemoButton({
   label = "Try the demo",
+  pendingLabel = "Setting up your closet…",
+  action = "/api/demo",
   className = "btn btn-primary",
 }: {
   label?: string;
+  pendingLabel?: string;
+  action?: string;
   className?: string;
 }) {
   const [pending, setPending] = useState(false);
   return (
-    <form action="/api/demo" method="POST" onSubmit={() => setPending(true)}>
+    <form action={action} method="POST" onSubmit={() => setPending(true)}>
       <button type="submit" className={className} disabled={pending} aria-busy={pending}>
-        {pending ? "Setting up your closet…" : label}
+        {pending ? pendingLabel : label}
       </button>
     </form>
   );

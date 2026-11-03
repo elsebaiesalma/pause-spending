@@ -52,6 +52,36 @@ export function shiftToCurrentMonth(items: readonly MockItem[], now: Date = new 
   });
 }
 
+// The sample closet includes two deliberately messy rows (an unknown price, and
+// rows flagged for review) to exercise the Gmail receipt-review flow. With Gmail
+// parked, a visitor would see "2 receipts need a quick look" and "Needs review"
+// badges for a feature they can't reach, so the demo gets a clean closet.
+const DEMO_PRICES: Record<string, number> = {
+  "frank-and-oak-oxford-shirt-blue": 98,
+  "birkenstock-arizona-sandals-brown": 135,
+};
+const DEMO_FALLBACK_PRICE = 60;
+
+export function cleanForDemo(items: readonly MockItem[]): MockItem[] {
+  return items.map((item) => ({
+    ...item,
+    price: item.price ?? DEMO_PRICES[item.key] ?? DEMO_FALLBACK_PRICE,
+    needsReview: false,
+  }));
+}
+
+// What "Try a sample item" adds: a confirmed item that matches the sample
+// closet (it overlaps the Dr. Martens boots) and pushes this month's plan over,
+// so the first pause screen shows every part of the product.
+export const SAMPLE_ITEM = {
+  itemName: "Black leather ankle boots",
+  price: "189.00",
+  category: "shoes",
+  colorName: "Black",
+  colorFamily: "black",
+  styleTags: ["classic"],
+} as const;
+
 // Every mock image is optional: an item whose file is missing from public/mock
 // shows the placeholder, same as the seed script. public/ is not on a
 // serverless function's filesystem, so instead of checking the disk at request
@@ -66,7 +96,7 @@ export async function createDemoSession(): Promise<{ sessionToken: string; expir
     },
   });
 
-  const items = shiftToCurrentMonth(parseMockWardrobe(mockWardrobeJson));
+  const items = cleanForDemo(shiftToCurrentMonth(parseMockWardrobe(mockWardrobeJson)));
   await seedMockWardrobe({
     userId: user.id,
     items,

@@ -1,8 +1,6 @@
-/* Scoped to the home/landing page only - the rest of the app keeps the
-   light "Midnight Editorial" app theme in globals.css untouched. This
-   page applies .theme-dark (see globals.css) for the canonical dark
-   landing look and reads color through the same shared tokens, so it
-   never breaks if the theme mapping changes. */
+/* Scoped to the home/landing page. It uses the same light Sage and Cream
+   tokens as the rest of the app (globals.css), so going from the landing
+   page into the app doesn't look like switching products. */
 
 /* Strips native button chrome so the demo CTA (a form button, since it
    POSTs) looks exactly like the link classes it's paired with. Kept first so
@@ -32,57 +30,10 @@
 /* The shared site-main (globals.css) adds top padding to clear the fixed
    header, but paints no background of its own - without this, the app's
    own background shows through that gap above this page's content. */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background: var(--color-bg);
-}
-
-.glow {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-}
 
 /* No blend mode: on the near-black page a plain low-opacity rose blob
    reads as a soft light leak. (Multiply was only right for the old
    white-background variant, where it needed to darken/tint instead.) */
-.glowBlob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.12;
-  background: var(--color-fill);
-  animation: float 16s ease-in-out infinite alternate;
-}
-
-.glowBlob:nth-child(1) {
-  top: -10%;
-  right: -10%;
-  width: 40rem;
-  height: 40rem;
-}
-
-.glowBlob:nth-child(2) {
-  bottom: -10%;
-  left: -12%;
-  width: 44rem;
-  height: 44rem;
-  opacity: 0.08;
-  animation-delay: -6s;
-}
-
-@keyframes float {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-  to {
-    transform: translate(18px, -18px) scale(1.06);
-  }
-}
 
 .reveal {
   opacity: 0;
@@ -129,128 +80,95 @@
 /* ---------- Hero ---------- */
 
 .hero {
-  position: relative;
   max-width: var(--width-container);
   margin: 0 auto;
-  padding: 4.32rem 1.5rem 2.88rem 1.5rem;
-}
-
-.heroTopBar {
-  display: flex;
+  padding: 3rem 1.5rem 3.5rem;
+  display: grid;
+  gap: 2.5rem;
   align-items: center;
-  justify-content: space-between;
-  padding-bottom: 0.72rem;
-  margin-bottom: 2.16rem;
-  border-bottom: 1px solid var(--color-line);
 }
 
-.heroGrid {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 1.44rem 2rem;
-  align-items: flex-end;
-}
-
-@media (min-width: 1024px) {
-  .heroGrid {
-    flex-direction: row;
-    justify-content: space-between;
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 4rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
   }
-}
-
-.heroImage {
-  position: relative;
-  width: 100%;
-  max-width: 32rem;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
-}
-
-.heroImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.15);
-}
-
-.heroImageTag {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
-  padding: 0.216rem 0.6rem;
-  border: 1px solid var(--color-line-strong);
-}
-
-.heroNarrative {
-  width: 100%;
-  max-width: 18rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.08rem 1.5rem;
-}
-
-.heroNarrative p {
-  color: var(--color-ink-soft);
-  font-size: 1rem;
-  line-height: 1.6;
 }
 
 .heroHeadline {
   composes: display;
-  font-size: clamp(3.24rem, 12vw, 9.72rem);
-  text-transform: uppercase;
-  margin: 0.72rem 0 0 0;
+  font-size: clamp(2.4rem, 6.5vw, 4.25rem);
+  line-height: 1.02;
+  margin: 0.25rem 0 0;
+  text-wrap: balance;
 }
 
-.heroHeadline em {
-  font-style: normal;
-  color: var(--color-accent-dim);
+.heroSub {
+  margin-top: 1.25rem;
+  max-width: 34rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--color-ink-soft);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 2rem;
+}
+
+.heroNote {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-faint);
 }
 
 /* ---------- Buttons ---------- */
 
+/* One primary action per view (Polaris), sentence case for readability,
+   and at least 48px tall so it is an easy tap target on a phone. */
 .btnPrimary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.9rem 1.75rem;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  min-height: 3rem;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
   font-weight: 600;
   border-radius: 999px;
-  background: var(--color-ink);
-  color: var(--color-bg);
-  border: 1px solid var(--color-ink);
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid var(--color-primary);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
 }
 
 .btnPrimary:hover {
-  background: var(--color-accent-dim);
-  border-color: var(--color-accent-dim);
-  color: var(--color-ink);
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 .btnPrimary:active {
   transform: translateY(1px);
 }
 
+.btnPrimary:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
 .btnGhost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.9rem 1.75rem;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
   font-weight: 600;
   border-radius: 999px;
   background: transparent;
@@ -265,6 +183,12 @@
 
 .btnGhost:active {
   transform: translateY(1px);
+}
+
+.btnPrimary:focus-visible,
+.btnGhost:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
 }
 
 /* ---------- Stat grid ---------- */
@@ -427,55 +351,8 @@
   border-color: var(--color-accent-dim);
 }
 
-/* ---------- Parallax banner ---------- */
-
-.banner {
-  display: grid;
-  gap: 1.44rem 2rem;
-  align-items: center;
-  max-width: var(--width-container);
-  margin: 0 auto;
-  padding: 2.16rem 1.5rem;
-  border-bottom: 1px solid var(--color-line);
-}
-
-@media (min-width: 1024px) {
-  .banner {
-    grid-template-columns: 5fr 7fr;
-    min-height: 22rem;
-  }
-}
-
 /* The slot for a real screenshot of our Pause screen. Never cropped or
    recolored (see ImageSlot's "contain"). */
-.bannerShot {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--color-line-strong);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.bannerCard {
-  max-width: 34rem;
-}
-
-.bannerCard h3 {
-  font-family: var(--font-display), sans-serif;
-  font-weight: 600;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  font-size: 1.75rem;
-  margin: 0.36rem 0 0.432rem 0;
-}
-
-.bannerCard p {
-  font-size: 1rem;
-  color: var(--color-ink-soft);
-  line-height: 1.5;
-  margin-bottom: 0.72rem;
-}
 
 /* ---------- Mechanism phases ---------- */
 
@@ -521,101 +398,6 @@
   color: var(--color-ink-soft);
   font-size: 1rem;
   line-height: 1.6;
-}
-
-/* ---------- Gallery ---------- */
-
-.galleryHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 0.72rem 1rem;
-  padding-bottom: 1.44rem;
-  margin-bottom: 2.16rem;
-  border-bottom: 1px solid var(--color-line);
-}
-
-@media (min-width: 700px) {
-  .galleryHeader {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-}
-
-.galleryGrid {
-  display: grid;
-  gap: 1.44rem 2rem;
-}
-
-@media (min-width: 1024px) {
-  .galleryGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.galleryItem {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border: 1px solid var(--color-line-strong);
-}
-
-.galleryItem img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(1) contrast(1.15);
-}
-
-.galleryTag {
-  position: absolute;
-  top: 1.25rem;
-  left: 1.25rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  background: color-mix(in srgb, var(--color-bg) 80%, transparent);
-  padding: 0.216rem 0.6rem;
-  border: 1px solid var(--color-line-strong);
-}
-
-.galleryCaption {
-  position: absolute;
-  left: 1.25rem;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-  backdrop-filter: blur(6px);
-  border: 1px solid var(--color-line-strong);
-  padding: 0.9rem 1.25rem;
-}
-
-.galleryCaptionTop {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.72rem 1rem;
-  margin-bottom: 0.288rem;
-}
-
-.galleryCaptionTop strong {
-  font-family: var(--font-display), sans-serif;
-  font-size: 1.134rem;
-}
-
-.galleryCaptionTop span {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--color-accent-dim);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.galleryCaption p {
-  font-size: 1rem;
-  color: var(--color-ink-soft);
-  line-height: 1.5;
 }
 
 /* ---------- Feature points ---------- */

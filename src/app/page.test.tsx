@@ -10,13 +10,13 @@ import Home from "./page";
 describe("Home (landing page)", () => {
   it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("PA<em>U</em>SE");
+    expect(html).toContain("PAUSE puts the thing you&#x27;re about to buy");
     expect(html).not.toMatch(/CALIB/i);
   });
 
   it("opens with the new eyebrow, not the old edition line", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("FOR THE MOMENT BEFORE CHECKOUT");
+    expect(html).toContain("For the moment before checkout");
     expect(html).not.toContain("Architectural Stillness");
   });
 
@@ -35,13 +35,17 @@ describe("Home (landing page)", () => {
     expect(html).not.toMatch(/Illustrative figure|82.4|4,850|99.4/);
   });
 
-  it("uses neutral image slots instead of hotlinked stock photos, including a pause screen screenshot slot", () => {
+  it("shows the product in the hero with built-in art: no stock photos and no image files to go missing", () => {
     const html = renderToStaticMarkup(Home());
     expect(html).not.toContain("picsum.photos");
-    expect(html).toContain("/images/hero.jpg");
-    expect(html).toContain("/images/pause-screen.jpg");
-    expect(html).toContain("/images/sample-1.jpg");
-    expect(html).toContain("/images/sample-2.jpg");
+    expect(html).not.toContain("/images/");
+    expect(html).toContain("Example of a PAUSE screen");
+    expect(html).toContain("Before you buy it, see what you already own.");
+  });
+
+  it("makes no wear or cost-per-wear claims, because there is no wear data", () => {
+    const html = renderToStaticMarkup(Home());
+    expect(html).not.toMatch(/per wear|documented wears|\/ wear/i);
   });
 
   afterEach(() => {
@@ -64,10 +68,14 @@ describe("Home (landing page)", () => {
     expect(html).not.toContain("mailto:");
   });
 
-  it("describes the real sync mechanism (Gmail), not fictional IMAP/OCR/browser-extension claims", () => {
-    const html = renderToStaticMarkup(Home());
+  it("mentions Gmail sync only when Gmail is enabled, and never fictional IMAP/OCR/browser-extension claims", () => {
+    const parked = renderToStaticMarkup(Home());
+    expect(parked).not.toContain("Gmail");
+    expect(parked).not.toMatch(/IMAP|OCR|browser extension/i);
 
-    expect(html).toContain("Gmail");
-    expect(html).not.toMatch(/IMAP|OCR|browser extension/i);
+    vi.stubEnv("GMAIL_ENABLED", "true");
+    const enabled = renderToStaticMarkup(Home());
+    expect(enabled).toContain("Gmail");
+    expect(enabled).not.toMatch(/IMAP|OCR|browser extension/i);
   });
 });

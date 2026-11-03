@@ -15,6 +15,8 @@ import { LocalGreeting } from "./LocalGreeting";
 import { PauseConfirmation } from "@/components/PauseConfirmation";
 import { RackSlice } from "./RackSlice";
 import { SmartAdd } from "./SmartAdd";
+import { DemoButton } from "@/components/DemoButton";
+import { isDemoEmail } from "@/lib/demo";
 import styles from "./page.module.css";
 
 const RACK_SLICE_ITEMS = 4;
@@ -63,6 +65,17 @@ export default async function DashboardPage() {
       <PauseConfirmation />
 
       <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} />
+      {isDemoEmail(session.user?.email) && (
+        <div className={styles.sampleRow}>
+          <span>Not sure what to try?</span>
+          <DemoButton
+            action="/api/demo/sample-item"
+            label="Try a sample item"
+            pendingLabel="Opening…"
+            className="btn btn-primary"
+          />
+        </div>
+      )}
 
       {needsReviewCount > 0 && (
         <div className={styles.statusLines}>
