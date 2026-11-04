@@ -31,7 +31,9 @@
   stroke-width: 4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
+  /* No non-scaling-stroke here: it would put the draw-in dash in screen
+     pixels while the script measures in SVG units, so the line would lag
+     behind the dot. */
 }
 
 .dot {

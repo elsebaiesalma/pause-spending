@@ -1,0 +1,91 @@
+/* The add box: input and its button on one row (stacked on small phones),
+   the screenshot drop zone underneath at the same width. */
+
+.addItem {
+  display: grid;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+/* Forms are capped at 26rem globally; this one spans its container. */
+.addItem form {
+  max-width: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.625rem;
+  align-items: stretch;
+}
+
+@media (max-width: 420px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row > button {
+    justify-self: stretch;
+  }
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 3rem;
+}
+
+.input[aria-invalid] {
+  border-color: var(--color-warn);
+}
+
+.row > button {
+  min-height: 3rem;
+  min-width: 8.5rem;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-warn);
+}
+
+.drop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px dashed var(--color-line-strong);
+  border-radius: var(--radius-card, 12px);
+  color: var(--color-ink-soft);
+  font-size: 0.9375rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.drop:hover,
+.drop[data-dragging] {
+  border-color: var(--color-espresso);
+  background: var(--color-bg-alt);
+  color: var(--color-ink);
+}
+
+.drop:focus-within {
+  outline: 2px solid var(--color-accent, var(--color-espresso));
+  outline-offset: 2px;
+}
+
+.dropIcon {
+  display: inline-flex;
+  color: var(--color-ink);
+}
+
+.dropText strong {
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

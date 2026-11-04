@@ -94,7 +94,7 @@ describe("WardrobePage", () => {
       expect(price).toBeGreaterThan(name);
     });
 
-    it("shows a seeded row's photo, and the category placeholder only when it has no image", async () => {
+    it("shows a seeded row's photo, and the garment drawing only when it has no image", async () => {
       const withImage = await renderFor(await seedCard("seed"));
       expect(withImage).toContain("example.com/tee.jpg");
       expect(withImage).not.toContain("Garment illustration");
@@ -102,7 +102,7 @@ describe("WardrobePage", () => {
       await prisma.wardrobeItem.updateMany({ where: { id: { in: itemIds } }, data: { imageUrl: null } });
       const withoutImage = await renderFor((await prisma.user.findFirstOrThrow()).id);
       expect(withoutImage).not.toContain("example.com/tee.jpg");
-      expect(withoutImage).toContain(">tops<");
+      expect(withoutImage).toContain("Garment illustration");
     });
 
     it("opens on the Grid view with the toggle pressed, and puts the hero and piece count at the top", async () => {

@@ -1,9 +1,36 @@
 /* Budget & goals: two independent settings, each a card with a switch. */
 
+/* Polaris annotated layout: each setting is a row with its explanation on
+   the left (one third) and its card on the right. Every row shares the same
+   two columns, so all titles and all cards line up. */
 .stack {
   display: grid;
+  gap: var(--space-4);
+}
+
+.annotated {
+  display: grid;
   gap: var(--space-2);
-  max-width: 44rem;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+}
+
+.stack > :first-child .annotated,
+.stack > .annotated:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+@media (min-width: 900px) {
+  .annotated {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-5);
+    align-items: start;
+  }
+}
+
+.annotation {
+  min-width: 0;
 }
 
 .card {
@@ -21,9 +48,10 @@
 
 .cardTop {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
+  min-height: 2.75rem;
 }
 
 .cardText {
@@ -50,49 +78,27 @@
   display: none;
 }
 
-/* The switch: espresso when on, a neutral track when off. 44 x 24 with the
-   whole button as the target; the focus ring is the site's usual one. */
-.switch {
-  flex: none;
-  position: relative;
-  width: 2.75rem;
-  height: 1.5rem;
-  min-height: 0;
-  padding: 0;
-  border: 0;
+/* Status badge (Polaris Badge): neutral when off, espresso tint when on. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
   border-radius: 999px;
-  background: var(--color-line-strong);
-  cursor: pointer;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-line);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
 }
 
-.switch[aria-checked="true"] {
-  background: var(--color-espresso);
+.badgeOn {
+  background: var(--color-blush);
+  border-color: transparent;
+  color: var(--color-espresso);
 }
 
-.switchKnob {
-  position: absolute;
-  top: 0.1875rem;
-  left: 0.1875rem;
-  width: 1.125rem;
-  height: 1.125rem;
-  border-radius: 50%;
-  background: #fff;
-}
-
-.switch[aria-checked="true"] .switchKnob {
-  transform: translateX(1.25rem);
-}
-
-.switch:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .switch,
-  .switchKnob {
-    transition: background-color 160ms ease, transform 160ms ease;
-  }
+.cancel {
+  justify-self: start;
 }
 
 .value {
@@ -132,13 +138,19 @@
   font-weight: 500;
 }
 
+/* Amount and its button on one row, sharing one height. */
 .formRow {
   display: flex;
-  flex-wrap: wrap;
+  align-items: stretch;
   gap: 0.625rem;
 }
 
-.formRow input {
-  flex: 1;
-  min-width: 8rem;
+.formRow > button {
+  flex: none;
+}
+
+.formRow > input,
+.formRow > .money-field {
+  flex: 1 1 auto;
+  min-width: 0;
 }

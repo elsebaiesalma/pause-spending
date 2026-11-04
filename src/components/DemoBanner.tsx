@@ -1,4 +1,4 @@
-import { DemoButton } from "@/components/DemoButton";
+import { StartOverButton } from "@/components/StartOverButton";
 
 // A slim, informational strip on every signed-in page of a demo account, so
 // nobody mistakes the sample closet for real data. "Start over" makes a fresh
@@ -10,7 +10,7 @@ export function DemoBanner() {
         You&apos;re exploring a sample closet. Nothing here is real, and nothing is shared with other
         visitors.
       </p>
-      <DemoButton label="Start over" pendingLabel="Starting over…" className="demo-banner__action" />
+      <StartOverButton label="Start over" className="demo-banner__action" />
     </div>
   );
 }

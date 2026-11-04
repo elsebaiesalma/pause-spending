@@ -79,7 +79,9 @@ export function HangingPiece({ item, menu = true }: { item: WardrobeEntry; menu?
 function RackTag({ item }: { item: WardrobeEntry }) {
   return (
     <div className={styles.tag}>
-      {item.brand && <p className={styles.tagBrand}>{item.brand}</p>}
+      {/* The brand row is always there (empty when unknown), so names and
+          prices line up across the rail. */}
+      <p className={styles.tagBrand}>{item.brand ?? ""}</p>
       <p className={styles.tagName}>{item.displayName}</p>
       <p className={item.price === null ? styles.tagPriceMissing : styles.tagPrice}>
         {item.price !== null ? `$${item.price.toFixed(0)}` : "Price not set"}

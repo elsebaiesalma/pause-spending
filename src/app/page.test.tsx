@@ -96,6 +96,9 @@ describe("Home (landing page)", () => {
     expect(html).toContain("$292.00");
     expect(html).toContain("$223.00");
     expect(html).toContain("$69.00");
-    expect(html).toContain("Pause the next one.");
+    expect(html).toContain('id="hero-heading"');
+    expect(html.indexOf("It adds up quietly.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
+    expect(html).toContain("Frequently asked questions");
+    expect(html).not.toContain("Good to know");
   });
 });

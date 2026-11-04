@@ -1,6 +1,7 @@
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { PageHeader } from "@/components/PageHeader";
 import SearchBox from "./SearchBox";
+import { AddItem } from "@/components/AddItem";
 
 export default async function NewDesiredItemPage({ searchParams }: PageProps<"/desired-items/new">) {
   await requireUserIdOrRedirect();
@@ -10,54 +11,19 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
   const searchAvailable = Boolean(process.env.BRAVE_SEARCH_API_KEY);
 
   return (
-    <div className="page">
+    <div className="page page--narrow">
       <PageHeader title="Pause a purchase" subtitle="Add what caught your eye. You'll see it next to your closet before deciding." />
 
-      <div className="item-entry-flow">
-        {searchAvailable && (
-          <div className="item-entry-flow__search">
-            <SearchBox initialQuery={initialQuery} />
-          </div>
-        )}
-
-        <div className="item-entry-flow__url">
-          <h2>Paste a product URL</h2>
-          <form action="/api/desired-items/from-url" method="POST">
-            <input name="url" type="url" placeholder="https://..." required />
-            <button type="submit" className="action">
-              Look it up
-            </button>
-          </form>
+      {/* Typed text with search configured lands here as ?q= and lists the
+          matches; otherwise one box takes a link or a name, and the zone
+          under it takes a screenshot (the same box as Home). */}
+      {searchAvailable && initialQuery ? (
+        <div className="item-entry-flow__search">
+          <SearchBox initialQuery={initialQuery} />
         </div>
-
-        {/* DOM order matches desktop's default appearance (URL paste
-            first); CSS promotes this section ahead of URL paste on mobile
-            only (see globals.css) - it's the reliable path for exactly the
-            retailers search and direct-fetch extraction handle worst
-            (heavy anti-bot blocking), so on the viewport where a
-            screenshot is also just easier to take, it shouldn't be buried
-            below a form likely to fail into a low-confidence guess for
-            those same retailers. */}
-        <div className="item-entry-flow__screenshot">
-          <h2>Upload a screenshot</h2>
-          <form action="/api/desired-items/from-screenshot" method="POST" encType="multipart/form-data">
-            <input name="screenshot" type="file" accept="image/*" required />
-            <button type="submit" className="action">
-              Identify item
-            </button>
-          </form>
-        </div>
-
-        <div className="item-entry-flow__text">
-          <h2>Or just type it</h2>
-          <form action="/api/desired-items/from-text" method="POST">
-            <input name="text" placeholder="e.g. navy wool blazer" required />
-            <button type="submit" className="btn-primary action">
-              Continue
-            </button>
-          </form>
-        </div>
-      </div>
+      ) : (
+        <AddItem searchAvailable={searchAvailable} />
+      )}
     </div>
   );
 }

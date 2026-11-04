@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DemoButton } from "@/components/DemoButton";
+import { StartOverButton } from "@/components/StartOverButton";
 
 // The landing page and sign-in are public, so they carry no app navigation.
 function isPublicPath(pathname: string): boolean {
@@ -24,8 +26,12 @@ function isUnder(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function isActive(pathname: string, link: (typeof LINKS)[number]): boolean {
-  if (pathname === PAUSE_HREF) return false;
+// Adding an item and deciding on it (confirm, pause, still want it) are the
+// Pause action, not a place in Decisions, so no tab is highlighted there.
+const PAUSE_FLOW = /^\/desired-items\/(new|[^/]+\/(confirm|pause|still-want-it))\/?$/;
+
+export function isActive(pathname: string, link: (typeof LINKS)[number]): boolean {
+  if (PAUSE_FLOW.test(pathname)) return false;
   return link.match.some((href) => isUnder(pathname, href));
 }
 
@@ -83,11 +89,15 @@ export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: He
               <AccountMenu initials={initials} isDemo={isDemo} signOutAction={signOutAction} current={isUnder(pathname, "/account") || isUnder(pathname, "/budget")} />
             </>
           ) : (
-            pathname !== "/login" && (
+            pathname !== "/login" &&
+            (gmailEnabled ? (
               <Link href="/login" className="site-header__link">
-                {gmailEnabled ? "Sign in" : "Try the demo"}
+                Sign in
               </Link>
-            )
+            ) : (
+              // Starts the demo directly, like every other "Try the demo".
+              <DemoButton label="Try the demo" pendingLabel="Setting up…" className="site-header__link" />
+            ))
           )}
         </div>
       </div>
@@ -122,18 +132,22 @@ function AccountMenu({
         <Link href="/budget" className="account-menu__item" role="menuitem">
           Budget &amp; goals
         </Link>
-        {isDemo && (
-          <form action="/api/demo" method="POST">
-            <button type="submit" className="account-menu__item" role="menuitem">
-              Start over with a fresh closet
-            </button>
-          </form>
-        )}
         <form action={signOutAction}>
           <button type="submit" className="account-menu__item" role="menuitem">
             Sign out
           </button>
         </form>
+        {/* Destructive, so set apart below a divider and confirmed first. */}
+        {isDemo && (
+          <>
+            <hr className="account-menu__divider" />
+            <StartOverButton
+              label="Start over with a fresh closet"
+              className="account-menu__item account-menu__item--danger"
+              role="menuitem"
+            />
+          </>
+        )}
       </div>
     </details>
   );

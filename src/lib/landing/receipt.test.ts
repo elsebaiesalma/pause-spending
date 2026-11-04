@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RECEIPT_LINES, money, receiptPhase, receiptTotals } from "./receipt";
+import { RECEIPT_LINES, money, receiptTotals } from "./receipt";
 
 describe("example receipt", () => {
   it("adds up: the repeats come off and the rest stays in the plan", () => {
@@ -20,12 +20,5 @@ describe("example receipt", () => {
 
   it("formats money with cents", () => {
     expect(money(69)).toBe("$69.00");
-  });
-
-  it("moves through the four phases as the page scrolls", () => {
-    expect(receiptPhase(0)).toBe(0);
-    expect(receiptPhase(0.4)).toBe(1);
-    expect(receiptPhase(0.65)).toBe(2);
-    expect(receiptPhase(0.9)).toBe(3);
   });
 });

@@ -2,7 +2,7 @@ import { clashDisplay } from "./fonts";
 import { ScrollReveal } from "./ScrollReveal";
 import { HeroPreview } from "@/components/HeroPreview";
 import { DemoButton } from "@/components/DemoButton";
-import { ReceiptBand } from "./ReceiptBand";
+import { ReceiptHero } from "./ReceiptHero";
 import { UrgeCurve } from "./UrgeCurve";
 import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
@@ -105,38 +105,47 @@ export default function Home() {
     <DemoButton label="Try the demo" className={styles.btnPrimary} />
   );
 
-  // The receipt band is dark, so its button is the light one.
-  const ctaLight = gmail ? (
-    <a href="/connect/gmail" className={styles.btnLight}>
-      Connect Gmail
-    </a>
-  ) : (
-    <DemoButton label="Try the demo" className={styles.btnLight} />
+  // The hero is on the espresso band, so its buttons are the light ones.
+  const heroActions = (
+    <>
+      {gmail ? (
+        <a href="/connect/gmail" className={styles.btnLight}>
+          Connect Gmail
+        </a>
+      ) : (
+        <DemoButton label="Try the demo" className={styles.btnLight} />
+      )}
+      <a href="#how-it-works" className={styles.btnGhostLight}>
+        See how it works
+      </a>
+    </>
   );
 
   return (
     <div className={`${styles.root} ${clashDisplay.variable}`}>
       <ScrollReveal />
 
-      {/* Hero: what it is in one line, one primary action, the product itself. */}
-      <section className={styles.hero}>
+      {/* Hero: a receipt that prints, gets stamped, and drops the repeats. */}
+      <ReceiptHero
+        actions={heroActions}
+        note={gmail ? undefined : "No account needed. Opens with a sample closet of 30 pieces."}
+      />
+
+      {/* What PAUSE does, with the product itself. */}
+      <section className={styles.hero} aria-labelledby="product-heading">
         <div>
           <span className={styles.eyebrow}>
             <span className={styles.eyebrowDot} />
-            For the moment before checkout
+            What PAUSE does
           </span>
-          <h1 className={styles.heroHeadline}>Before you buy it, see what you already own.</h1>
+          <h2 id="product-heading" className={styles.sectionHeading}>
+            Before you buy it, see what you already own.
+          </h2>
           <p className={styles.heroSub}>
             PAUSE lines up what you want with the pieces you already have, then gives you a moment to
             decide. Reflection, not restriction.
           </p>
-          <div className={styles.heroActions}>
-            {cta}
-            <a href="#how-it-works" className={styles.btnGhost}>
-              See how it works
-            </a>
-          </div>
-          {!gmail && <p className={styles.heroNote}>No account needed. Opens with a sample closet of 30 pieces.</p>}
+          <div className={styles.heroActions}>{cta}</div>
         </div>
         <HeroPreview />
       </section>
@@ -177,9 +186,6 @@ export default function Home() {
           ))}
         </ol>
       </section>
-
-      {/* It adds up quietly: a receipt prints, gets stamped, tears off into the call to action. */}
-      <ReceiptBand cta={ctaLight} />
 
       {/* Why a pause works: each finding, and what PAUSE does because of it. */}
       <section className={styles.sectionTinted} id="why" aria-labelledby="why-heading">
@@ -234,9 +240,8 @@ export default function Home() {
       <section className={styles.section} id="faq" aria-labelledby="faq-heading">
         <div className={styles.faqGrid}>
           <div>
-            <span className={styles.eyebrow}>Questions</span>
             <h2 id="faq-heading" className={styles.sectionHeading}>
-              Good to know
+              Frequently asked questions
             </h2>
           </div>
           <div className={styles.faqList}>
@@ -271,7 +276,7 @@ export default function Home() {
             <nav className={styles.footerLinks} aria-label="Footer">
               <a href="#how-it-works">How it works</a>
               <a href="#why">Why a pause works</a>
-              <a href="#faq">Questions</a>
+              <a href="#faq">FAQ</a>
             </nav>
           </div>
         </div>

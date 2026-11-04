@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUserId } from "@/lib/session";
-import { parseGoalInput, removeSavingsGoal, restartSavingsGoal, saveSavingsGoal } from "@/lib/goals/savingsGoal";
+import {
+  monthStart,
+  parseGoalInput,
+  removeSavingsGoal,
+  restartSavingsGoal,
+  saveSavingsGoal,
+} from "@/lib/goals/savingsGoal";
+import { currentMonthKey } from "@/lib/budget";
 import { safeReturnPath } from "@/lib/looks/returnPath";
 
 // One form endpoint for the goal sheet and card: intent=save (create or edit),
@@ -31,6 +38,9 @@ export async function POST(request: NextRequest) {
   const input = parseGoalInput(form.get("name"), form.get("amount"));
   if (!input) return back("invalid");
 
-  const saved = intent === "restart" ? await restartSavingsGoal(userId, input) : await saveSavingsGoal(userId, input);
+  // countFrom=month: a new goal also counts what was let go earlier this month.
+  const startAt = form.get("countFrom")?.toString() === "month" ? monthStart(currentMonthKey()) : undefined;
+  const saved =
+    intent === "restart" ? await restartSavingsGoal(userId, input) : await saveSavingsGoal(userId, input, startAt);
   return back(saved ? "saved" : "unavailable");
 }

@@ -3,9 +3,9 @@
 import { useQueryParam } from "@/lib/dashboard/useQueryParam";
 import styles from "./GoalCard.module.css";
 
+// Confirmations ("Goal saved.") are a toast (ActionToast); only errors stay
+// here, inline, next to the form that caused them.
 const MESSAGES: Record<string, { text: string; error: boolean }> = {
-  saved: { text: "Goal saved.", error: false },
-  removed: { text: "Goal removed.", error: false },
   invalid: { text: "Add a name and an amount above $0, then try again.", error: true },
   unavailable: { text: "Your goal couldn't be saved right now.", error: true },
 };
