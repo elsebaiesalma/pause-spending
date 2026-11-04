@@ -1,13 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { devWardrobeWhere } from "@/lib/devWardrobeView";
-import { COLOR_FAMILIES } from "@/lib/colorFamily";
-import { capitalizeFirst } from "@/lib/wardrobeDisplay";
 import { toWardrobeEntry } from "@/lib/wardrobeEntries";
 import { buildConcentration } from "@/lib/wardrobeClusters";
 import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
 import { PageHeader } from "@/components/PageHeader";
 import { ClosetTabs } from "@/components/ClosetTabs";
+import { PieceForm } from "@/components/PieceForm";
 import { ClosetConcentration } from "./ClosetConcentration";
 import { WardrobeBrowser } from "./WardrobeBrowser";
 import styles from "./page.module.css";
@@ -58,32 +57,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
       <h2>Add a piece</h2>
-      <form action="/api/wardrobe" method="POST">
-        <input name="itemName" placeholder="Item name (required)" required />
-        <input name="category" placeholder="Category, e.g. tops" />
-        <label htmlFor="colorFamily">Color</label>
-        <select id="colorFamily" name="colorFamily" defaultValue="">
-          <option value="">Choose a color</option>
-          {COLOR_FAMILIES.map((family) => (
-            <option key={family} value={family}>
-              {capitalizeFirst(family)}
-            </option>
-          ))}
-        </select>
-        <input name="colorName" placeholder="Color name (optional), e.g. Espresso" />
-        <input name="styleTags" placeholder="Style tags (comma separated)" />
-        <input name="useCaseTags" placeholder="Use-case tags (comma separated)" />
-        <label htmlFor="ownedSince">Owned since</label>
-        <input id="ownedSince" name="ownedSince" type="date" />
-        <div className="row">
-          <button type="submit" className="btn-primary">
-            Add to closet
-          </button>
-          <a href="#" className="btn-quiet">
-            Cancel
-          </a>
-        </div>
-      </form>
+      <PieceForm mode="add" action="/api/wardrobe" cancelHref="#" submitLabel="Add to closet" />
     </section>
   );
 
