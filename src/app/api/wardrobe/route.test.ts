@@ -83,4 +83,31 @@ describe("POST /api/wardrobe", () => {
     createdIds.push(item.id);
     expect(item.colorFamily).toBeNull();
   });
+
+  it("saves a typed brand and price, and turns '$1,250.50' into a number", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
+
+    await POST(buildRequest({ itemName: "Priced Coat", brand: " Aritzia ", price: "$1,250.50" }));
+
+    const item = await prisma.wardrobeItem.findFirstOrThrow({ where: { itemName: "Priced Coat" } });
+    createdIds.push(item.id);
+    expect(item.brand).toBe("Aritzia");
+    expect(Number(item.price)).toBe(1250.5);
+  });
+
+  it("leaves brand and price empty when blank, and rejects (400) a price that is not a number without creating a row", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
+    await POST(buildRequest({ itemName: "Plain Coat", brand: "", price: "" }));
+    const plain = await prisma.wardrobeItem.findFirstOrThrow({ where: { itemName: "Plain Coat" } });
+    createdIds.push(plain.id);
+    expect(plain.brand).toBeNull();
+    expect(plain.price).toBeNull();
+
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
+    const response = await POST(buildRequest({ itemName: "Bad Price Coat", price: "lots" }));
+    expect(response.status).toBe(400);
+    expect(await prisma.wardrobeItem.findFirst({ where: { itemName: "Bad Price Coat" } })).toBeNull();
+  });
 });

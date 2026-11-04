@@ -64,3 +64,40 @@ describe("toWardrobeEntry", () => {
     });
   });
 });
+
+describe("toWardrobeEntry brand and price", () => {
+  const base = {
+    id: "w1",
+    itemName: "Aritzia Wool Coat",
+    category: "outerwear",
+    colorName: null,
+    colorFamily: null,
+    imageUrl: null,
+    ownedSince: null,
+    status: "active",
+  };
+
+  it("shows what was typed on a piece with no purchase, and strips the brand from the name", () => {
+    const entry = toWardrobeEntry({ ...base, brand: "Aritzia", price: "189.50", sourcePurchase: null });
+    expect(entry.brand).toBe("Aritzia");
+    expect(entry.price).toBe(189.5);
+    expect(entry.displayName).toBe("Wool Coat");
+  });
+
+  it("prefers the order's merchant and price over typed values", () => {
+    const entry = toWardrobeEntry({
+      ...base,
+      brand: "Typed",
+      price: 1,
+      sourcePurchase: { merchant: "Aritzia", price: "120.00" },
+    });
+    expect(entry.brand).toBe("Aritzia");
+    expect(entry.price).toBe(120);
+  });
+
+  it("is null for both when neither exists", () => {
+    const entry = toWardrobeEntry({ ...base, sourcePurchase: null });
+    expect(entry.brand).toBeNull();
+    expect(entry.price).toBeNull();
+  });
+});

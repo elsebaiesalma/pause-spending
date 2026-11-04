@@ -42,11 +42,14 @@ export function UrgeCurve() {
     const update = () => {
       frame = 0;
       const rect = root.getBoundingClientRect();
-      // 0 when the chart's top is 90% of the way down the screen, 1 once it
-      // has risen to 35%.
-      const start = window.innerHeight * 0.9;
-      const end = window.innerHeight * 0.35;
-      const progress = Math.min(1, Math.max(0, (start - rect.top) / (start - end)));
+      // Nothing draws until the whole chart is on screen, y-axis, curve and
+      // hour labels included (its bottom is above 95% of the way down). The
+      // line then draws while the chart rises to the middle of the screen, so
+      // the dot lands on the last label with everything still in view.
+      const vh = window.innerHeight;
+      const start = vh * 0.95;
+      const end = vh * 0.4 + rect.height / 2;
+      const progress = Math.min(1, Math.max(0, (start - rect.bottom) / Math.max(150, start - end)));
       path.style.strokeDashoffset = String(length * (1 - progress));
       const point = path.getPointAtLength(length * progress);
       dot.setAttribute("cx", point.x.toFixed(1));
@@ -72,17 +75,23 @@ export function UrgeCurve() {
 
   return (
     <figure className={styles.chart} ref={rootRef} data-lit={URGE_MARKS.length}>
-      <figcaption className={styles.axisLabel}>Urge to buy (an illustration of the finding, not plotted data)</figcaption>
-      <svg
-        className={styles.svg}
-        viewBox={`0 0 ${CURVE_WIDTH} ${CURVE_HEIGHT}`}
-        aria-hidden="true"
-        focusable="false"
-      >
-        <line x1="0" x2={CURVE_WIDTH} y1={CURVE_BASELINE} y2={CURVE_BASELINE} className={styles.axis} />
-        <path ref={pathRef} d={PATH} className={styles.line} />
-        <circle ref={dotRef} cx={END.x - 8} cy={END.y} r="9" className={styles.dot} />
-      </svg>
+      <div className={styles.plot}>
+        <div className={styles.yAxis} aria-hidden="true">
+          <span>High</span>
+          <span className={styles.yTitle}>Urge to buy</span>
+          <span>Low</span>
+        </div>
+        <svg
+          className={styles.svg}
+          viewBox={`0 0 ${CURVE_WIDTH} ${CURVE_HEIGHT}`}
+          aria-hidden="true"
+          focusable="false"
+        >
+          <line x1="0" x2={CURVE_WIDTH} y1={CURVE_BASELINE} y2={CURVE_BASELINE} className={styles.axis} />
+          <path ref={pathRef} d={PATH} className={styles.line} />
+          <circle ref={dotRef} cx={END.x - 8} cy={END.y} r="9" className={styles.dot} />
+        </svg>
+      </div>
       <ol className={styles.marks}>
         {URGE_MARKS.map((mark, index) => (
           <li key={mark.hour} className={styles.mark} data-index={index}>

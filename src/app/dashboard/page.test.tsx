@@ -155,27 +155,27 @@ describe("DashboardPage (Home)", () => {
       expect(html).not.toContain("over your plan");
     });
 
-    it("shows spent against the plan, and the receipt: spent, plan, then what is left", async () => {
+    it("shows spent against the plan: spent, what is left, and the plan it is measured against", async () => {
       vi.mocked(getBudgetForMonth).mockResolvedValueOnce({ amount: "400" } as never);
       vi.mocked(getMonthSpend).mockResolvedValueOnce(210);
 
       const html = await render();
 
       expect(html).not.toContain("What would help most?");
-      expect(html).toMatch(/Spent<\/span><span[^>]*>\$210/);
-      expect(html).toMatch(/Plan<\/span><span[^>]*>\$400/);
-      expect(html).toMatch(/Left<\/span><span[^>]*>\$190/);
+      expect(html).toContain("<strong>$210 spent</strong>");
+      expect(html).toContain("$190 left");
+      expect(html).toContain("of your $400 plan");
+      expect(html).toContain("Edit budget");
     });
 
-    it("words an overage as over your plan, in the accent colour, without warning styling", async () => {
+    it("words an overage as over, with a warning icon, instead of what is left", async () => {
       vi.mocked(getBudgetForMonth).mockResolvedValueOnce({ amount: "400" } as never);
       vi.mocked(getMonthSpend).mockResolvedValueOnce(440);
 
       const html = await render();
 
-      expect(html).toContain("$40 over your plan");
-      expect(html).not.toContain(">Left<");
-      expect(html).not.toMatch(/warning|⚠/i);
+      expect(html).toMatch(/<svg[^>]*aria-hidden="true"[^>]*>.*<\/svg> \$40 over</);
+      expect(html).not.toContain("left</span>");
     });
 
     it("shows what was saved in the at-a-glance line, linking to the let-go list", async () => {

@@ -3,6 +3,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { GOAL_NAME_MAX, goalProgress, type SavingsGoal } from "@/lib/goals/savingsGoal";
 import { GoalSheet } from "./GoalSheet";
 import { GoalStatus } from "./GoalStatus";
+import { EDIT_BUTTON_CLASS, MoneyCard } from "./MoneyCard";
 import styles from "./GoalCard.module.css";
 
 function dollars(amount: number): string {
@@ -68,39 +69,38 @@ export function GoalCard({ goal }: { goal: SavingsGoal | null }) {
   }
 
   return (
-    <section className={styles.card} aria-labelledby="goal-heading">
-      <p className={styles.eyebrow}>Saving toward</p>
-      <h2 id="goal-heading" className={styles.goalName}>
-        {goal.name}
-      </h2>
-      <ProgressBar
-        value={progress.saved}
-        max={goal.target}
-        label={`${goal.name}: ${dollars(progress.saved)} saved of ${dollars(goal.target)}`}
-        step={0}
-        tone="rose"
-      />
-      <p className={styles.figures}>
-        <strong>{dollars(progress.saved)} saved</strong>
-        <span>{dollars(progress.remaining)} to go</span>
-      </p>
-      {goal.lastAdded && (
-        <p className={styles.last}>
-          Last added: {dollars(goal.lastAdded.amount)}
-          {goal.lastAdded.itemName ? ` from ${goal.lastAdded.itemName}` : ""}, {shortDate(goal.lastAdded.at)}
-        </p>
-      )}
-      <div className={styles.editRow}>
+    <MoneyCard
+      eyebrow="Saving toward"
+      title={goal.name}
+      titleId="goal-heading"
+      action={
         <GoalSheet
           mode="save"
-          triggerLabel="Edit"
-          triggerClassName="btn-quiet"
+          triggerLabel="Edit goal"
+          triggerClassName={EDIT_BUTTON_CLASS}
           initial={{ name: goal.name, target: goal.target }}
           hasGoal
           nameMax={GOAL_NAME_MAX}
         />
-      </div>
+      }
+      bar={
+        <ProgressBar
+          value={progress.saved}
+          max={goal.target}
+          label={`${goal.name}: ${dollars(progress.saved)} saved of ${dollars(goal.target)}`}
+          step={0}
+          tone="rose"
+        />
+      }
+      left={`${dollars(progress.saved)} saved`}
+      right={`${dollars(progress.remaining)} to go`}
+      note={
+        goal.lastAdded
+          ? `Last added: ${dollars(goal.lastAdded.amount)}${goal.lastAdded.itemName ? ` from ${goal.lastAdded.itemName}` : ""}, ${shortDate(goal.lastAdded.at)}`
+          : `of your ${dollars(goal.target)} goal`
+      }
+    >
       <GoalStatus />
-    </section>
+    </MoneyCard>
   );
 }

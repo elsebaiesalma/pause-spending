@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { ColorDot } from "@/components/ColorDot";
+import { SlidingToggle } from "@/components/SlidingToggle";
 import {
   CATEGORIES,
   OTHER_CATEGORY,
@@ -16,6 +17,11 @@ import { ItemImage, ItemMenu } from "./WardrobeParts";
 import styles from "./page.module.css";
 
 type View = "grid" | "rack";
+
+const VIEW_OPTIONS: { value: View; label: string }[] = [
+  { value: "grid", label: "Grid" },
+  { value: "rack", label: "Rack" },
+];
 
 const SORT_OPTIONS: { value: Sort; label: string }[] = [
   { value: "newest", label: "Newest" },
@@ -92,14 +98,7 @@ export function WardrobeBrowser({
           />
         </div>
         <div className={styles.toolbarActions}>
-          <div className={styles.viewToggle} role="group" aria-label="View">
-            <button type="button" aria-pressed={view === "grid"} onClick={() => setView("grid")}>
-              Grid
-            </button>
-            <button type="button" aria-pressed={view === "rack"} onClick={() => setView("rack")}>
-              Rack
-            </button>
-          </div>
+          <SlidingToggle options={VIEW_OPTIONS} value={view} onChange={setView} label="View" />
         </div>
       </div>
 
@@ -128,19 +127,7 @@ export function WardrobeBrowser({
 
         <div className={styles.sortRow}>
           <span>Sort</span>
-          <span className={styles.sortLinks} role="group" aria-label="Sort items">
-            {SORT_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={styles.sortLink}
-                aria-current={sort === option.value ? "true" : undefined}
-                onClick={() => setSort(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </span>
+          <SlidingToggle options={SORT_OPTIONS} value={sort} onChange={setSort} label="Sort items" />
         </div>
       </div>
 

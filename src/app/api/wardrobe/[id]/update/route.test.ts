@@ -56,6 +56,27 @@ describe("POST /api/wardrobe/[id]/update", () => {
     await prisma.wardrobeItem.delete({ where: { id: item.id } });
   });
 
+  it("updates brand and price, and leaves them alone when the form sends neither (a piece from an order)", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const item = await prisma.wardrobeItem.create({
+      data: { userId: user.id, itemName: "Edit Me", brand: "Old", price: 10, status: "active" },
+    });
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
+    await POST(buildRequest({ itemName: "Edit Me", brand: "New", price: "25.5" }), await ctxFor(item.id));
+    let row = await prisma.wardrobeItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(row.brand).toBe("New");
+    expect(Number(row.price)).toBe(25.5);
+
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: user.id } } as never);
+    await POST(buildRequest({ itemName: "Edit Me 2" }), await ctxFor(item.id));
+    row = await prisma.wardrobeItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(row.itemName).toBe("Edit Me 2");
+    expect(row.brand).toBe("New");
+    expect(Number(row.price)).toBe(25.5);
+
+    await prisma.wardrobeItem.delete({ where: { id: item.id } });
+  });
+
   describe("cross-tenant isolation", () => {
     let fixture: TwoTenantFixture;
 

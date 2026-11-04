@@ -14,13 +14,19 @@ export type WardrobeRow = {
   imageUrl: string | null;
   ownedSince: Date | null;
   status: string;
+  // Typed by hand on pieces with no purchase.
+  brand?: string | null;
+  price?: unknown;
   sourcePurchase: { merchant: string; price: unknown } | null;
 };
 
 // Shared by the Wardrobe page and the Home rack slice, so both show the same
 // brand-stripped name, capitalized color and price.
 export function toWardrobeEntry(item: WardrobeRow): WardrobeEntry {
-  const brand = item.sourcePurchase?.merchant ?? null;
+  // A receipt piece shows its purchase's merchant and price; a hand-added one
+  // shows what was typed.
+  const brand = item.sourcePurchase?.merchant ?? item.brand ?? null;
+  const rawPrice = item.sourcePurchase?.price ?? item.price ?? null;
   const colorName = item.colorName ?? item.colorFamily;
   return {
     id: item.id,
@@ -30,7 +36,7 @@ export function toWardrobeEntry(item: WardrobeRow): WardrobeEntry {
     categoryKey: categoryKeyOf(item.category),
     colorLabel: colorName ? capitalizeFirst(colorName) : null,
     colorFamily: item.colorFamily,
-    price: item.sourcePurchase?.price != null ? Number(item.sourcePurchase.price) : null,
+    price: rawPrice != null ? Number(rawPrice) : null,
     ownedSince: item.ownedSince ? MONTH_YEAR_FORMAT.format(item.ownedSince) : null,
     sortTime: item.ownedSince?.getTime() ?? 0,
     // Seeded rows carry mock photos too; a row with no image gets the

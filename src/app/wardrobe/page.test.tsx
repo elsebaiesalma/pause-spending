@@ -119,13 +119,16 @@ describe("WardrobePage", () => {
       expect(html).toContain("example.com/tee.jpg");
     });
 
-    it("puts Add a piece in the page header, with a 15-color dropdown and an optional color name", async () => {
+    it("puts Add a piece in the page header, with labelled fields, a category list, a colour picker and More details", async () => {
       const html = await renderFor((await prisma.user.findFirstOrThrow()).id);
       expect(html).toContain('href="#add-to-wardrobe"');
-      const options = html.match(/<select id="colorFamily"[\s\S]*?<\/select>/)?.[0] ?? "";
-      expect(options.match(/<option /g)).toHaveLength(16); // placeholder + 15 families
-      expect(options).toContain(">Navy<");
-      expect(html).toContain('placeholder="Color name (optional)');
+      expect(html).toContain('for="piece-name"');
+      expect(html).toContain('for="piece-category"');
+      // One radio per colour family, plus "Not sure".
+      expect(html.match(/name="colorFamily"/g)).toHaveLength(16);
+      expect(html).toContain(">Navy<");
+      expect(html).toContain("More details");
+      expect(html).not.toContain("comma separated");
     });
   });
 });

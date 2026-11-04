@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createManualWardrobeItem } from "@/lib/wardrobe";
 import { requireUserId } from "@/lib/session";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
+import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -22,6 +23,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "itemName is required" }, { status: 400 });
   }
 
+  const price = parsePrice(form.get("price")?.toString() ?? "");
+  if (!price.ok) {
+    return NextResponse.json({ error: "price must be a number like 49.99" }, { status: 400 });
+  }
+  const brand = form.get("brand")?.toString().trim().slice(0, MAX_BRAND_LENGTH) || null;
+
   const ownedSinceRaw = form.get("ownedSince")?.toString();
   const colorFamily = form.get("colorFamily")?.toString().trim() || null;
   if (colorFamily && !isColorFamily(colorFamily)) {
@@ -35,6 +42,8 @@ export async function POST(request: NextRequest) {
     userId,
     itemName,
     category: form.get("category")?.toString() || null,
+    brand,
+    price: price.value,
     colorName: form.get("colorName")?.toString().trim() || null,
     colorFamily,
     styleTags: parseTags(form.get("styleTags")?.toString() ?? null),

@@ -82,7 +82,8 @@ describe("Home (landing page)", () => {
   it("tells the 25-hour finding as the urge chart, with its source and the 24-hour default", () => {
     const html = renderToStaticMarkup(Home());
     expect(html).toContain("The urge is loud. Then it fades.");
-    expect(html).toContain("an illustration of the finding, not plotted data");
+    expect(html).not.toContain("An illustration of the finding");
+    expect(html).not.toContain("promising but still early");
     expect(html).toContain("Pause for 24 hours");
     expect(html).not.toContain("A day is long enough");
     expect(html).toContain("A few minutes of reflection helps too");

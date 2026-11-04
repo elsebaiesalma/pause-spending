@@ -17,7 +17,7 @@ export function ProgressBar({
   label: string;
   // Position in a stack of bars; each one starts 80ms after the one before.
   step?: number;
-  tone?: "espresso" | "rose";
+  tone?: "espresso" | "rose" | "warn";
 }) {
   const safeMax = max > 0 ? max : 1;
   const clamped = Math.min(Math.max(value, 0), safeMax);
@@ -32,7 +32,7 @@ export function ProgressBar({
       aria-valuenow={clamped}
     >
       <span
-        className={`${styles.fill} ${tone === "rose" ? styles.rose : ""}`}
+        className={`${styles.fill} ${tone === "rose" ? styles.rose : tone === "warn" ? styles.warn : ""}`}
         style={{ "--fill": fraction, "--step": step } as React.CSSProperties}
       />
     </div>

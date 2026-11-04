@@ -129,7 +129,7 @@ function AccountMenu({
         <Link href="/account" className="account-menu__item" role="menuitem">
           Settings
         </Link>
-        <Link href="/budget" className="account-menu__item" role="menuitem">
+        <Link href="/budget" className="account-menu__item account-menu__item--sub" role="menuitem">
           Budget &amp; goals
         </Link>
         <form action={signOutAction}>

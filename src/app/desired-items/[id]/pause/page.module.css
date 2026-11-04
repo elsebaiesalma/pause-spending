@@ -37,7 +37,7 @@
 
 @media (min-width: 900px) {
   .columns {
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
 }
 
@@ -561,10 +561,23 @@
 /* ---------- 5. Actions ---------- */
 
 .actions {
-  margin-top: calc(var(--space-5) * 0.72);
   display: grid;
   gap: 0.75rem;
-  max-width: 32rem;
+}
+
+/* Right column: the cost of buying, then the decision, as one stack. On a
+   wide screen it stays in view while the reflection is filled in. */
+.decision {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .decision {
+    position: sticky;
+    top: 5rem;
+  }
 }
 
 .actionMain {
@@ -678,4 +691,62 @@
   width: 150px;
   height: 12rem;
   flex: 0 0 auto;
+}
+
+/* ---------- Simplified decision screen ---------- */
+
+/* Optional questions, folded away. */
+.more {
+  margin-top: calc(var(--space-4) * 0.72);
+  border-top: 1px solid var(--color-line);
+  padding-top: 0.75rem;
+}
+
+.moreSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+
+.moreSummary::-webkit-details-marker {
+  display: none;
+}
+
+.moreSummary::after {
+  content: "+";
+  font-size: 1.25rem;
+  color: var(--color-ink-soft);
+}
+
+.more[open] > .moreSummary::after {
+  content: "\2212";
+}
+
+.moreBody {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: 0.5rem;
+}
+
+.moreBody .question {
+  margin-top: 0;
+}
+
+/* The three "decide now" choices: plain text buttons in one row. */
+.actionQuiet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 1.25rem;
+}
+
+.actionQuiet :global(.action) {
+  width: auto;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }

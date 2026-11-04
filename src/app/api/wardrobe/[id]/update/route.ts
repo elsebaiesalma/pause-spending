@@ -3,6 +3,7 @@ import { updateWardrobeItem } from "@/lib/wardrobe";
 import { requireUserId } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
+import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -24,6 +25,12 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
     return NextResponse.json({ error: "itemName is required" }, { status: 400 });
   }
 
+  const price = parsePrice(form.get("price")?.toString() ?? "");
+  if (!price.ok) {
+    return NextResponse.json({ error: "price must be a number like 49.99" }, { status: 400 });
+  }
+  const brand = form.get("brand")?.toString().trim().slice(0, MAX_BRAND_LENGTH) || null;
+
   const ownedSinceRaw = form.get("ownedSince")?.toString();
   const colorFamily = form.get("colorFamily")?.toString().trim() || null;
   if (colorFamily && !isColorFamily(colorFamily)) {
@@ -37,6 +44,9 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
     await updateWardrobeItem(id, userId, {
       itemName,
       category: form.get("category")?.toString() || null,
+      // A piece from an order has no brand/price fields in its form, so the
+      // form sends none; leave whatever is stored alone then.
+      ...(form.has("price") || form.has("brand") ? { brand, price: price.value } : {}),
       colorName: form.get("colorName")?.toString().trim() || null,
       colorFamily,
       styleTags: parseTags(form.get("styleTags")?.toString() ?? null),

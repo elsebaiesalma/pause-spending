@@ -17,6 +17,8 @@ function makeWardrobeItem(overrides: Partial<WardrobeItem>): WardrobeItem {
     itemName: "Navy Blazer",
     imageUrl: null,
     category: "outerwear",
+    brand: null,
+    price: null,
     colorName: "navy",
     colorFamily: "navy",
     styleTags: ["business-casual"],
