@@ -343,9 +343,15 @@
   margin-top: 2.5rem;
 }
 
+.chartPayoff {
+  margin: 1.5rem 0 0;
+  font-size: 1.125rem;
+  color: var(--color-ink);
+}
+
 @media (min-width: 900px) {
   .findings {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem;
   }
 

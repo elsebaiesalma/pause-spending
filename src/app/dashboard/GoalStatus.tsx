@@ -7,7 +7,7 @@ const MESSAGES: Record<string, { text: string; error: boolean }> = {
   saved: { text: "Goal saved.", error: false },
   removed: { text: "Goal removed.", error: false },
   invalid: { text: "Add a name and an amount above $0, then try again.", error: true },
-  unavailable: { text: "Goals aren't available yet. Try again later.", error: true },
+  unavailable: { text: "Your goal couldn't be saved right now.", error: true },
 };
 
 // The result of the last goal action, read from ?goal=. A local component on

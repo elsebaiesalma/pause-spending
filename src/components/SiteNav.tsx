@@ -120,7 +120,7 @@ function AccountMenu({
           Settings
         </Link>
         <Link href="/budget" className="account-menu__item" role="menuitem">
-          Monthly plan
+          Budget &amp; goals
         </Link>
         {isDemo && (
           <form action="/api/demo" method="POST">

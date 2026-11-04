@@ -27,12 +27,12 @@ describe("AccountPage", () => {
     expect(html).toContain(user.name ?? user.email);
   });
 
-  it("has Gmail connection, Monthly plan, and the two coming-later placeholders", async () => {
+  it("has Gmail connection, Budget & goals, and the two coming-later placeholders", async () => {
     vi.stubEnv("GMAIL_ENABLED", "true");
     const { html } = await render();
     expect(html).toContain("Gmail connection");
     expect(html).toContain("Permanently delete my data");
-    expect(html).toContain("Monthly plan");
+    expect(html).toContain("Budget &amp; goals");
     expect(html).toContain("Tone");
     expect(html).toContain("Auto-move timing");
     expect(html.match(/Coming later/g)).toHaveLength(2);
@@ -55,7 +55,7 @@ describe("AccountPage", () => {
     const { html } = await render();
     expect(html).not.toContain("Gmail connection");
     expect(html).not.toContain('href="/connect/gmail"');
-    expect(html).toContain("Monthly plan");
+    expect(html).toContain("Budget &amp; goals");
   });
 
   it("tells a demo visitor what signing out means, instead of showing a throwaway email", async () => {

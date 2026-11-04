@@ -29,6 +29,7 @@ vi.mock("@/lib/dashboard/pausePattern", async (importOriginal) => ({
 vi.mock("@/lib/goals/savingsGoal", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/goals/savingsGoal")>()),
   getSavingsGoal: vi.fn().mockResolvedValue(null),
+  isGoalStorageAvailable: vi.fn().mockResolvedValue(true),
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -51,7 +52,7 @@ import { getBudgetForMonth, getMonthSpend } from "@/lib/budget";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
 import { buildPausePattern, loadPausePattern } from "@/lib/dashboard/pausePattern";
-import { getSavingsGoal } from "@/lib/goals/savingsGoal";
+import { getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
 import DashboardPage from "./page";
 
 const SIGNED_IN = { user: { id: "u1", name: "Salma Elsebaie" } } as never;
@@ -147,7 +148,7 @@ describe("DashboardPage (Home)", () => {
       const html = await render();
 
       expect(html).toContain("No plan set for October yet.");
-      expect(html).toContain('href="/budget"');
+      expect(html).toContain('href="/budget?open=plan"');
       expect(html).not.toContain('action="/api/budget"');
       expect(html).not.toContain(">Left<");
       expect(html).not.toContain("over your plan");
@@ -288,12 +289,33 @@ describe("DashboardPage (Home)", () => {
       expect(html.indexOf("Your September in PAUSE")).toBeLessThan(html.indexOf("Get to know PAUSE"));
     });
 
-    it("gives an empty goal card the full row when there is no pattern", async () => {
+    it("asks what would help most when neither a plan nor a goal is set, on the full row", async () => {
       const html = await render();
 
-      expect(html).toContain("Give your savings somewhere to go");
+      expect(html).toContain("What would help most?");
+      expect(html).toContain("Stay under a monthly amount");
       expect(html).toContain("insightsSingle");
       expect(html).not.toContain("What works for you");
+    });
+
+    it("offers only the plan when the goals table is missing", async () => {
+      vi.mocked(isGoalStorageAvailable).mockResolvedValueOnce(false);
+
+      const html = await render();
+
+      expect(html).toContain("Stay under a monthly amount");
+      expect(html).not.toContain("Save toward something");
+      expect(html).not.toContain("Saving for something?");
+    });
+
+    it("shows a quiet 'also try' for the goal once there is a plan, and no choice card", async () => {
+      vi.mocked(getBudgetForMonth).mockResolvedValueOnce({ amount: "400" } as never);
+
+      const html = await render();
+
+      expect(html).not.toContain("What would help most?");
+      expect(html).toContain("Saving for something?");
+      expect(html).toContain("Set a savings goal");
     });
 
     it("shows the goal beside the pattern once there are finished pauses", async () => {

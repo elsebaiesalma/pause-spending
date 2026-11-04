@@ -265,3 +265,13 @@
 .skelReceipt {
   height: 11rem;
 }
+
+/* The one quiet line for the option that is off: a prompt, never a second
+   filled button. */
+.alsoTry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  color: var(--color-ink-soft);
+}

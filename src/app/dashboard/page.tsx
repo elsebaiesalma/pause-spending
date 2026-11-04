@@ -19,9 +19,11 @@ import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGui
 import { SetupGuide } from "./SetupGuide";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
 import { loadPausePattern } from "@/lib/dashboard/pausePattern";
-import { getSavingsGoal } from "@/lib/goals/savingsGoal";
+import { GOAL_NAME_MAX, getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
 import { MonthlyRecap } from "./MonthlyRecap";
 import { GoalCard } from "./GoalCard";
+import { GoalSheet } from "./GoalSheet";
+import { MoneyChoice } from "./MoneyChoice";
 import { PatternCard } from "./PatternCard";
 import styles from "./page.module.css";
 
@@ -45,7 +47,7 @@ export default async function DashboardPage() {
 
   const monthKey = currentMonthKey();
 
-  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, pattern] =
+  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, pattern, goalAvailable] =
     await Promise.all([
     getBudgetForMonth(userId, monthKey),
     getMonthSpend(userId, monthKey),
@@ -61,6 +63,7 @@ export default async function DashboardPage() {
     loadMonthlyRecap(userId),
     getSavingsGoal(userId),
     loadPausePattern(userId),
+    isGoalStorageAvailable(),
   ]);
 
   const planAmount = budget ? Number(budget.amount) : null;
@@ -74,6 +77,13 @@ export default async function DashboardPage() {
   const steps = setupSteps(setupProgress);
   const showGuide = nextStep(steps) !== null;
   const showPattern = pattern !== null && pattern.decided > 0;
+  // Plan and goal are each optional. Whichever is on leads; the other is one
+  // quiet line, never a second filled button. With neither, ask which would help.
+  const hasPlan = planAmount !== null;
+  const hasGoal = goal !== null;
+  const showGoalCard = goalAvailable && hasGoal;
+  const showMoneyChoice = !hasPlan && !hasGoal;
+  const showInsights = showGoalCard || showMoneyChoice || (pattern !== null && showPattern);
   const spentShare = planAmount ? Math.min(100, (spend / planAmount) * 100) : 0;
 
   return (
@@ -124,12 +134,17 @@ export default async function DashboardPage() {
         </a>
       </section>
 
-      {/* Goal and pattern side by side; the goal takes the full width when
-          there is no pattern to show yet (no finished pauses, or it can't be read). */}
-      <div className={`${styles.insights} ${showPattern ? "" : styles.insightsSingle}`}>
-        <GoalCard goal={goal} />
-        {pattern && showPattern && <PatternCard pattern={pattern} />}
-      </div>
+      {/* Goal (or the first question) and pattern side by side; either takes
+          the full width when the other has nothing to show yet. */}
+      {showInsights && (
+        <div
+          className={`${styles.insights} ${showPattern && (showGoalCard || showMoneyChoice) ? "" : styles.insightsSingle}`}
+        >
+          {showGoalCard && <GoalCard goal={goal} />}
+          {!showGoalCard && showMoneyChoice && <MoneyChoice goalAvailable={goalAvailable} />}
+          {pattern && showPattern && <PatternCard pattern={pattern} />}
+        </div>
+      )}
 
       <div className={styles.cards}>
         <section className={styles.card} aria-labelledby="month-heading">
@@ -138,8 +153,10 @@ export default async function DashboardPage() {
           </h2>
           {planAmount === null ? (
             <p className={styles.cardText}>
-              Set a monthly plan to see what each purchase does to it.{" "}
-              <a href="/budget" className="link">
+              {hasGoal
+                ? "Also want a monthly limit? Set a plan to see what each purchase does to it."
+                : "Set a monthly plan to see what each purchase does to it."}{" "}
+              <a href="/budget?open=plan" className="link">
                 Set a plan
               </a>
             </p>
@@ -195,6 +212,19 @@ export default async function DashboardPage() {
             ))}
         </section>
       </div>
+
+      {goalAvailable && hasPlan && !hasGoal && (
+        <p className={styles.alsoTry}>
+          Saving for something?{" "}
+          <GoalSheet
+            mode="save"
+            triggerLabel="Set a savings goal"
+            triggerClassName="btn-quiet"
+            hasGoal={false}
+            nameMax={GOAL_NAME_MAX}
+          />
+        </p>
+      )}
 
       <QuoteBand text={quote.text} source={quote.source} />
     </div>

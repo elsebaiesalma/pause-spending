@@ -1,0 +1,91 @@
+/* The urge curve. The finished chart is the default; the draw-in only runs
+   when the script has taken over (it sets the dash and the lit marks). */
+
+.chart {
+  margin: var(--space-4) 0 0;
+}
+
+.axisLabel {
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.axis {
+  stroke: var(--color-line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.line {
+  fill: none;
+  stroke: var(--color-espresso);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.dot {
+  fill: var(--color-rose);
+  stroke: var(--color-bg-alt);
+  stroke-width: 3;
+}
+
+.marks {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+}
+
+@media (min-width: 700px) {
+  .marks {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mark {
+  display: grid;
+  gap: 0.125rem;
+  padding-top: 0.625rem;
+  border-top: 2px solid var(--color-line-strong);
+}
+
+.hour {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.thought {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-rose-deep);
+}
+
+/* While the line draws, a label stays quiet until the dot has passed it. The
+   default (data-lit = all four) shows every label in full. */
+@media (prefers-reduced-motion: no-preference) {
+  .mark {
+    transition:
+      opacity 200ms ease,
+      border-color 200ms ease;
+  }
+  .chart[data-lit="1"] .mark:nth-child(n + 2),
+  .chart[data-lit="2"] .mark:nth-child(n + 3),
+  .chart[data-lit="3"] .mark:nth-child(n + 4) {
+    opacity: 0.35;
+    border-top-color: var(--color-line);
+  }
+}

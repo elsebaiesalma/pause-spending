@@ -85,3 +85,9 @@ export async function setBudgetForMonth(
     update: { amount: amount.toString() },
   });
 }
+
+// Turning the monthly plan off removes this month's figure only. Past months
+// are never touched, and the person can turn it back on with a new amount.
+export async function removeBudgetForMonth(userId: string, monthKey: string): Promise<void> {
+  await prisma.budget.deleteMany({ where: { userId, month: monthKey } });
+}

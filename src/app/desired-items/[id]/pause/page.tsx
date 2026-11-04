@@ -283,8 +283,10 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         </div>
 
         {/* 5. Actions */}
-        {/* Same labels and order as every other screen with these actions: one
-            primary, one secondary, and the rest as quiet links (Polaris). */}
+        {/* Same labels and order as every other screen with these actions. Three
+            tiers: the pause is the main choice; Decide later and Let it go sit
+            below as smaller outlined buttons; Buy anyway stays possible but is the
+            quietest choice, on its own line. */}
         <div className={styles.actions}>
           <div className={styles.actionMain}>
             <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary action">
@@ -294,13 +296,18 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
               Pause for 7 days
             </button>
           </div>
-          <div className={styles.actionLinks}>
-            <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action action--quiet">
+          <p className={styles.actionDivider}>
+            <span>or decide now</span>
+          </p>
+          <div className={styles.actionSecond}>
+            <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action">
               Decide later
             </button>
-            <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action action--quiet">
+            <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
               Let it go
             </button>
+          </div>
+          <div className={styles.actionBuy}>
             <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
           </div>
         </div>

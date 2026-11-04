@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import { useQueryParam } from "@/lib/dashboard/useQueryParam";
 import styles from "./GoalCard.module.css";
 
@@ -14,13 +14,17 @@ export function GoalSheet({
   mode,
   triggerLabel,
   triggerClassName,
+  triggerContent,
   initial,
   hasGoal,
   nameMax,
+  returnTo = "/dashboard",
 }: {
   mode: GoalSheetMode;
   triggerLabel: string;
   triggerClassName: string;
+  // Replaces the plain label, for a trigger that is a card.
+  triggerContent?: ReactNode;
   // Prefilled when editing.
   initial?: { name: string; target: number };
   // False in the empty state: with no table to save into there is nothing to open.
@@ -28,6 +32,8 @@ export function GoalSheet({
   // Passed in rather than imported: the goals module reads the database and
   // must stay out of the client bundle.
   nameMax: number;
+  // Where the form sends the person back to: Home, or Settings.
+  returnTo?: string;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const status = useQueryParam("goal");
@@ -38,7 +44,7 @@ export function GoalSheet({
   return (
     <>
       <button type="button" className={triggerClassName} onClick={() => dialogRef.current?.showModal()}>
-        {triggerLabel}
+        {triggerContent ?? triggerLabel}
       </button>
       <dialog ref={dialogRef} className={styles.sheet} aria-labelledby={`goal-sheet-${mode}`}>
         <form method="post" action="/api/goal" className={styles.sheetForm}>
@@ -46,7 +52,7 @@ export function GoalSheet({
             {title}
           </h2>
           <input type="hidden" name="intent" value={mode} />
-          <input type="hidden" name="returnTo" value="/dashboard" />
+          <input type="hidden" name="returnTo" value={returnTo} />
 
           <label className={styles.field}>
             <span>What are you saving toward?</span>
@@ -57,7 +63,7 @@ export function GoalSheet({
               maxLength={nameMax}
               defaultValue={initial?.name ?? ""}
               autoComplete="off"
-              placeholder="Winter boots"
+              placeholder="e.g. Winter boots"
             />
           </label>
 
@@ -70,7 +76,7 @@ export function GoalSheet({
               required
               defaultValue={initial ? String(initial.target) : ""}
               autoComplete="off"
-              placeholder="250"
+              placeholder="$ 250"
             />
             <small>Counts money you chose not to spend. PAUSE doesn&rsquo;t move money.</small>
           </label>

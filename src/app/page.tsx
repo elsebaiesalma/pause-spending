@@ -2,6 +2,8 @@ import { clashDisplay } from "./fonts";
 import { ScrollReveal } from "./ScrollReveal";
 import { HeroPreview } from "@/components/HeroPreview";
 import { DemoButton } from "@/components/DemoButton";
+import { ReceiptBand } from "./ReceiptBand";
+import { UrgeCurve } from "./UrgeCurve";
 import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
 
@@ -31,13 +33,8 @@ const STATS = [
   },
 ] as const;
 
+// The first finding (the 25-hour wait) is told by the urge chart above these cards.
 const FINDINGS = [
-  {
-    title: "A day is long enough for the urge to cool",
-    body: "In shopping experiments, a wait of about 25 hours lowered both the urge to buy and the intent to buy. A 10-minute wait did not: people kept shopping while they waited.",
-    source: "Moser, University of Michigan, 2020",
-    feature: "So the default is Pause for 24 hours.",
-  },
   {
     title: "A few minutes of reflection helps too",
     body: "Asking what an item would replace, how much it is needed, and one reason for and against was the prompt shoppers in their 20s found most helpful.",
@@ -108,6 +105,15 @@ export default function Home() {
     <DemoButton label="Try the demo" className={styles.btnPrimary} />
   );
 
+  // The receipt band is dark, so its button is the light one.
+  const ctaLight = gmail ? (
+    <a href="/connect/gmail" className={styles.btnLight}>
+      Connect Gmail
+    </a>
+  ) : (
+    <DemoButton label="Try the demo" className={styles.btnLight} />
+  );
+
   return (
     <div className={`${styles.root} ${clashDisplay.variable}`}>
       <ScrollReveal />
@@ -172,19 +178,27 @@ export default function Home() {
         </ol>
       </section>
 
+      {/* It adds up quietly: a receipt prints, gets stamped, tears off into the call to action. */}
+      <ReceiptBand cta={ctaLight} />
+
       {/* Why a pause works: each finding, and what PAUSE does because of it. */}
       <section className={styles.sectionTinted} id="why" aria-labelledby="why-heading">
         <div className={styles.sectionInner}>
           <div className={styles.whyIntro}>
             <span className={styles.eyebrow}>Why a pause works</span>
             <h2 id="why-heading" className={styles.sectionHeading}>
-              Built on the research, not on willpower
+              The urge is loud. Then it fades.
             </h2>
             <p className={styles.sectionLede}>
-              The urge to buy is strong, short-lived and easy to misjudge in the moment. A pause gives
-              the calmer you a chance to weigh in.
+              In shopping experiments, a wait of about 25 hours lowered both the urge to buy and the
+              intent to buy. A 10-minute wait did not: people kept shopping while they waited.
             </p>
           </div>
+          <UrgeCurve />
+          <p className={styles.chartPayoff}>
+            So the default is <strong>Pause for 24 hours</strong>.{" "}
+            <span className={styles.statSourceLight}>Moser, University of Michigan, 2020</span>
+          </p>
           <div className={styles.findings}>
             {FINDINGS.map((finding) => (
               <article key={finding.title} className={`${styles.finding} reveal`} data-reveal>

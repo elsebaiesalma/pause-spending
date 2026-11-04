@@ -1,0 +1,144 @@
+/* Budget & goals: two independent settings, each a card with a switch. */
+
+.stack {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 44rem;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.cardOff {
+  background: var(--color-bg);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cardText {
+  min-width: 0;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.0625rem;
+}
+
+.cardDescription {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--color-ink-soft);
+}
+
+.cardBody {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.cardBody[hidden] {
+  display: none;
+}
+
+/* The switch: espresso when on, a neutral track when off. 44 x 24 with the
+   whole button as the target; the focus ring is the site's usual one. */
+.switch {
+  flex: none;
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-line-strong);
+  cursor: pointer;
+}
+
+.switch[aria-checked="true"] {
+  background: var(--color-espresso);
+}
+
+.switchKnob {
+  position: absolute;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.switch[aria-checked="true"] .switchKnob {
+  transform: translateX(1.25rem);
+}
+
+.switch:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .switch,
+  .switchKnob {
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.valueMain {
+  display: grid;
+  gap: 0.375rem;
+  min-width: 12rem;
+  flex: 1;
+}
+
+.valueLine {
+  margin: 0;
+  font-weight: 600;
+}
+
+.valueNote {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.form {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 22rem;
+}
+
+.form label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.formRow input {
+  flex: 1;
+  min-width: 8rem;
+}
