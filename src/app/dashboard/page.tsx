@@ -9,7 +9,8 @@ import { quoteForDay } from "@/lib/dashboard/dailyQuote";
 import { sweepEndedPauses } from "@/lib/considering/consideringMeta";
 import { recentHangingEntries, toWardrobeEntry } from "@/lib/wardrobeEntries";
 import { QuoteBand } from "@/components/kit/QuoteBand";
-import { ReceiptBlock } from "@/components/kit/ReceiptBlock";
+import { ProgressBar } from "@/components/ProgressBar";
+import { WarnIcon } from "@/components/WarnIcon";
 import { LocalGreeting } from "./LocalGreeting";
 import { PauseConfirmation } from "@/components/PauseConfirmation";
 import { RackSlice } from "./RackSlice";
@@ -24,6 +25,7 @@ import { GOAL_NAME_MAX, getSavingsGoal, isGoalStorageAvailable } from "@/lib/goa
 import { MonthlyRecap } from "./MonthlyRecap";
 import { GoalCard } from "./GoalCard";
 import { GoalSheet } from "./GoalSheet";
+import { EDIT_BUTTON_CLASS, MoneyCard } from "./MoneyCard";
 import { MoneyChoice } from "./MoneyChoice";
 import { PatternCard } from "./PatternCard";
 import styles from "./page.module.css";
@@ -84,7 +86,6 @@ export default async function DashboardPage() {
   const hasGoal = goal !== null;
   const showGoalCard = goalAvailable && hasGoal;
   const showMoneyChoice = !hasPlan && !hasGoal;
-  const spentShare = planAmount ? Math.min(100, (spend / planAmount) * 100) : 0;
 
   return (
     <div className={`page ${styles.home}`}>
@@ -112,38 +113,50 @@ export default async function DashboardPage() {
         <MoneyChoice goalAvailable={goalAvailable} />
       ) : (
         <div className={styles.money}>
-          <section className={styles.card} aria-labelledby="month-heading">
-            <h2 id="month-heading" className={styles.cardTitle}>
-              This month
-            </h2>
-            {planAmount === null ? (
+          {planAmount === null || remaining === null ? (
+            <section className={styles.card} aria-labelledby="month-heading">
+              <h2 id="month-heading" className={styles.cardTitle}>
+                This month
+              </h2>
               <p className={styles.cardText}>
                 No plan set for {formatMonthLabel(monthKey)}. Want a monthly limit?{" "}
                 <a href="/budget?open=plan" className="link">
                   Set a plan
                 </a>
               </p>
-            ) : (
-              <>
-                <div className={styles.planBar} aria-hidden="true">
-                  <span style={{ width: `${spentShare}%` }} />
-                </div>
-                {remaining !== null && (
-                  <ReceiptBlock
-                    rows={[
-                      { label: "Spent", amount: dollars(spend) },
-                      { label: "Plan", amount: dollars(planAmount) },
-                    ]}
-                    closing={
-                      isOver
-                        ? { label: `${dollars(Math.abs(remaining))} over your plan`, over: true }
-                        : { label: "Left", amount: dollars(remaining), over: false }
-                    }
-                  />
-                )}
-              </>
-            )}
-          </section>
+            </section>
+          ) : (
+            <MoneyCard
+              eyebrow="Monthly plan"
+              title="This month"
+              titleId="month-heading"
+              action={
+                <a href="/budget#plan" className={EDIT_BUTTON_CLASS}>
+                  Edit budget
+                </a>
+              }
+              bar={
+                <ProgressBar
+                  value={spend}
+                  max={planAmount}
+                  label={`${dollars(spend)} spent of ${dollars(planAmount)}`}
+                  step={0}
+                />
+              }
+              left={`${dollars(spend)} spent`}
+              right={
+                isOver ? (
+                  <>
+                    <WarnIcon /> {dollars(Math.abs(remaining))} over
+                  </>
+                ) : (
+                  `${dollars(remaining)} left`
+                )
+              }
+              rightWarn={isOver}
+              note={`of your ${dollars(planAmount)} plan for ${formatMonthLabel(monthKey)}`}
+            />
+          )}
 
           {showGoalCard ? (
             <GoalCard goal={goal} />

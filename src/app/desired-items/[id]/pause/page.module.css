@@ -37,7 +37,7 @@
 
 @media (min-width: 900px) {
   .columns {
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   }
 }
 
@@ -561,10 +561,23 @@
 /* ---------- 5. Actions ---------- */
 
 .actions {
-  margin-top: calc(var(--space-5) * 0.72);
   display: grid;
   gap: 0.75rem;
-  max-width: 32rem;
+}
+
+/* Right column: the cost of buying, then the decision, as one stack. On a
+   wide screen it stays in view while the reflection is filled in. */
+.decision {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .decision {
+    position: sticky;
+    top: 5rem;
+  }
 }
 
 .actionMain {

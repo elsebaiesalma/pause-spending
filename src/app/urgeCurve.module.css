@@ -12,6 +12,35 @@
   color: var(--color-ink-soft);
 }
 
+/* The y-axis sits to the left of the plot and stretches to its height. */
+.plot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.75rem;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 0.25rem;
+  border-right: 1px solid var(--color-line-strong);
+  padding-right: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+
+.yTitle {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  letter-spacing: 0.08em;
+  color: var(--color-rose-deep);
+}
+
 .svg {
   display: block;
   width: 100%;
@@ -44,7 +73,8 @@
 
 .marks {
   list-style: none;
-  margin: var(--space-2) 0 0;
+  /* Lines up under the plot, not under the y-axis. */
+  margin: var(--space-2) 0 0 var(--marks-indent, 0);
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

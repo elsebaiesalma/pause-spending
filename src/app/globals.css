@@ -307,8 +307,9 @@ p {
 .site-header--overlay {
   position: sticky;
   top: 0;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: saturate(1.2) blur(8px);
+  /* Solid white: translucent, it turned grey over the dark hero as the page
+     scrolled under it. */
+  background: #fff;
 }
 
 .site-main {

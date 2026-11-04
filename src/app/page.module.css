@@ -352,8 +352,15 @@
 
 /* ---------- Why a pause works ---------- */
 
+/* The paragraph runs the full width on purpose: a narrow column made it tall,
+   which pushed the chart so far down that its axis and labels were off screen
+   while the line drew. */
 .whyIntro {
-  max-width: 40rem;
+  max-width: none;
+}
+
+.whyIntro .sectionLede {
+  max-width: none;
 }
 
 .findings {

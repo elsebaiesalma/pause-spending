@@ -236,7 +236,10 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           </div>
         </section>
 
-        {/* 4. This month */}
+        {/* 4 and 5. The cost and the decision share the right column: what it
+            does to the plan, then the buttons, so nothing is left floating
+            under a short card. */}
+        <aside className={styles.decision}>
         <section className={`section ${styles.card} ${styles.budgetSection}`}>
           <h2 className={styles.cardTitle}>This month</h2>
           {!budget.hasBudget ? (
@@ -281,9 +284,6 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           )}
         </section>
 
-        </div>
-
-        {/* 5. Actions */}
         {/* Same labels and order as every other screen with these actions. Three
             tiers: the pause is the main choice; Decide later and Let it go sit
             below as smaller outlined buttons; Buy anyway stays possible but is the
@@ -311,6 +311,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           <div className={styles.actionBuy}>
             <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
           </div>
+        </div>
+        </aside>
         </div>
       </form>
     </div>

@@ -154,3 +154,14 @@
   flex: 1 1 auto;
   min-width: 0;
 }
+
+/* display: grid above would otherwise beat the hidden attribute. */
+.form[hidden] {
+  display: none;
+}
+
+/* Both settings' buttons ("Edit budget", "Edit goal") share one width, so the
+   two progress bars end at the same place. */
+.value > button {
+  min-width: 9.5rem;
+}

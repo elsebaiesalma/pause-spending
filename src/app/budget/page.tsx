@@ -13,6 +13,7 @@ import { GoalSheet, GoalStartChoice } from "../dashboard/GoalSheet";
 import { ActionToast } from "@/components/ActionToast";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { GoalStatus } from "../dashboard/GoalStatus";
+import { PlanValue } from "./PlanValue";
 import { SettingCard } from "./SettingCard";
 import styles from "./budget.module.css";
 
@@ -49,7 +50,7 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
       <PageHeader
         back={{ href: "/account", label: "Settings" }}
         title="Budget & goals"
-        subtitle="Use one, both or neither. Home shows what you turn on. PAUSE only counts money you choose not to spend; it never moves any."
+        subtitle="PAUSE only counts money you choose not to spend. It never moves any."
       />
 
       <div className={styles.stack}>
@@ -63,35 +64,7 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
             offFields={{ intent: "off", returnTo: "/budget" }}
             onContent={
               planAmount !== null && (
-                <>
-                  <div className={styles.valueMain}>
-                    <p className={styles.valueLine}>{money(planAmount)} a month</p>
-                    <p className={styles.valueNote}>
-                      {planAmount - spend >= 0
-                        ? `${money(planAmount - spend)} left in ${formatMonthLabel(monthKey)}`
-                        : `${money(spend - planAmount)} over in ${formatMonthLabel(monthKey)}`}
-                    </p>
-                  </div>
-                  <form action="/api/budget" method="POST" className={styles.form}>
-                    <input type="hidden" name="returnTo" value="/budget" />
-                    <label htmlFor="plan-amount">Change the plan</label>
-                    <div className={styles.formRow}>
-                      <span className="money-field">
-                        <span aria-hidden="true">$</span>
-                        <input
-                          id="plan-amount"
-                          name="amount"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          defaultValue={planAmount}
-                          required
-                        />
-                      </span>
-                      <button type="submit">Save plan</button>
-                    </div>
-                  </form>
-                </>
+                <PlanValue amount={planAmount} spend={spend} monthLabel={formatMonthLabel(monthKey)} />
               )
             }
             offContent={

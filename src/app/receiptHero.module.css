@@ -1,12 +1,35 @@
-/* The landing hero: copy left, receipt right (stacked on phones). Resting
-   state = the finished receipt; the print-in only runs with motion allowed. */
+/* The landing hero: copy left, receipt right (stacked on phones). The resting
+   state is the finished receipt (--step 6, --feed 1): reduced motion, no
+   script and short screens all see it. When motion is allowed the script sets
+   data-live, which makes the hero a tall scene with a sticky stage, and drives
+   --feed (paper coming out of the slot, 0 to 1) and --step (0 to 6, which line
+   or event has happened) from the scroll position. */
 
 .hero {
+  --step: 6;
+  --feed: 1;
   background: var(--color-espresso);
   color: #fff;
 }
 
+.hero[data-live] {
+  height: 280svh;
+}
+
+.stage {
+  display: grid;
+  align-items: center;
+}
+
+.hero[data-live] .stage {
+  position: sticky;
+  top: 3.5rem;
+  height: calc(100svh - 3.5rem);
+  align-content: center;
+}
+
 .inner {
+  width: 100%;
   max-width: var(--width-container);
   margin: 0 auto;
   padding: 3rem var(--gutter) 3.5rem;
@@ -168,9 +191,6 @@
   grid-area: 1 / 1;
 }
 
-.totalBefore {
-  visibility: hidden;
-}
 
 .kept {
   font-weight: 700;
@@ -205,87 +225,100 @@
   border: 0;
 }
 
-/* ---- The print-in, once, on load ----
-   The paper feeds out of the slot while the four lines print (0.25-1.3s),
-   the total prints (1.8s), the repeats are struck (2.5s, 2.7s), the stamp
-   lands (3s), then the total drops and "kept" appears (3.2s). */
+/* ---- Scroll states ----
+   Every state is a number from --step, so one rule covers each element:
+   opacity: clamp(0, step - n, 1) is 0 until the step reaches n + 1. */
+
+.line {
+  opacity: clamp(0, calc(var(--step) - var(--i, 0)), 1);
+}
+
+.total {
+  opacity: clamp(0, calc(var(--step) - 3), 1);
+}
+
+.totalBefore {
+  opacity: clamp(0, calc(6 - var(--step)), 1);
+}
+
+.totalAfter {
+  opacity: clamp(0, calc(var(--step) - 5), 1);
+}
+
+.kept {
+  opacity: clamp(0, calc(var(--step) - 5), 1);
+}
+
+.line[data-repeat]::after {
+  transform: scaleX(clamp(0, calc(var(--step) - 4), 1));
+}
+
+.stamp {
+  opacity: clamp(0, calc((var(--step) - 4) * 0.9), 0.9);
+  transform: rotate(-12deg) scale(calc(1 + (1 - clamp(0, calc(var(--step) - 4), 1)) * 0.7));
+}
+
+.feed {
+  clip-path: inset(0.75rem -3rem -4rem -3rem);
+}
+
+.receipt {
+  translate: 0 calc((1 - var(--feed)) * -105%);
+}
+
+.hint {
+  display: none;
+}
+
+.hero[data-live] .hint {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  translate: -50% 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-espresso-soft);
+  opacity: clamp(0, calc(1 - var(--step)), 1);
+  pointer-events: none;
+}
+
+/* On a phone the stage has to hold the headline, the button and the receipt,
+   so the paragraph waits until the scene is over. */
+@media (max-width: 899px) {
+  .hero[data-live] .body,
+  .hero[data-live] .note {
+    display: none;
+  }
+
+  .hero[data-live] .inner {
+    padding-top: 1.25rem;
+    padding-bottom: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .hero[data-live] .actions {
+    margin-top: 1rem;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .feed {
-    clip-path: inset(0.75rem -3rem -4rem -3rem);
-  }
-
-  .receipt {
-    animation: feed 1.6s cubic-bezier(0.3, 0.6, 0.3, 1) both;
-  }
-
-  .line {
-    animation: appear 160ms ease-out both;
-    animation-delay: calc(0.25s + var(--i, 0) * 0.35s);
-  }
-
-  .line[data-repeat] {
-    animation:
-      appear 160ms ease-out both,
-      fade-repeat 300ms ease-out both;
-    animation-delay:
-      calc(0.25s + var(--i) * 0.35s),
-      calc(2.3s + var(--i) * 0.2s);
+  .line,
+  .total,
+  .totalBefore,
+  .totalAfter,
+  .kept {
+    transition: opacity 220ms ease-out;
   }
 
   .line[data-repeat]::after {
-    animation: strike 280ms ease-out both;
-    animation-delay: calc(2.3s + var(--i) * 0.2s);
-  }
-
-  .total {
-    animation-delay: 1.8s;
-  }
-
-  .totalBefore {
-    animation: show-then-hide 3.2s step-end both;
-  }
-
-  .totalAfter {
-    animation: appear 200ms ease-out 3.2s both;
-  }
-
-  .kept {
-    animation-delay: 3.35s;
+    transition: transform 320ms ease-out;
   }
 
   .stamp {
-    animation: stamp-in 280ms cubic-bezier(0.2, 1.4, 0.4, 1) 3s both;
-  }
-
-  @keyframes feed {
-    from { translate: 0 -100%; }
-    to { translate: 0 0; }
-  }
-
-  @keyframes appear {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes fade-repeat {
-    from { color: var(--color-ink); }
-    to { color: var(--color-ink-soft); }
-  }
-
-  @keyframes strike {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
-  }
-
-  /* Hidden until the total prints at 1.8s, shown until 3.2s, then hidden. */
-  @keyframes show-then-hide {
-    0% { visibility: hidden; }
-    56.25% { visibility: visible; }
-    100% { visibility: hidden; }
-  }
-
-  @keyframes stamp-in {
-    from { opacity: 0; transform: rotate(-12deg) scale(1.7); }
-    to { opacity: 0.9; transform: rotate(-12deg) scale(1); }
+    transition:
+      opacity 200ms ease-out,
+      transform 320ms cubic-bezier(0.2, 1.4, 0.4, 1);
   }
 }

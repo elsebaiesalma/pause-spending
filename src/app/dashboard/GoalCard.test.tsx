@@ -48,7 +48,7 @@ describe("GoalCard", () => {
   it("offers an Edit sheet prefilled with the current goal", () => {
     const html = renderToStaticMarkup(<GoalCard goal={IN_PROGRESS} />);
 
-    expect(html).toContain(">Edit<");
+    expect(html).toContain(">Edit goal<");
     expect(html).toContain('value="Winter boots"');
     expect(html).toContain('value="800"');
   });
