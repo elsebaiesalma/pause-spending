@@ -421,13 +421,6 @@
   color: var(--color-rose-deep);
 }
 
-.caveat {
-  margin-top: 2rem;
-  max-width: 44rem;
-  font-size: 0.875rem;
-  color: var(--color-ink-soft);
-}
-
 /* ---------- FAQ ---------- */
 
 .faqGrid {

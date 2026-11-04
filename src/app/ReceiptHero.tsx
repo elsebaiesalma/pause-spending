@@ -1,78 +1,85 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
-import { RECEIPT_LINES, money, receiptTotals } from "@/lib/landing/receipt";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { RECEIPT_LINES, feedLine, money, runningTotals, type ReceiptLine } from "@/lib/landing/receipt";
 import styles from "./receiptHero.module.css";
 
-// Scroll positions (0 to 1 through the scene) at which each step happens:
-// the four lines print, the repeats are struck and PAUSED lands, then the
-// total drops and "kept" appears.
-const STEP_AT = [0.08, 0.2, 0.32, 0.44, 0.6, 0.78] as const;
-// The paper is fed out of the slot over the first 40% of the scene.
-const FEED_UNTIL = 0.4;
+// A new line prints this often while nobody has paused the receipt.
+const PRINT_EVERY_MS = 1100;
+// Lines kept on the paper at once. Older ones have scrolled off, and are
+// counted in "+ N earlier items" so the total is still the whole tab.
+const VISIBLE_LINES = 14;
+
+type Mode = "static" | "running" | "paused";
+
+const MOTION_QUERY = "(prefers-reduced-motion: no-preference)";
+
+// Whether this visitor allows motion. The server (and the render that
+// hydrates) answers false, so the first paint is always the finished receipt.
+function subscribeToMotion(onChange: () => void) {
+  const query = window.matchMedia(MOTION_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
 
 // The opening of the landing page: the headline and call to action on the
-// left, and a receipt on the right that prints as you scroll. The page holds
-// still (a sticky stage) while the four lines print, the two repeat tees are
-// struck through, a PAUSED stamp lands, and the total drops to what is left.
+// left, and a receipt on the right that keeps printing by itself, a new item
+// every second or so, so the tab only ever grows. Hover it and a faint Pause
+// button shows (clicking anywhere on the receipt does the same). Pausing
+// stamps it PAUSED, strikes through the repeats and shows what stays in the
+// plan, which is the product in one gesture.
 //
-// The finished receipt is the default: with reduced motion, with no script, on
-// a short screen and before hydration the hero is a normal section showing that
-// state. Only when motion is allowed does the script make it a tall scene and
-// drive it from the scroll position, by editing CSS variables on the element
-// (not React state), so scrolling never re-renders.
+// The finished, stamped receipt is the default ("static"): with reduced
+// motion, with no script and before hydration the receipt is exactly that and
+// nothing moves. Only once the page has loaded, and only when the visitor
+// allows motion, does it start printing.
 export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: ReactNode }) {
-  const totals = receiptTotals();
-  const rootRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const motionOk = useSyncExternalStore(
+    subscribeToMotion,
+    () => window.matchMedia(MOTION_QUERY).matches,
+    () => false
+  );
+  const [paused, setPaused] = useState(false);
+  const mode: Mode = !motionOk ? "static" : paused ? "paused" : "running";
+  const [extra, setExtra] = useState(0);
+  const figureRef = useRef<HTMLElement>(null);
+  const visibleRef = useRef(true);
 
+  // Don't print while the receipt is off screen, so coming back to it isn't a
+  // wall of lines, and not while the tab is in the background.
   useEffect(() => {
-    const root = rootRef.current;
-    const stage = stageRef.current;
-    if (!root || !stage) return;
-    const canPlay = () =>
-      window.matchMedia("(prefers-reduced-motion: no-preference)").matches && window.innerHeight >= 600;
-    if (!canPlay()) return;
-
-    root.dataset.live = "true";
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      if (!canPlay()) {
-        delete root.dataset.live;
-        root.style.removeProperty("--step");
-        root.style.removeProperty("--feed");
-        return;
-      }
-      root.dataset.live = "true";
-      const rect = root.getBoundingClientRect();
-      const stickyTop = parseFloat(getComputedStyle(stage).top) || 0;
-      const span = rect.height - stage.offsetHeight;
-      const progress = span > 0 ? Math.min(1, Math.max(0, (stickyTop - rect.top) / span)) : 1;
-      const step = STEP_AT.filter((at) => progress >= at).length;
-      root.style.setProperty("--feed", Math.min(1, progress / FEED_UNTIL).toFixed(3));
-      if (root.style.getPropertyValue("--step") !== String(step)) root.style.setProperty("--step", String(step));
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-
-    schedule();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      delete root.dataset.live;
-      root.style.removeProperty("--step");
-      root.style.removeProperty("--feed");
-    };
+    const figure = figureRef.current;
+    if (!figure || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(([entry]) => {
+      visibleRef.current = entry.isIntersecting;
+    });
+    observer.observe(figure);
+    return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (mode !== "running") return;
+    const timer = window.setInterval(() => {
+      if (visibleRef.current && !document.hidden) setExtra((n) => n + 1);
+    }, PRINT_EVERY_MS);
+    return () => window.clearInterval(timer);
+  }, [mode]);
+
+  const interactive = mode !== "static";
+  const stamped = mode !== "running";
+  const totals = runningTotals(extra);
+
+  const printed: ReceiptLine[] = [...RECEIPT_LINES];
+  for (let i = 0; i < extra; i += 1) printed.push(feedLine(i));
+  const firstShown = Math.max(0, printed.length - VISIBLE_LINES);
+  const shown = printed.slice(firstShown);
+
+  function toggle() {
+    setPaused((current) => !current);
+  }
+
   return (
-    <section ref={rootRef} className={styles.hero} aria-labelledby="hero-heading">
-      <div ref={stageRef} className={styles.stage}>
+    <section className={styles.hero} aria-labelledby="hero-heading">
       <div className={styles.inner}>
         <div className={styles.copy}>
           <span className={styles.eyebrow}>For the moment before checkout</span>
@@ -87,49 +94,78 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
           {note && <p className={styles.note}>{note}</p>}
         </div>
 
-        <figure className={styles.receiptWrap}>
+        <figure className={styles.receiptWrap} ref={figureRef}>
           <span className={styles.slot} aria-hidden="true" />
           <div className={styles.feed}>
-          <div className={styles.receipt} aria-hidden="true">
-            <p className={styles.shop}>CHECKOUT &middot; ORDER 0429</p>
-            <p className={styles.date}>An example, not real data</p>
-            <hr className={styles.rule} />
-            {RECEIPT_LINES.map((line, index) => (
-              <p
-                key={line.name}
-                className={styles.line}
-                data-repeat={line.repeat || undefined}
-                style={{ "--i": index } as CSSProperties}
-              >
-                <span>{line.name}</span>
-                <span className={styles.amount}>{line.price.toFixed(2)}</span>
+            {/* Clicking the paper pauses it; the button inside is the same
+                control for a keyboard and for anyone who doesn't know the paper
+                is clickable. */}
+            <div
+              className={styles.receipt}
+              data-mode={mode}
+              data-clickable={interactive || undefined}
+              onClick={interactive ? toggle : undefined}
+              aria-hidden={interactive ? undefined : "true"}
+            >
+              <p className={styles.shop} aria-hidden="true">
+                CHECKOUT &middot; ORDER 0429
               </p>
-            ))}
-            <hr className={styles.rule} />
-            <p className={`${styles.line} ${styles.total}`}>
-              <span>TOTAL</span>
-              <span className={`${styles.amount} ${styles.totalValue}`}>
-                <span className={styles.totalBefore}>{money(totals.all)}</span>
-                <span className={styles.totalAfter}>{money(totals.afterPause)}</span>
-              </span>
-            </p>
-            <p className={`${styles.line} ${styles.kept}`}>
-              <span>KEPT IN YOUR PLAN</span>
-              <span className={styles.amount}>{money(totals.kept)}</span>
-            </p>
-            <span className={styles.stamp}>PAUSED</span>
-          </div>
+              <p className={styles.date} aria-hidden="true">
+                An example, not real data
+              </p>
+              <hr className={styles.rule} />
+              <div className={styles.lines} data-full={shown.length >= VISIBLE_LINES || undefined} aria-hidden="true">
+                {firstShown > 0 && <p className={styles.earlier}>+ {firstShown} earlier items</p>}
+                {shown.map((line, index) => (
+                  <p
+                    key={firstShown + index}
+                    className={styles.line}
+                    data-repeat={stamped && line.repeat ? "true" : undefined}
+                    data-new={interactive && firstShown + index >= RECEIPT_LINES.length ? "true" : undefined}
+                  >
+                    <span>{line.name}</span>
+                    <span className={styles.amount}>{line.price.toFixed(2)}</span>
+                  </p>
+                ))}
+              </div>
+              <div aria-hidden="true">
+                <hr className={styles.rule} />
+                <p className={`${styles.line} ${styles.total}`}>
+                  <span>TOTAL</span>
+                  <span className={styles.amount}>{money(stamped ? totals.afterPause : totals.all)}</span>
+                </p>
+                {stamped && (
+                  <p className={`${styles.line} ${styles.kept}`}>
+                    <span>KEPT IN YOUR PLAN</span>
+                    <span className={styles.amount}>{money(totals.kept)}</span>
+                  </p>
+                )}
+                {stamped && <span className={styles.stamp}>PAUSED</span>}
+              </div>
+              {interactive && (
+                <button
+                  type="button"
+                  className={styles.pause}
+                  aria-pressed={mode === "paused"}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggle();
+                  }}
+                >
+                  <span className={styles.pauseIcon} aria-hidden="true">
+                    {mode === "paused" ? "▶" : "❚❚"}
+                  </span>
+                  {mode === "paused" ? "Resume" : "Pause"}
+                </button>
+              )}
+            </div>
           </div>
           <figcaption className={styles.srOnly}>
-            An example receipt: a white crew tee $34, a white linen tee $29, an oversized white tee $40 and a black
-            wool coat $189, {money(totals.all)} in all. PAUSE flags the two extra tees as repeats, so the total after a
-            pause is {money(totals.afterPause)} and {money(totals.kept)} stays in the plan.
+            An example receipt that keeps printing new items. It starts with a white crew tee $34, a white linen tee
+            $29, an oversized white tee $40 and a black wool coat $189, {money(292)} in all. When paused, PAUSE flags
+            the repeats and shows what stays in the plan.
           </figcaption>
         </figure>
-      </div>
-      <span className={styles.hint} aria-hidden="true">
-        Scroll to print the receipt
-      </span>
       </div>
     </section>
   );

@@ -19,6 +19,11 @@
   background: var(--color-rose, #c98a92);
 }
 
+/* Only for a real problem (Polaris: critical tone is for an exhausted limit). */
+.warn {
+  background: var(--color-warn, #a12b2b);
+}
+
 @keyframes fillBar {
   from {
     transform: scaleX(0);

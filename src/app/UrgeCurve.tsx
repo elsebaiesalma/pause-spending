@@ -42,14 +42,14 @@ export function UrgeCurve() {
     const update = () => {
       frame = 0;
       const rect = root.getBoundingClientRect();
-      // The whole chart, its axes and its hour labels, is on screen for the
-      // entire draw: it starts as the chart's top reaches 80% of the way down
-      // and finishes once its bottom has risen to 85%, so the last label is
-      // visible when the dot lands on it.
+      // Nothing draws until the whole chart is on screen, y-axis, curve and
+      // hour labels included (its bottom is above 95% of the way down). The
+      // line then draws while the chart rises to the middle of the screen, so
+      // the dot lands on the last label with everything still in view.
       const vh = window.innerHeight;
-      const start = vh * 0.8;
-      const endTop = vh * 0.85 - rect.height;
-      const progress = Math.min(1, Math.max(0, (start - rect.top) / Math.max(1, start - endTop)));
+      const start = vh * 0.95;
+      const end = vh * 0.4 + rect.height / 2;
+      const progress = Math.min(1, Math.max(0, (start - rect.bottom) / Math.max(150, start - end)));
       path.style.strokeDashoffset = String(length * (1 - progress));
       const point = path.getPointAtLength(length * progress);
       dot.setAttribute("cx", point.x.toFixed(1));
@@ -75,7 +75,6 @@ export function UrgeCurve() {
 
   return (
     <figure className={styles.chart} ref={rootRef} data-lit={URGE_MARKS.length}>
-      <figcaption className={styles.axisLabel}>An illustration of the finding, not plotted data</figcaption>
       <div className={styles.plot}>
         <div className={styles.yAxis} aria-hidden="true">
           <span>High</span>

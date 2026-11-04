@@ -150,24 +150,6 @@ export default function Home() {
         <HeroPreview />
       </section>
 
-      {/* The problem, in numbers, on the dark band. */}
-      <section className={styles.band} aria-labelledby="stats-heading">
-        <div className={styles.bandInner}>
-          <h2 id="stats-heading" className={styles.bandHeading}>
-            Checkout is built to be fast. Deciding shouldn&apos;t be.
-          </h2>
-          <div className={styles.statGrid}>
-            {STATS.map((stat) => (
-              <div key={stat.source} className={`${styles.stat} reveal`} data-reveal>
-                <div className={styles.statValue}>{stat.value}</div>
-                <p className={styles.statNote}>{stat.claim}</p>
-                <span className={styles.statSource}>{stat.source}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* How it works */}
       <section className={styles.section} id="how-it-works" aria-labelledby="how-heading">
         <span className={styles.eyebrow}>How it works</span>
@@ -215,10 +197,6 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <p className={styles.caveat}>
-            The research on shopping delays is promising but still early, so PAUSE measures its own
-            outcomes: how many paused items are let go, and how many are bought anyway.
-          </p>
         </div>
       </section>
 
@@ -235,6 +213,24 @@ export default function Home() {
           </p>
         </section>
       )}
+
+      {/* The problem, in numbers, on the dark band. */}
+      <section className={styles.band} aria-labelledby="stats-heading">
+        <div className={styles.bandInner}>
+          <h2 id="stats-heading" className={styles.bandHeading}>
+            Checkout is built to be fast. Deciding shouldn&apos;t be.
+          </h2>
+          <div className={styles.statGrid}>
+            {STATS.map((stat) => (
+              <div key={stat.source} className={`${styles.stat} reveal`} data-reveal>
+                <div className={styles.statValue}>{stat.value}</div>
+                <p className={styles.statNote}>{stat.claim}</p>
+                <span className={styles.statSource}>{stat.source}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* FAQ: native details/summary, so it works without JavaScript and with a keyboard. */}
       <section className={styles.section} id="faq" aria-labelledby="faq-heading">

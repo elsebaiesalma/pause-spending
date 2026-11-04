@@ -1,40 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { ProgressBar } from "@/components/ProgressBar";
 import type { ConcentrationRow } from "@/lib/wardrobeClusters";
 import styles from "./concentration.module.css";
 
-// How many categories show before "Show all". Enough to see where the
-// closet leans without turning the card into a table.
+// On a phone only this many categories show before "Show all". From tablet
+// width every category is shown, in two columns, so there is nothing to open.
 const COLLAPSED_ROWS = 4;
 
-// Colour says rank, so the fullest categories stand out: espresso for the top
-// two, rose for the next two, blush for the rest. Categories with the same
-// count share a tier, so a tie never makes one look fuller than another.
-export function tierFor(rows: readonly ConcentrationRow[]): number[] {
-  const tiers: number[] = [];
-  rows.forEach((row, index) => {
-    if (index > 0 && row.count === rows[index - 1].count) {
-      tiers.push(tiers[index - 1]);
-    } else {
-      tiers.push(index < 2 ? 0 : index < 4 ? 1 : 2);
-    }
-  });
-  return tiers;
+// Polaris progress guidance: the default tone for ordinary progress, a tone
+// only where something needs attention. Here that is a category with
+// near-duplicates (rose); the rest stay neutral (espresso).
+export function toneFor(row: Pick<ConcentrationRow, "wellStocked">): "rose" | "espresso" {
+  return row.wellStocked ? "rose" : "espresso";
 }
 
-const TIER_CLASS = ["tierTop", "tierMid", "tierLow"] as const;
-
-// One row per category: the count against the largest category as a bar, the
-// real count in words, and, for a well-stocked category, one plain sentence
-// about what is repeated. Never a percentage.
+// One row per category: a progress bar of that category's share of the whole
+// closet (the max is the real total, as Polaris asks), the plain count beside
+// it ("5 of 30 pieces"), and, for a well-stocked category, one sentence about
+// what is repeated. Never a percentage.
 export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
   const [expanded, setExpanded] = useState(false);
   if (rows.length === 0) return null;
 
-  const tiers = tierFor(rows);
+  const total = rows.reduce((sum, row) => sum + row.count, 0);
   const canCollapse = rows.length > COLLAPSED_ROWS;
-  const visible = canCollapse && !expanded ? rows.slice(0, COLLAPSED_ROWS) : rows;
 
   return (
     <section className={styles.panel} aria-labelledby="closet-concentration">
@@ -43,17 +34,24 @@ export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
       </h2>
       <p className={styles.sub}>Your fullest categories, and where you own near-duplicates.</p>
       <ul className={styles.rows} role="list" id="closet-concentration-rows">
-        {visible.map((row, index) => (
-          <li key={row.key} className={styles.row}>
+        {rows.map((row, index) => (
+          <li
+            key={row.key}
+            className={styles.row}
+            data-extra={canCollapse && index >= COLLAPSED_ROWS && !expanded ? "" : undefined}
+          >
             <span className={styles.label}>{row.label}</span>
-            <span className={styles.bar} aria-hidden="true">
-              <span
-                className={`${styles.barFill} ${styles[TIER_CLASS[tiers[index]]]}`}
-                style={{ width: `${Math.max(row.share * 100, 2)}%` }}
-              />
-            </span>
             <span className={styles.count}>
-              {row.count} {row.count === 1 ? "piece" : "pieces"}
+              {row.count} of {total} {total === 1 ? "piece" : "pieces"}
+            </span>
+            <span className={styles.bar}>
+              <ProgressBar
+                value={row.count}
+                max={total}
+                label={`${row.label}: ${row.count} of ${total} pieces in your closet`}
+                step={index}
+                tone={toneFor(row)}
+              />
             </span>
             {row.sentence && (
               <span className={styles.sentence}>

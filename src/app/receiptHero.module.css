@@ -1,35 +1,13 @@
 /* The landing hero: copy left, receipt right (stacked on phones). The resting
-   state is the finished receipt (--step 6, --feed 1): reduced motion, no
-   script and short screens all see it. When motion is allowed the script sets
-   data-live, which makes the hero a tall scene with a sticky stage, and drives
-   --feed (paper coming out of the slot, 0 to 1) and --step (0 to 6, which line
-   or event has happened) from the scroll position. */
+   state is the finished, stamped receipt; the script only starts printing once
+   the page has loaded and motion is allowed (data-mode="running"). */
 
 .hero {
-  --step: 6;
-  --feed: 1;
   background: var(--color-espresso);
   color: #fff;
 }
 
-.hero[data-live] {
-  height: 280svh;
-}
-
-.stage {
-  display: grid;
-  align-items: center;
-}
-
-.hero[data-live] .stage {
-  position: sticky;
-  top: 3.5rem;
-  height: calc(100svh - 3.5rem);
-  align-content: center;
-}
-
 .inner {
-  width: 100%;
   max-width: var(--width-container);
   margin: 0 auto;
   padding: 3rem var(--gutter) 3.5rem;
@@ -225,100 +203,118 @@
   border: 0;
 }
 
-/* ---- Scroll states ----
-   Every state is a number from --step, so one rule covers each element:
-   opacity: clamp(0, step - n, 1) is 0 until the step reaches n + 1. */
+/* ---- Printing ---- */
 
-.line {
-  opacity: clamp(0, calc(var(--step) - var(--i, 0)), 1);
+/* The paper stops growing at this height; after that the oldest lines scroll
+   off the top, under a soft fade, and the newest stay beside the total. */
+.lines {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-height: 21rem;
+  overflow: hidden;
 }
 
-.total {
-  opacity: clamp(0, calc(var(--step) - 3), 1);
+.lines[data-full] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 2.5rem);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 2.5rem);
 }
 
-.totalBefore {
-  opacity: clamp(0, calc(6 - var(--step)), 1);
+.earlier {
+  margin: 0.5rem 0;
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
 }
 
-.totalAfter {
-  opacity: clamp(0, calc(var(--step) - 5), 1);
+.receipt[data-clickable] {
+  cursor: pointer;
 }
 
-.kept {
-  opacity: clamp(0, calc(var(--step) - 5), 1);
-}
-
-.line[data-repeat]::after {
-  transform: scaleX(clamp(0, calc(var(--step) - 4), 1));
-}
-
-.stamp {
-  opacity: clamp(0, calc((var(--step) - 4) * 0.9), 0.9);
-  transform: rotate(-12deg) scale(calc(1 + (1 - clamp(0, calc(var(--step) - 4), 1)) * 0.7));
-}
-
-.feed {
-  clip-path: inset(0.75rem -3rem -4rem -3rem);
-}
-
-.receipt {
-  translate: 0 calc((1 - var(--feed)) * -105%);
-}
-
-.hint {
-  display: none;
-}
-
-.hero[data-live] .hint {
-  display: block;
+/* Faint until the receipt is hovered or focused, so it reads as an option
+   without competing with the headline. */
+.pause {
   position: absolute;
-  left: 50%;
+  left: 1.25rem;
   bottom: 1.25rem;
-  translate: -50% 0;
+  min-height: 2.25rem;
+  padding: 0.375rem 0.875rem;
+  gap: 0.5rem;
+  border-color: var(--color-ink);
+  background: rgba(42, 18, 8, 0.06);
+  color: var(--color-ink);
   font-size: 0.8125rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-on-espresso-soft);
-  opacity: clamp(0, calc(1 - var(--step)), 1);
-  pointer-events: none;
+  font-weight: 600;
+  opacity: 0.45;
 }
 
-/* On a phone the stage has to hold the headline, the button and the receipt,
-   so the paragraph waits until the scene is over. */
-@media (max-width: 899px) {
-  .hero[data-live] .body,
-  .hero[data-live] .note {
-    display: none;
-  }
+.pauseIcon {
+  font-size: 0.625rem;
+  letter-spacing: -0.1em;
+}
 
-  .hero[data-live] .inner {
-    padding-top: 1.25rem;
-    padding-bottom: 1.25rem;
-    gap: 1.25rem;
-  }
+.receipt:hover .pause,
+.pause:hover,
+.pause:focus-visible {
+  opacity: 1;
+  background: var(--color-surface);
+}
 
-  .hero[data-live] .actions {
-    margin-top: 1rem;
+@media (hover: none) {
+  /* No hover on a touch screen: keep it a little more visible. */
+  .pause {
+    opacity: 0.7;
   }
+}
+
+.hero .receipt .pause:hover {
+  border-color: var(--color-ink);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .line,
-  .total,
-  .totalBefore,
-  .totalAfter,
-  .kept {
-    transition: opacity 220ms ease-out;
-  }
-
-  .line[data-repeat]::after {
-    transition: transform 320ms ease-out;
+  .line[data-new] {
+    animation: print-in 280ms ease-out both;
   }
 
   .stamp {
-    transition:
-      opacity 200ms ease-out,
-      transform 320ms cubic-bezier(0.2, 1.4, 0.4, 1);
+    animation: stamp-in 320ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  }
+
+  .line[data-repeat]::after {
+    animation: strike 320ms ease-out both;
+  }
+
+  .pause {
+    transition: opacity 200ms ease, background-color 200ms ease;
+  }
+
+  @keyframes print-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes strike {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes stamp-in {
+    from {
+      opacity: 0;
+      transform: rotate(-12deg) scale(1.7);
+    }
+    to {
+      opacity: 0.9;
+      transform: rotate(-12deg) scale(1);
+    }
   }
 }

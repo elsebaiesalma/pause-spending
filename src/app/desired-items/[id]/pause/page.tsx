@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { ProgressBar } from "@/components/ProgressBar";
 import { WarnIcon } from "@/components/WarnIcon";
 import { assemblePauseScreen } from "@/lib/pauseScreen/assemblePauseScreen";
 import { requireUserIdOrRedirect } from "@/lib/session";
@@ -201,38 +202,43 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
               </div>
             </div>
 
-            <div className={styles.question}>
-              <div className={styles.reasonGrid}>
-                <label className={styles.reasonField}>
-                  <span className={styles.questionLabel}>One reason for</span>
-                  <input
-                    type="text"
-                    name="reflectionReasonFor"
-                    maxLength={140}
-                    placeholder="Optional"
-                    defaultValue={reflection?.reasonFor ?? ""}
-                  />
-                </label>
-                <label className={styles.reasonField}>
-                  <span className={styles.questionLabel}>One reason against</span>
-                  <input
-                    type="text"
-                    name="reflectionReasonAgainst"
-                    maxLength={140}
-                    placeholder="Optional"
-                    defaultValue={reflection?.reasonAgainst ?? ""}
-                  />
-                </label>
+            {/* Optional ways to think it through, folded away so the screen
+                opens on two questions, not five things. Still part of the form
+                when closed. */}
+            <details className={styles.more} open={Boolean(hasLook || reflection?.reasonFor || reflection?.reasonAgainst)}>
+              <summary className={styles.moreSummary}>More ways to think it through</summary>
+              <div className={styles.moreBody}>
+                <div className={styles.reasonGrid}>
+                  <label className={styles.reasonField}>
+                    <span className={styles.questionLabel}>One reason for</span>
+                    <input
+                      type="text"
+                      name="reflectionReasonFor"
+                      maxLength={140}
+                      placeholder="Optional"
+                      defaultValue={reflection?.reasonFor ?? ""}
+                    />
+                  </label>
+                  <label className={styles.reasonField}>
+                    <span className={styles.questionLabel}>One reason against</span>
+                    <input
+                      type="text"
+                      name="reflectionReasonAgainst"
+                      maxLength={140}
+                      placeholder="Optional"
+                      defaultValue={reflection?.reasonAgainst ?? ""}
+                    />
+                  </label>
+                </div>
+                <div className={styles.question}>
+                  <p className={styles.questionLabel}>Or picture it with what you own</p>
+                  <div className="action-group">
+                    <BuildLookButton itemId={desiredItem.id} />
+                  </div>
+                  {hasLook && <p className={styles.emptyNote}>You have built a look for this one.</p>}
+                </div>
               </div>
-            </div>
-
-            <div className={styles.question}>
-              <p className={styles.questionLabel}>Or picture it with what you own</p>
-              <div className="action-group">
-                <BuildLookButton itemId={desiredItem.id} />
-              </div>
-              {hasLook && <p className={styles.emptyNote}>You have built a look for this one.</p>}
-            </div>
+            </details>
           </div>
         </section>
 
@@ -257,23 +263,16 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
             </p>
           ) : (
             <>
-              <div className={styles.budgetBar}>
-                <div
-                  className={styles.budgetBarProjected}
-                  style={{ width: `${Math.min(100, (budget.spendAfterPurchase / budget.budgetAmount) * 100)}%` }}
-                />
-                <div
-                  className={styles.budgetBarSpend}
-                  style={{ width: `${Math.min(100, (budget.spend / budget.budgetAmount) * 100)}%` }}
-                />
-              </div>
+              <ProgressBar
+                value={budget.spendAfterPurchase}
+                max={budget.budgetAmount}
+                label={`${"$"}${budget.spendAfterPurchase.toFixed(0)} of ${"$"}${budget.budgetAmount.toFixed(0)} if you buy this`}
+                step={0}
+                tone={budget.spendAfterPurchase > budget.budgetAmount ? "warn" : "espresso"}
+              />
               <p className={styles.budgetLine}>
-                ${budget.spend.toFixed(0)} of ${budget.budgetAmount.toFixed(0)} → $
-                {budget.spendAfterPurchase.toFixed(0)} if you buy this
-              </p>
-              <p className={styles.budgetPercent}>
-                This is {Math.round(((budget.spendAfterPurchase - budget.spend) / budget.budgetAmount) * 100)}% of
-                your monthly plan
+                ${budget.spend.toFixed(0)} of ${budget.budgetAmount.toFixed(0)} spent. ${budget.spendAfterPurchase.toFixed(0)}{" "}
+                if you buy this.
               </p>
               {budget.spendAfterPurchase > budget.budgetAmount && (
                 <p className={styles.overPlan}>
@@ -284,10 +283,10 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           )}
         </section>
 
-        {/* Same labels and order as every other screen with these actions. Three
-            tiers: the pause is the main choice; Decide later and Let it go sit
-            below as smaller outlined buttons; Buy anyway stays possible but is the
-            quietest choice, on its own line. */}
+        {/* Same labels and order as every other screen with these actions. Two
+            tiers (Polaris: one primary, the rest quieter): the pause is the
+            main choice, with 7 days beside it; Decide later, Let it go and
+            Buy anyway are plain text buttons in one row below. */}
         <div className={styles.actions}>
           <div className={styles.actionMain}>
             <button type="submit" formAction={waitAction} name="duration" value="24h" className="btn-primary action">
@@ -300,15 +299,13 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           <p className={styles.actionDivider}>
             <span>or decide now</span>
           </p>
-          <div className={styles.actionSecond}>
-            <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action">
+          <div className={styles.actionQuiet}>
+            <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action action--quiet">
               Decide later
             </button>
-            <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action">
+            <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action action--quiet">
               Let it go
             </button>
-          </div>
-          <div className={styles.actionBuy}>
             <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
           </div>
         </div>
