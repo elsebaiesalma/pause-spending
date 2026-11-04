@@ -34,7 +34,7 @@ describe("ensureWardrobeItemTagged", () => {
 
     const tagged = await ensureWardrobeItemTagged(item);
 
-    expect(tagged.colorName).toBe("navy");
+    expect(tagged.colorName).toBeNull(); // names are no longer written
     expect(tagged.colorFamily).toBe("navy");
     expect(tagged.styleTags).toEqual(["business-casual"]);
     expect(tagged.useCaseTags).toEqual(["work"]);
@@ -79,7 +79,7 @@ describe("ensureWardrobeItemTagged", () => {
     const secondResult = await ensureWardrobeItemTagged(firstResult);
 
     expect(extractWardrobeItemTags).toHaveBeenCalledTimes(1);
-    expect(secondResult.colorName).toBe("burgundy");
+    expect(secondResult.colorName).toBeNull();
     expect(secondResult.colorFamily).toBe("red");
   });
 });

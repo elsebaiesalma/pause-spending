@@ -101,3 +101,34 @@
 .stepAction form {
   max-width: none;
 }
+
+.dismissible {
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-ink-soft);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: var(--color-bg-alt);
+  color: var(--color-ink);
+}
+
+/* Leave room so the count never sits under the close button. */
+.dismissible .header {
+  padding-right: 2.5rem;
+}

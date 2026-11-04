@@ -7,6 +7,7 @@ import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib
 import { PageHeader } from "@/components/PageHeader";
 import { ClosetTabs } from "@/components/ClosetTabs";
 import { PieceForm } from "@/components/PieceForm";
+import { commonColors } from "@/lib/pieceForm";
 import { ClosetConcentration } from "./ClosetConcentration";
 import { WardrobeBrowser } from "./WardrobeBrowser";
 import styles from "./page.module.css";
@@ -57,7 +58,13 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
       <h2>Add a piece</h2>
-      <PieceForm mode="add" action="/api/wardrobe" cancelHref="#" submitLabel="Add to closet" />
+      <PieceForm
+        mode="add"
+        action="/api/wardrobe"
+        cancelHref="#"
+        submitLabel="Add to closet"
+        commonColors={commonColors(rows.map((row) => row.colorFamily))}
+      />
     </section>
   );
 

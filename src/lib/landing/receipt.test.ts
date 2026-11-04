@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RECEIPT_LINES, feedLine, money, receiptTotals, runningTotals } from "./receipt";
+import { RECEIPT_LINES, WINDOW_LINES, feedLine, lineAt, money, receiptTotals, runningTotals, tabTotals } from "./receipt";
 
 describe("example receipt", () => {
   it("adds up: the repeats come off and the rest stays in the plan", () => {
@@ -36,5 +36,16 @@ describe("example receipt", () => {
     const two = runningTotals(2);
     expect(two.kept).toBe(69 + feedLine(1).price);
     expect(two.all - two.kept).toBe(two.afterPause);
+  });
+
+  it("the visible window is the four starting lines then the feed, and its totals match", () => {
+    const first = Array.from({ length: WINDOW_LINES }, (_, i) => lineAt(i));
+    expect(first.slice(0, 4)).toEqual([...RECEIPT_LINES]);
+    expect(first[4]).toEqual(feedLine(0));
+    const sum = (lines: typeof first) => lines.reduce((t, l) => t + l.price, 0);
+    const totals = tabTotals(0);
+    expect(totals.all).toBe(sum(first));
+    expect(totals.kept).toBe(sum(first.filter((l) => l.repeat)));
+    expect(tabTotals(3).all).toBe(sum(Array.from({ length: WINDOW_LINES + 3 }, (_, i) => lineAt(i))));
   });
 });

@@ -124,9 +124,10 @@ describe("WardrobePage", () => {
       expect(html).toContain('href="#add-to-wardrobe"');
       expect(html).toContain('for="piece-name"');
       expect(html).toContain('for="piece-category"');
-      // One radio per colour family, plus "Not sure".
-      expect(html.match(/name="colorFamily"/g)).toHaveLength(16);
-      expect(html).toContain(">Navy<");
+      // The three most common colours first, then Show more and Other.
+      expect(html.match(/name="colorPick"/g)!.length).toBeGreaterThanOrEqual(4);
+      expect(html).toContain("Show more");
+      expect(html).toContain(">Other<");
       expect(html).toContain("More details");
       expect(html).not.toContain("comma separated");
     });

@@ -1,0 +1,98 @@
+.wheel {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 20rem;
+}
+
+.picked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* The two wheels share one highlight band across the middle row. */
+.columns {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.5rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 12px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.band {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  top: calc(50% + 0.75rem - 1.25rem);
+  height: 2.5rem;
+  border-radius: 8px;
+  background: var(--color-blush);
+  pointer-events: none;
+}
+
+.columns[data-unset] .band {
+  opacity: 0.5;
+}
+
+.col {
+  position: relative;
+  display: grid;
+  justify-items: stretch;
+}
+
+.colLabel {
+  padding: 0.5rem 0 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+
+.list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  height: 12.5rem;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+  /* Rows fade out toward the top and bottom, like a wheel turning away. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%);
+  /* Room above and below so the first and last row can reach the middle. */
+  padding-block: 5rem;
+  box-sizing: border-box;
+}
+
+.list::-webkit-scrollbar {
+  display: none;
+}
+
+.list:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+
+.row {
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  scroll-snap-align: center;
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.row[aria-selected="true"] {
+  color: var(--color-ink);
+  font-weight: 600;
+}

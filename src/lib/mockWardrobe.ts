@@ -88,7 +88,7 @@ export function buildRows(item: MockItem, userId: string, imageExists: (file: st
       price: item.price,
       category: item.category,
       imageUrl,
-      colorName: item.colorName,
+      colorName: null,
       colorFamily: item.colorFamily,
       // The real ingestion rule: a purchase with no price is always a review draft.
       status: item.price === null ? "needs_review" : "active",
@@ -100,7 +100,7 @@ export function buildRows(item: MockItem, userId: string, imageExists: (file: st
       itemName: fullName,
       imageUrl,
       category: item.category,
-      colorName: item.colorName,
+      colorName: null,
       colorFamily: item.colorFamily,
       styleTags: item.tags,
       ownedSince: purchaseDate,

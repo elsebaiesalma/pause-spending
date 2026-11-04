@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import { ProgressBar } from "@/components/ProgressBar";
-import { WarnIcon } from "@/components/WarnIcon";
 import { assemblePauseScreen } from "@/lib/pauseScreen/assemblePauseScreen";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
@@ -8,10 +6,10 @@ import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
 import { ItemArt } from "@/components/ItemArt";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
-import { hasReflectionAnswer } from "@/lib/pauseScreen/reflectionGate";
 import { compareAttributes, similarityBand } from "@/lib/pauseScreen/attributeMatch";
 import { BuildLookButton } from "./BuildLookButton";
-import { BuyAnywayButton } from "./BuyAnywayButton";
+import { ImpactRows } from "./ImpactRows";
+import { ReflectionSteps } from "./ReflectionSteps";
 import styles from "./page.module.css";
 
 const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
@@ -38,6 +36,31 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
   const price = desiredItem.price ? Number(desiredItem.price) : null;
   const waitAction = `/api/desired-items/${desiredItem.id}/wait`;
   const resolveAction = `/api/desired-items/${desiredItem.id}/resolve`;
+
+  // The last step: what buying does to the plan, in three rows and one bar
+  // that shows this item's share of the month.
+  const money = (n: number) => `$${n.toFixed(0)}`;
+  const impactStep = !budget.hasBudget ? (
+    <p className={styles.emptyNote}>
+      No plan set yet -{" "}
+      <a href="/budget" className="link">
+        set one
+      </a>{" "}
+      to see how this affects it.
+    </p>
+  ) : !budget.priceKnown ? (
+    <p className={styles.emptyNote}>
+      This item has no price yet, so its effect on your plan can&apos;t be shown. Spent so far this month:{" "}
+      {money(budget.spend)} of {money(budget.budgetAmount)}.
+    </p>
+  ) : (
+    <ImpactRows
+      budget={budget.budgetAmount}
+      spent={budget.spend}
+      item={budget.spendAfterPurchase - budget.spend}
+      after={budget.spendAfterPurchase}
+    />
+  );
 
   // The closest owned piece goes side by side with the wanted one; the
   // rest are listed below it. "Closest" is the database's own order, since
@@ -154,34 +177,44 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         <div className={styles.columns}>
         <section className={`section ${styles.card}`} id="reflection">
           <h2 className={styles.cardTitle}>A moment to think</h2>
-          <div className={styles.reflectionForm}>
-            <div className={styles.question}>
-              <p className={styles.questionLabel}>What would this replace?</p>
-              <div className={styles.chipRow} role="radiogroup" aria-label="What would this replace?">
-                {similarItems.map((item) => (
-                  <label key={item.id} className={styles.chipOption}>
-                    <input
-                      type="radio"
-                      name="reflectionReplaces"
-                      value={item.id}
-                      defaultChecked={reflection?.replacesWardrobeItemId === item.id}
-                    />
-                    <span>{item.itemName}</span>
-                  </label>
-                ))}
-                <label className={styles.chipOption}>
-                  <input
-                    type="radio"
-                    name="reflectionReplaces"
-                    value={REFLECTION_NOTHING_VALUE}
-                    defaultChecked={reflection?.replacesNothing ?? false}
-                  />
-                  <span>Nothing, it&apos;s new to me</span>
-                </label>
-              </div>
-            </div>
+          <ReflectionSteps
+            questions={[
+              {
+                title: "replaces",
+                body: (
+                  <div className={styles.question}>
+                    <p className={styles.questionLabel}>What would this replace?</p>
+                    <div className={styles.chipRow} role="radiogroup" aria-label="What would this replace?">
+                      {similarItems.map((item) => (
+                        <label key={item.id} className={styles.chipOption}>
+                          <input
+                            type="radio"
+                            name="reflectionReplaces"
+                            value={item.id}
+                            defaultChecked={reflection?.replacesWardrobeItemId === item.id}
+                          />
+                          <span>{item.itemName}</span>
+                        </label>
+                      ))}
+                      <label className={styles.chipOption}>
+                        <input
+                          type="radio"
+                          name="reflectionReplaces"
+                          value={REFLECTION_NOTHING_VALUE}
+                          defaultChecked={reflection?.replacesNothing ?? false}
+                        />
+                        <span>Nothing, it&apos;s new to me</span>
+                      </label>
+                    </div>
+                  </div>
 
-            <div className={styles.question}>
+
+                ),
+              },
+              {
+                title: "need",
+                body: (
+                  <div className={styles.question}>
               <p className={styles.questionLabel}>How much do you need it?</p>
               <div className={styles.scaleRow} role="radiogroup" aria-label="How much do you need it? 1 to 7">
                 {NEED_SCALE.map((score) => (
@@ -202,12 +235,13 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
               </div>
             </div>
 
-            {/* Optional ways to think it through, folded away so the screen
-                opens on two questions, not five things. Still part of the form
-                when closed. */}
-            <details className={styles.more} open={Boolean(hasLook || reflection?.reasonFor || reflection?.reasonAgainst)}>
-              <summary className={styles.moreSummary}>More ways to think it through</summary>
-              <div className={styles.moreBody}>
+
+                ),
+              },
+              {
+                title: "reasons",
+                body: (
+                  <div className={styles.reflectionForm}>
                 <div className={styles.reasonGrid}>
                   <label className={styles.reasonField}>
                     <span className={styles.questionLabel}>One reason for</span>
@@ -237,52 +271,17 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                   </div>
                   {hasLook && <p className={styles.emptyNote}>You have built a look for this one.</p>}
                 </div>
-              </div>
-            </details>
-          </div>
+                  </div>
+                ),
+              },
+            ]}
+            impact={impactStep}
+          />
         </section>
 
-        {/* 4 and 5. The cost and the decision share the right column: what it
-            does to the plan, then the buttons, so nothing is left floating
-            under a short card. */}
+        {/* The decision stays in view at every step, so pausing is one press away
+            whichever question is showing. */}
         <aside className={styles.decision}>
-        <section className={`section ${styles.card} ${styles.budgetSection}`}>
-          <h2 className={styles.cardTitle}>This month</h2>
-          {!budget.hasBudget ? (
-            <p className={styles.emptyNote}>
-              No plan set yet -{" "}
-              <a href="/budget" className="link">
-                set one
-              </a>{" "}
-              to see how this affects it.
-            </p>
-          ) : !budget.priceKnown ? (
-            <p className={styles.emptyNote}>
-              This item has no price yet, so its effect on your plan can&apos;t be shown. Spent so far this month: $
-              {budget.spend.toFixed(0)} of ${budget.budgetAmount.toFixed(0)}.
-            </p>
-          ) : (
-            <>
-              <ProgressBar
-                value={budget.spendAfterPurchase}
-                max={budget.budgetAmount}
-                label={`${"$"}${budget.spendAfterPurchase.toFixed(0)} of ${"$"}${budget.budgetAmount.toFixed(0)} if you buy this`}
-                step={0}
-                tone={budget.spendAfterPurchase > budget.budgetAmount ? "warn" : "espresso"}
-              />
-              <p className={styles.budgetLine}>
-                ${budget.spend.toFixed(0)} of ${budget.budgetAmount.toFixed(0)} spent. ${budget.spendAfterPurchase.toFixed(0)}{" "}
-                if you buy this.
-              </p>
-              {budget.spendAfterPurchase > budget.budgetAmount && (
-                <p className={styles.overPlan}>
-                  <WarnIcon />${(budget.spendAfterPurchase - budget.budgetAmount).toFixed(0)} over your plan
-                </p>
-              )}
-            </>
-          )}
-        </section>
-
         {/* Same labels and order as every other screen with these actions. Two
             tiers (Polaris: one primary, the rest quieter): the pause is the
             main choice, with 7 days beside it; Decide later, Let it go and
@@ -297,7 +296,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
             </button>
           </div>
           <p className={styles.actionDivider}>
-            <span>or decide now</span>
+            <span>Or skip the wait</span>
           </p>
           <div className={styles.actionQuiet}>
             <button type="submit" formAction={resolveAction} name="outcome" value="saved_for_later" className="action action--quiet">
@@ -306,7 +305,9 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
             <button type="submit" formAction={resolveAction} name="outcome" value="dropped" className="action action--quiet">
               Let it go
             </button>
-            <BuyAnywayButton formAction={resolveAction} alreadyAnswered={hasReflectionAnswer(reflection, hasLook)} />
+            <button type="submit" formAction={resolveAction} name="outcome" value="proceeded" className="action action--quiet">
+              Buy anyway
+            </button>
           </div>
         </div>
         </aside>

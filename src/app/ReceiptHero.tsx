@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { RECEIPT_LINES, feedLine, money, runningTotals, type ReceiptLine } from "@/lib/landing/receipt";
+import { WINDOW_LINES, lineAt, money, tabTotals } from "@/lib/landing/receipt";
 import styles from "./receiptHero.module.css";
 
-// A new line prints this often while nobody has paused the receipt.
-const PRINT_EVERY_MS = 1100;
-// Lines kept on the paper at once. Older ones have scrolled off, and are
-// counted in "+ N earlier items" so the total is still the whole tab.
-const VISIBLE_LINES = 14;
+// A new line scrolls in this often while nobody has paused the receipt. The
+// slide itself (receiptHero.module.css) is shorter, so there is a beat between.
+const PRINT_EVERY_MS = 1300;
 
 type Mode = "static" | "running" | "paused";
 
@@ -23,16 +21,17 @@ function subscribeToMotion(onChange: () => void) {
 }
 
 // The opening of the landing page: the headline and call to action on the
-// left, and a receipt on the right that keeps printing by itself, a new item
-// every second or so, so the tab only ever grows. Hover it and a faint Pause
-// button shows (clicking anywhere on the receipt does the same). Pausing
-// stamps it PAUSED, strikes through the repeats and shows what stays in the
-// plan, which is the product in one gesture.
+// left, and a receipt on the right that scrolls by itself. The paper stays the
+// same size: a window of eight lines, new items arriving at the bottom while the
+// tab slides up and the total counts up beneath it. A faint Pause button sits
+// in the middle of the paper (clicking the paper does the same). Pausing stops
+// the scroll, strikes through the repeats and shows what stays in the plan,
+// which is the product in one gesture.
 //
-// The finished, stamped receipt is the default ("static"): with reduced
-// motion, with no script and before hydration the receipt is exactly that and
-// nothing moves. Only once the page has loaded, and only when the visitor
-// allows motion, does it start printing.
+// The finished receipt (repeats struck, what stays in the plan shown) is the
+// default ("static"): with reduced motion, with no script and before hydration
+// the receipt is exactly that and nothing moves. Only once the page has loaded,
+// and only when the visitor allows motion, does it start scrolling.
 export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: ReactNode }) {
   const motionOk = useSyncExternalStore(
     subscribeToMotion,
@@ -67,12 +66,13 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
 
   const interactive = mode !== "static";
   const stamped = mode !== "running";
-  const totals = runningTotals(extra);
+  const totals = tabTotals(extra);
 
-  const printed: ReceiptLine[] = [...RECEIPT_LINES];
-  for (let i = 0; i < extra; i += 1) printed.push(feedLine(i));
-  const firstShown = Math.max(0, printed.length - VISIBLE_LINES);
-  const shown = printed.slice(firstShown);
+  // Before the first tick the window shows lines 0 to 7. After it, one line
+  // more is rendered above the window and the whole track slides up by a line
+  // (CSS), which ends looking exactly like the next tick's starting frame.
+  const first = Math.max(0, extra - 1);
+  const rendered = Array.from({ length: extra === 0 ? WINDOW_LINES : WINDOW_LINES + 1 }, (_, k) => lineAt(first + k));
 
   function toggle() {
     setPaused((current) => !current);
@@ -84,11 +84,11 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
         <div className={styles.copy}>
           <span className={styles.eyebrow}>For the moment before checkout</span>
           <h1 id="hero-heading" className={styles.heading}>
-            It adds up quietly.
+            Want it now? Want it tomorrow?
           </h1>
           <p className={styles.body}>
-            Three white tees and a coat, one tap at a time. PAUSE spots what you already own before you buy it
-            again, and the money stays in your plan.
+            The urge to buy fades with time. PAUSE puts a day between wanting and buying, with your closet in view,
+            so you only keep what you still want.
           </p>
           <div className={styles.actions}>{actions}</div>
           {note && <p className={styles.note}>{note}</p>}
@@ -110,23 +110,32 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
               <p className={styles.shop} aria-hidden="true">
                 CHECKOUT &middot; ORDER 0429
               </p>
-              <p className={styles.date} aria-hidden="true">
-                An example, not real data
-              </p>
               <hr className={styles.rule} />
-              <div className={styles.lines} data-full={shown.length >= VISIBLE_LINES || undefined} aria-hidden="true">
-                {firstShown > 0 && <p className={styles.earlier}>+ {firstShown} earlier items</p>}
-                {shown.map((line, index) => (
-                  <p
-                    key={firstShown + index}
-                    className={styles.line}
-                    data-repeat={stamped && line.repeat ? "true" : undefined}
-                    data-new={interactive && firstShown + index >= RECEIPT_LINES.length ? "true" : undefined}
+              <div className={styles.window} data-moving={interactive || undefined}>
+                <div key={extra} className={styles.track} data-slide={extra > 0 || undefined} aria-hidden="true">
+                  {rendered.map((line, index) => (
+                    <p key={first + index} className={styles.line} data-repeat={stamped && line.repeat ? "true" : undefined}>
+                      <span>{line.name}</span>
+                      <span className={styles.amount}>{line.price.toFixed(2)}</span>
+                    </p>
+                  ))}
+                </div>
+                {interactive && (
+                  <button
+                    type="button"
+                    className={styles.pause}
+                    aria-pressed={mode === "paused"}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      toggle();
+                    }}
                   >
-                    <span>{line.name}</span>
-                    <span className={styles.amount}>{line.price.toFixed(2)}</span>
-                  </p>
-                ))}
+                    <span className={styles.pauseIcon} aria-hidden="true">
+                      {mode === "paused" ? "▶" : "❚❚"}
+                    </span>
+                    {mode === "paused" ? "Resume" : "Pause"}
+                  </button>
+                )}
               </div>
               <div aria-hidden="true">
                 <hr className={styles.rule} />
@@ -134,36 +143,18 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
                   <span>TOTAL</span>
                   <span className={styles.amount}>{money(stamped ? totals.afterPause : totals.all)}</span>
                 </p>
-                {stamped && (
-                  <p className={`${styles.line} ${styles.kept}`}>
-                    <span>KEPT IN YOUR PLAN</span>
-                    <span className={styles.amount}>{money(totals.kept)}</span>
-                  </p>
-                )}
-                {stamped && <span className={styles.stamp}>PAUSED</span>}
+                {/* Always in the layout, so showing it never changes the paper's size. */}
+                <p className={`${styles.line} ${styles.kept}`} data-hidden={!stamped || undefined}>
+                  <span>KEPT IN YOUR PLAN</span>
+                  <span className={styles.amount}>{money(totals.kept)}</span>
+                </p>
               </div>
-              {interactive && (
-                <button
-                  type="button"
-                  className={styles.pause}
-                  aria-pressed={mode === "paused"}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggle();
-                  }}
-                >
-                  <span className={styles.pauseIcon} aria-hidden="true">
-                    {mode === "paused" ? "▶" : "❚❚"}
-                  </span>
-                  {mode === "paused" ? "Resume" : "Pause"}
-                </button>
-              )}
             </div>
           </div>
           <figcaption className={styles.srOnly}>
-            An example receipt that keeps printing new items. It starts with a white crew tee $34, a white linen tee
-            $29, an oversized white tee $40 and a black wool coat $189, {money(292)} in all. When paused, PAUSE flags
-            the repeats and shows what stays in the plan.
+            An example, not real data: a checkout receipt that keeps scrolling with new items. It starts with a white
+            crew tee $34, a white linen tee $29, an oversized white tee $40 and a black wool coat $189, {money(292)} in
+            all. When paused, PAUSE flags the repeats and shows what stays in the plan.
           </figcaption>
         </figure>
       </div>

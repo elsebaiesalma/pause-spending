@@ -9,17 +9,12 @@ import styles from "./concentration.module.css";
 // width every category is shown, in two columns, so there is nothing to open.
 const COLLAPSED_ROWS = 4;
 
-// Polaris progress guidance: the default tone for ordinary progress, a tone
-// only where something needs attention. Here that is a category with
-// near-duplicates (rose); the rest stay neutral (espresso).
-export function toneFor(row: Pick<ConcentrationRow, "wellStocked">): "rose" | "espresso" {
-  return row.wellStocked ? "rose" : "espresso";
-}
-
 // One row per category: a progress bar of that category's share of the whole
 // closet (the max is the real total, as Polaris asks), the plain count beside
 // it ("5 of 30 pieces"), and, for a well-stocked category, one sentence about
-// what is repeated. Never a percentage.
+// what is repeated. Never a percentage. Every bar is the same colour, so a bar
+// of a given length always means the same thing; the near-duplicate sentence
+// (with its dot) is what carries the warning, not a different bar colour.
 export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
   const [expanded, setExpanded] = useState(false);
   if (rows.length === 0) return null;
@@ -50,7 +45,6 @@ export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
                 max={total}
                 label={`${row.label}: ${row.count} of ${total} pieces in your closet`}
                 step={index}
-                tone={toneFor(row)}
               />
             </span>
             {row.sentence && (

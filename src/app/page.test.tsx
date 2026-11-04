@@ -6,6 +6,7 @@ vi.mock("./fonts", () => ({
 }));
 
 import Home from "./page";
+import { money, tabTotals } from "@/lib/landing/receipt";
 
 describe("Home (landing page)", () => {
   it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
@@ -92,13 +93,16 @@ describe("Home (landing page)", () => {
 
   it("shows the receipt band as a labelled example, with sums that match and the call to action", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("It adds up quietly.");
+    expect(html).toContain("Want it now? Want it tomorrow?");
+    // Said to screen readers (not shown on the paper), and the resting receipt's sums match its lines.
     expect(html).toContain("An example, not real data");
     expect(html).toContain("$292.00");
-    expect(html).toContain("$223.00");
-    expect(html).toContain("$69.00");
+    const rest = tabTotals(0);
+    expect(html).toContain(money(rest.afterPause));
+    expect(html).toContain(money(rest.kept));
+    expect(html).not.toContain("PAUSED");
     expect(html).toContain('id="hero-heading"');
-    expect(html.indexOf("It adds up quietly.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
+    expect(html.indexOf("Want it now? Want it tomorrow?")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
     expect(html).toContain("Frequently asked questions");
     expect(html).not.toContain("Good to know");
   });

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { PageHeader } from "@/components/PageHeader";
 import { PieceForm } from "@/components/PieceForm";
+import { commonColors } from "@/lib/pieceForm";
 
 export default async function EditWardrobeItemPage({
   params,
@@ -17,6 +18,11 @@ export default async function EditWardrobeItemPage({
     notFound();
   }
 
+  const closetColors = await prisma.wardrobeItem.findMany({
+    where: { userId, status: { not: "returned" } },
+    select: { colorFamily: true },
+  });
+
   return (
     <div className="page">
       <PageHeader back={{ href: "/wardrobe", label: "Closet" }} title="Edit piece" subtitle={item.itemName} />
@@ -25,6 +31,7 @@ export default async function EditWardrobeItemPage({
         action={`/api/wardrobe/${item.id}/update`}
         cancelHref="/wardrobe"
         submitLabel="Save"
+        commonColors={commonColors(closetColors.map((row) => row.colorFamily))}
         brandPriceNote={item.sourcePurchase ? `Brand and price come from the order (${item.sourcePurchase.merchant}).` : undefined}
         initial={{
           itemName: item.itemName,

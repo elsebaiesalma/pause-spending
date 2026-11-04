@@ -24,7 +24,7 @@ import PauseScreenPage from "./page";
 
 const SLOW = 60_000;
 
-describe("PauseScreenPage: build a look, and the Buy anyway gate", () => {
+describe("PauseScreenPage: build a look, steps, and Buy anyway", () => {
   let fixture: TwoTenantFixture | undefined;
 
   afterEach(async () => {
@@ -69,37 +69,23 @@ describe("PauseScreenPage: build a look, and the Buy anyway gate", () => {
   );
 
   it(
-    "the gate is closed with no reflection answer and no look",
+    "Buy anyway is a plain submit button: no reflection answer is needed",
     async () => {
       fixture = await createTwoTenantFixture();
       const html = await render(fixture.userA);
 
-      expect(html).toContain('data-reflection-answered="false"');
+      expect(html).toContain("Buy anyway");
+      expect(html).not.toContain("data-reflection-answered");
+      expect(html).not.toContain("Answer one quick question first");
+      expect(html).toContain("Or skip the wait");
+      expect(html).not.toContain("or decide now");
       expect(html).not.toContain("You have built a look for this one.");
     },
     SLOW
   );
 
   it(
-    "a saved look counts as a reflection answer, so Buy anyway no longer asks for one",
-    async () => {
-      fixture = await createTwoTenantFixture();
-      const { userA } = fixture;
-      await saveLook(userA.user.id, {
-        placements: [{ wardrobeItemId: userA.wardrobeItem.id, x: 0.2, y: 0.2, scale: 0.4, zOrder: 0 }],
-        inspiredByDesiredItemId: userA.desiredItem.id,
-      });
-
-      const html = await render(userA);
-
-      expect(html).toContain('data-reflection-answered="true"');
-      expect(html).toContain("You have built a look for this one.");
-    },
-    SLOW
-  );
-
-  it(
-    "a look built for a different item does not open the gate",
+    "shows a saved look for this item, and not one built for a different item",
     async () => {
       fixture = await createTwoTenantFixture();
       const { userA } = fixture;
@@ -110,8 +96,26 @@ describe("PauseScreenPage: build a look, and the Buy anyway gate", () => {
         placements: [{ wardrobeItemId: userA.wardrobeItem.id, x: 0.2, y: 0.2, scale: 0.4, zOrder: 0 }],
         inspiredByDesiredItemId: other.id,
       });
+      expect(await render(userA)).not.toContain("You have built a look for this one.");
 
-      expect(await render(userA)).toContain('data-reflection-answered="false"');
+      await saveLook(userA.user.id, {
+        placements: [{ wardrobeItemId: userA.wardrobeItem.id, x: 0.2, y: 0.2, scale: 0.4, zOrder: 0 }],
+        inspiredByDesiredItemId: userA.desiredItem.id,
+      });
+      expect(await render(userA)).toContain("You have built a look for this one.");
+    },
+    SLOW
+  );
+
+  it(
+    "asks one question at a time and ends on the cost of buying",
+    async () => {
+      fixture = await createTwoTenantFixture();
+      const html = await render(fixture.userA);
+
+      expect(html).toContain("Question 1 of 3");
+      expect(html.indexOf("What would this replace?")).toBeLessThan(html.indexOf("How much do you need it?"));
+      expect(html.indexOf("How much do you need it?")).toBeLessThan(html.indexOf("One reason for"));
     },
     SLOW
   );

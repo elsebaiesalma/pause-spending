@@ -35,7 +35,7 @@ describe("ensureDesiredItemTagged", () => {
     const tagged = await ensureDesiredItemTagged(item);
 
     expect(tagged.category).toBe("outerwear");
-    expect(tagged.colorName).toBe("navy");
+    expect(tagged.colorName).toBeNull(); // names are no longer written
     expect(tagged.colorFamily).toBe("navy");
     expect(tagged.styleTags).toEqual(["business-casual"]);
   });

@@ -3,6 +3,7 @@ import { createManualWardrobeItem } from "@/lib/wardrobe";
 import { requireUserId } from "@/lib/session";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
 import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
+import { resolveColor } from "@/lib/colorResolve";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -38,14 +39,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // A typed colour ("Other") is filed under its closest family; a chosen family is kept.
+  const color = await resolveColor({ colorFamily, colorName: form.get("colorName")?.toString() });
+
   await createManualWardrobeItem({
     userId,
     itemName,
     category: form.get("category")?.toString() || null,
     brand,
     price: price.value,
-    colorName: form.get("colorName")?.toString().trim() || null,
-    colorFamily,
+    colorName: color.colorName,
+    colorFamily: color.colorFamily,
     styleTags: parseTags(form.get("styleTags")?.toString() ?? null),
     useCaseTags: parseTags(form.get("useCaseTags")?.toString() ?? null),
     ownedSince: ownedSinceRaw ? new Date(ownedSinceRaw) : null,
