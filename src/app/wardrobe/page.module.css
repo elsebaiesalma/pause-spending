@@ -302,11 +302,34 @@
   z-index: 2;
 }
 
+/* Every card in a row lines up: brand and date share the top line, the name
+   always reserves two lines, and price and colour are pinned to the bottom
+   edge, so a short name never lifts the footer. */
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
 .cardBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 0.468rem 0.75rem 0.612rem 0.75rem;
 }
 
+.cardTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.1rem;
+}
+
 .cardBrand {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-body);
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -314,32 +337,52 @@
   color: var(--color-ink-faint);
 }
 
+.cardDate {
+  flex: none;
+  margin-left: auto;
+  font-size: 0.8125rem;
+  color: var(--color-ink-soft);
+}
+
 .cardName {
   margin-top: 0.144rem;
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.3;
+  /* Two lines reserved, whatever the name length. */
+  min-height: 2.6em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.cardMeta {
-  margin-top: 0.288rem;
+.cardFoot {
+  margin-top: auto;
+  padding-top: 0.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   font-size: 1rem;
   color: var(--color-ink-soft);
 }
 
+.cardPrice {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
 .cardColor {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 
 .priceNotSet {
   color: var(--color-ink-faint);

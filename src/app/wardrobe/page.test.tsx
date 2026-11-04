@@ -82,12 +82,16 @@ describe("WardrobePage", () => {
       expect(html).toContain("Espresso");
     });
 
-    it("lists price first, then the date on its own line", async () => {
+    it("puts the date top right beside the brand, and the price bottom left", async () => {
       const html = await renderFor(await seedCard(null));
       const price = html.indexOf(">$59<");
       const date = html.indexOf(">Mar 2026<");
+      const name = html.indexOf(">Boxy Fit Tee<");
       expect(price).toBeGreaterThan(-1);
-      expect(date).toBeGreaterThan(price);
+      expect(date).toBeGreaterThan(-1);
+      // Top row (brand, date), then the name, then the footer (price, colour).
+      expect(date).toBeLessThan(name);
+      expect(price).toBeGreaterThan(name);
     });
 
     it("shows a seeded row's photo, and the category placeholder only when it has no image", async () => {

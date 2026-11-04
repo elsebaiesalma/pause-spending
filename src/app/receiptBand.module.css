@@ -1,0 +1,340 @@
+/* "It adds up quietly." Default (reduced motion, no script, first paint): a
+   normal-height band showing the finished, stamped receipt with the call to
+   action beneath. [data-live] (set by the script when motion is allowed)
+   turns it into a tall scene with a sticky stage, driven by --p (0 to 1) and
+   data-phase (0 printing, 1 the coat, 2 stamped, 3 torn off). */
+
+.band {
+  --p: 1;
+  background: var(--color-espresso);
+  color: #fff;
+}
+
+.stage {
+  max-width: var(--width-container, 72rem);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-3);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    column-gap: var(--space-5);
+  }
+}
+
+/* ---- Copy: only the block for the current phase is shown ---- */
+
+.copy {
+  display: grid;
+}
+
+.copyBlock {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: var(--space-2);
+  align-content: center;
+  visibility: hidden;
+}
+
+.band[data-phase="0"] .copyBlock[data-for="0"],
+.band[data-phase="1"] .copyBlock[data-for="1"],
+.band[data-phase="2"] .copyBlock[data-for="2"] {
+  visibility: visible;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-rose);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  line-height: 1.05;
+  color: #fff;
+}
+
+.body {
+  margin: 0;
+  max-width: 28rem;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-on-espresso-soft);
+}
+
+/* ---- The receipt ---- */
+
+.receiptWrap {
+  position: relative;
+  margin: 0;
+  justify-self: center;
+  width: min(100%, 21.5rem);
+  padding-top: 0.75rem;
+}
+
+.slot {
+  position: absolute;
+  top: 0;
+  left: -0.75rem;
+  right: -0.75rem;
+  height: 0.75rem;
+  border-radius: 0.375rem;
+  background: #140602;
+}
+
+.receipt {
+  position: relative;
+  padding: 1.5rem 1.5rem 6rem;
+  background: #fbf8f2;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  box-shadow: 0 1.125rem 2.5rem rgba(0, 0, 0, 0.4);
+  /* A torn bottom edge: the receipt has been ripped off the roll. */
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - 10px),
+    97% 100%, 94% calc(100% - 10px), 91% 100%, 88% calc(100% - 10px), 85% 100%, 82% calc(100% - 10px), 79% 100%,
+    76% calc(100% - 10px), 73% 100%, 70% calc(100% - 10px), 67% 100%, 64% calc(100% - 10px), 61% 100%,
+    58% calc(100% - 10px), 55% 100%, 52% calc(100% - 10px), 49% 100%, 46% calc(100% - 10px), 43% 100%,
+    40% calc(100% - 10px), 37% 100%, 34% calc(100% - 10px), 31% 100%, 28% calc(100% - 10px), 25% 100%,
+    22% calc(100% - 10px), 19% 100%, 16% calc(100% - 10px), 13% 100%, 10% calc(100% - 10px), 7% 100%,
+    4% calc(100% - 10px), 1% 100%, 0 calc(100% - 10px)
+  );
+}
+
+.shop {
+  margin: 0;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.date {
+  margin: 0.25rem 0 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+
+.rule {
+  margin: 0.875rem 0;
+  border: 0;
+  border-top: 1px dashed var(--color-line-strong);
+}
+
+.line {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+/* The repeats are struck through once the stamp lands. */
+.line[data-repeat]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.5px;
+  background: var(--color-ink);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.band[data-phase="2"] .line[data-repeat],
+.band[data-phase="3"] .line[data-repeat] {
+  color: var(--color-ink-soft);
+}
+
+.band[data-phase="2"] .line[data-repeat]::after,
+.band[data-phase="3"] .line[data-repeat]::after {
+  transform: scaleX(1);
+}
+
+.total {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* The three totals sit in one cell; the phase decides which shows. */
+.totalValue {
+  display: grid;
+  justify-items: end;
+}
+
+.totalValue > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.band[data-phase="0"] .totalValue > [data-total="0"],
+.band[data-phase="1"] .totalValue > [data-total="1"],
+.band[data-phase="2"] .totalValue > [data-total="2"],
+.band[data-phase="3"] .totalValue > [data-total="2"] {
+  visibility: visible;
+}
+
+.kept {
+  font-weight: 700;
+  color: var(--color-rose-deep);
+  visibility: hidden;
+}
+
+.band[data-phase="2"] .kept,
+.band[data-phase="3"] .kept {
+  visibility: visible;
+}
+
+/* Until the coat is printed, its line holds its space but is blank. */
+.line[data-coat] {
+  visibility: hidden;
+}
+
+.band:not([data-phase="0"]) .line[data-coat] {
+  visibility: visible;
+}
+
+.stamp {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1rem;
+  padding: 0.25rem 0.875rem;
+  border: 4px solid var(--color-rose-deep);
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--color-rose-deep);
+  opacity: 0.9;
+  transform: rotate(-12deg);
+  visibility: hidden;
+}
+
+.band[data-phase="2"] .stamp,
+.band[data-phase="3"] .stamp {
+  visibility: visible;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- The call to action ---- */
+
+.cta {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.ctaHeading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: #fff;
+}
+
+.ctaBody {
+  margin: 0;
+  color: var(--color-on-espresso-soft);
+}
+
+/* ================= Live: tall, sticky, scroll-driven ================= */
+
+@media (prefers-reduced-motion: no-preference) {
+  .band[data-live] {
+    height: 340svh;
+    padding: 0;
+  }
+
+  .band[data-live] .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    max-width: none;
+    margin: 0;
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+    width: 100%;
+    max-width: var(--width-container, 72rem);
+    margin-inline: auto;
+    align-content: center;
+    overflow: hidden;
+  }
+
+  /* The paper feeds out of the slot, top first, as --p goes 0 to 0.3. */
+  .band[data-live] .receipt {
+    clip-path: none;
+    -webkit-mask-image: linear-gradient(#000, #000);
+    mask-image: linear-gradient(#000, #000);
+  }
+
+  .band[data-live] .receiptWrap {
+    clip-path: inset(0 -2rem calc(100% * (1 - clamp(0, var(--p) / 0.3, 1))) -2rem);
+  }
+
+  /* Phase 3: the receipt lifts away and fades; the call to action takes the stage. */
+  .band[data-live] .receiptWrap {
+    translate: 0 calc(-3.5rem * clamp(0, (var(--p) - 0.74) / 0.2, 1));
+    opacity: calc(1 - clamp(0, (var(--p) - 0.74) / 0.16, 1));
+  }
+
+  .band[data-live][data-phase="3"] .copyBlock {
+    visibility: hidden;
+  }
+
+  .band[data-live] .cta {
+    position: absolute;
+    inset: 0;
+    align-content: center;
+    opacity: clamp(0, calc((var(--p) - 0.78) * 8), 1);
+    visibility: hidden;
+  }
+
+  .band[data-live][data-phase="3"] .cta {
+    visibility: visible;
+  }
+
+  /* The stamp thumps on when phase 2 begins. */
+  .band[data-live][data-phase="2"] .stamp,
+  .band[data-live][data-phase="3"] .stamp {
+    animation: stamp-in 260ms cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
+
+  @keyframes stamp-in {
+    from {
+      opacity: 0;
+      transform: rotate(-12deg) scale(1.7);
+    }
+    to {
+      opacity: 0.9;
+      transform: rotate(-12deg) scale(1);
+    }
+  }
+
+  .band[data-live] .line[data-repeat]::after {
+    transition: transform 280ms ease-out;
+  }
+}

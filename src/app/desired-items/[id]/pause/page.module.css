@@ -575,19 +575,49 @@
   }
 }
 
-/* The quieter choices, as text links in one row. */
-.actionLinks {
+/* A labelled rule separates the pause from the choices that skip it. */
+.actionDivider {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0 1.25rem;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
 }
 
-.actionLinks :global(.action) {
+.actionDivider::before,
+.actionDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-line);
+}
+
+/* Decide later and Let it go: equal weight, outlined, a step smaller. */
+.actionSecond {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.actionSecond :global(.action) {
+  min-height: 2.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+/* Buy anyway: possible, never promoted. */
+.actionBuy {
+  display: flex;
+  justify-content: center;
+}
+
+.actionBuy :global(.action) {
   width: auto;
-  justify-self: start;
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 /* Holds the Buy anyway button and its warning in one grid cell. */

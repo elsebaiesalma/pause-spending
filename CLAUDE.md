@@ -33,6 +33,14 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Email sync must dedupe against a "proceeded" desired item when a matching order arrives (for when email parsing resumes). "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
+## Budget & goals, landing scenes, closet cards (2026-11-03, branch `saving-rewards`, PR #5)
+
+- **Budget & goals** (`/budget`, Settings section of the same name): independent switches for the Monthly plan and the Savings goal. Home asks "What would help most?" (`MoneyChoice`) when neither is set, shows the chosen one, and offers the other as one quiet "Also try" line. `/api/budget` takes `intent=off` and a same-site `returnTo`. The goal sheet is a centred dialog on desktop and a bottom sheet on phones (global `* {margin:0}` breaks native dialog centring, so `.sheet` restores `inset:0; margin:auto`).
+- **The `savings_goals` table is hand-applied** (`prisma/manual/savings-goal.sql`, run by the user in Neon on main and test). Until it exists, `isGoalStorageAvailable()` is false and every goal control is hidden; only the plan shows.
+- **Landing scenes** (scroll-driven, no React state: a rAF handler edits a CSS variable and a data attribute; default and reduced-motion state is the finished picture): `ReceiptBand` ("It adds up quietly.", sticky stage, `src/lib/landing/receipt.ts` computes the sums) and `UrgeCurve` ("The urge is loud. Then it fades.", `src/lib/landing/urgeCurve.ts`). The receipt is labelled as an example. Sticky needs `overflow-x: clip` on html/body (`hidden` makes body a scroll container and breaks it).
+- **Closet:** concentration card is ~640px wide, colour by rank (equal counts share a colour, `tierFor`), top 4 plus "Show all N categories". Cards: brand + date on one line, 2-line name, price bottom-left and colour bottom-right, pinned to the bottom.
+- **Pause screen actions:** two pause buttons, "or decide now" divider, Decide later and Let it go as smaller outlined buttons, Buy anyway as a quiet link. Labels unchanged.
+
 ## Demo mode (2026-11-02, while Gmail is parked)
 
 - **Google sign-in and Gmail are hidden unless `GMAIL_ENABLED=true`.** The code is untouched; the flag only gates the login button, the landing CTAs, Account's Gmail section and the `/connect/gmail/*` pages (which redirect Home). See `src/lib/demo.ts`.

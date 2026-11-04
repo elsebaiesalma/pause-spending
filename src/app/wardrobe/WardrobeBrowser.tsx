@@ -166,19 +166,21 @@ export function WardrobeBrowser({
               </div>
 
               <div className={styles.cardBody}>
-                {item.brand && <p className={styles.cardBrand}>{item.brand}</p>}
+                <div className={styles.cardTop}>
+                  {item.brand && <p className={styles.cardBrand}>{item.brand}</p>}
+                  {item.ownedSince && <p className={styles.cardDate}>{item.ownedSince}</p>}
+                </div>
                 <h3 className={styles.cardName}>{item.displayName}</h3>
-                <div className={styles.cardMeta}>
+                <div className={styles.cardFoot}>
+                  <p className={item.price === null ? styles.priceNotSet : styles.cardPrice}>
+                    {item.price !== null ? `$${item.price.toFixed(0)}` : "Price not set"}
+                  </p>
                   {item.colorLabel && (
                     <p className={styles.cardColor}>
                       <ColorDot colorFamily={item.colorFamily} />
                       {item.colorLabel}
                     </p>
                   )}
-                  <p className={item.price === null ? styles.priceNotSet : undefined}>
-                    {item.price !== null ? `$${item.price.toFixed(0)}` : "Price not set"}
-                  </p>
-                  {item.ownedSince && <p>{item.ownedSince}</p>}
                 </div>
               </div>
 

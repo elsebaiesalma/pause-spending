@@ -61,6 +61,20 @@ type GoalRow = {
   last_at: Date | null;
 };
 
+// Whether the goals table exists. The goal UI is hidden entirely until it
+// does, instead of offering a form that can only fail.
+export async function isGoalStorageAvailable(): Promise<boolean> {
+  try {
+    const rows = await prisma.$queryRaw<{ present: boolean }[]>`
+      SELECT to_regclass('public.savings_goals') IS NOT NULL AS present
+    `;
+    return rows[0]?.present === true;
+  } catch (error) {
+    console.error("[goals] could not check for the goals table:", error);
+    return false;
+  }
+}
+
 export async function getSavingsGoal(userId: string): Promise<SavingsGoal | null> {
   try {
     const rows = await prisma.$queryRaw<GoalRow[]>`

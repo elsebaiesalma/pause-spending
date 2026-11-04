@@ -10,7 +10,7 @@ import Home from "./page";
 describe("Home (landing page)", () => {
   it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("PAUSE puts the thing you&#x27;re about to buy");
+    expect(html).toContain("PAUSE lines up what you want with the pieces you already have");
     expect(html).not.toMatch(/CALIB/i);
   });
 
@@ -77,5 +77,25 @@ describe("Home (landing page)", () => {
     const enabled = renderToStaticMarkup(Home());
     expect(enabled).toContain("Gmail");
     expect(enabled).not.toMatch(/IMAP|OCR|browser extension/i);
+  });
+
+  it("tells the 25-hour finding as the urge chart, with its source and the 24-hour default", () => {
+    const html = renderToStaticMarkup(Home());
+    expect(html).toContain("The urge is loud. Then it fades.");
+    expect(html).toContain("an illustration of the finding, not plotted data");
+    expect(html).toContain("Pause for 24 hours");
+    expect(html).not.toContain("A day is long enough");
+    expect(html).toContain("A few minutes of reflection helps too");
+    expect(html).toContain("Guilt doesn&#x27;t work, and people don&#x27;t want it");
+  });
+
+  it("shows the receipt band as a labelled example, with sums that match and the call to action", () => {
+    const html = renderToStaticMarkup(Home());
+    expect(html).toContain("It adds up quietly.");
+    expect(html).toContain("An example, not real data");
+    expect(html).toContain("$292.00");
+    expect(html).toContain("$223.00");
+    expect(html).toContain("$69.00");
+    expect(html).toContain("Pause the next one.");
   });
 });

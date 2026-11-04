@@ -246,6 +246,8 @@
 }
 
 .stat {
+  display: flex;
+  flex-direction: column;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
@@ -267,14 +269,18 @@
 
 .statSource {
   display: block;
-  margin-top: 0.5rem;
+  /* Pinned to the bottom of the stat so every source sits on one line,
+     whatever the claim's length. */
+  margin-top: auto;
+  padding-top: 0.5rem;
   font-size: 0.75rem;
   color: var(--color-on-espresso-soft);
 }
 
 .statSourceLight {
   display: block;
-  margin-top: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
   font-size: 0.75rem;
   color: var(--color-ink-soft);
 }
@@ -337,10 +343,26 @@
   margin-top: 2.5rem;
 }
 
+.chartPayoff {
+  margin: 1.5rem 0 0;
+  font-size: 1.125rem;
+  color: var(--color-ink);
+}
+
 @media (min-width: 900px) {
   .findings {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem;
+  }
+
+  /* Each card spans the grid's four rows (title, body, feature, source), so the
+     same row of every card lines up: titles, features and sources all align
+     even when one card's text wraps to an extra line. */
+  .finding {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
   }
 }
 
@@ -368,7 +390,6 @@
 /* What PAUSE does because of the finding: the link between research and
    product, so it gets the accent. */
 .findingFeature {
-  margin-top: auto;
   padding-top: 1rem;
   font-weight: 600;
   color: var(--color-rose-deep);
