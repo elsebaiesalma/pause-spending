@@ -154,6 +154,10 @@ model WardrobeItem {
   itemName         String    @map("item_name")
   imageUrl         String?   @map("image_url")
   category         String?
+  // Typed by hand for pieces with no purchase (receipt pieces use their
+  // purchase's merchant and price). Applied 20261104170000_add_wardrobe_item_brand_price.
+  brand            String?
+  price            Decimal?  @db.Decimal(10, 2)
   // Free-text color for display only (e.g. "Espresso") - never used in
   // redundancy matching. Renamed from primaryColor; see colorFamily.
   colorName        String?   @map("color_name")

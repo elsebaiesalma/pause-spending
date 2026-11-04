@@ -44,6 +44,8 @@ export type ManualWardrobeItemInput = {
   userId: string;
   itemName: string;
   category?: string | null;
+  brand?: string | null;
+  price?: number | null;
   colorName?: string | null;
   colorFamily?: string | null;
   styleTags?: string[];
@@ -69,6 +71,8 @@ export async function createManualWardrobeItem(
       userId: input.userId,
       itemName: input.itemName,
       category: input.category ?? null,
+      brand: input.brand ?? null,
+      price: input.price ?? null,
       colorName: input.colorName ? capitalizeFirst(input.colorName) : null,
       colorFamily: input.colorFamily ?? null,
       styleTags: input.styleTags ?? [],
@@ -84,12 +88,22 @@ export async function createManualWardrobeItem(
     return item;
   }
 
-  return ensureWardrobeItemTagged(item);
+  // The piece is already saved. If tagging fails (model down, no key), the
+  // person must not see an error page for something that worked: it stays
+  // untagged and is tagged on a later read, as the extraction flag intends.
+  try {
+    return await ensureWardrobeItemTagged(item);
+  } catch (error) {
+    console.warn("Tagging a new piece failed; it will be tagged later:", error instanceof Error ? error.message : error);
+    return item;
+  }
 }
 
 export type WardrobeItemEditInput = {
   itemName?: string;
   category?: string | null;
+  brand?: string | null;
+  price?: number | null;
   colorName?: string | null;
   colorFamily?: string | null;
   styleTags?: string[];

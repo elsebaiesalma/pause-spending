@@ -126,6 +126,22 @@ describe("wardrobe service", () => {
     expect(item.status).toBe("active");
   });
 
+  it("keeps the new piece, with its brand and price, when tagging fails", async () => {
+    userId = (await prisma.user.findFirstOrThrow()).id;
+    const { ensureWardrobeItemTagged } = await import("@/lib/tagging/tagWardrobeItem");
+    vi.mocked(ensureWardrobeItemTagged).mockRejectedValueOnce(new Error("model down"));
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const item = await createManualWardrobeItem({ userId, itemName: "Tag Fail Coat", brand: "Aritzia", price: 89.5 });
+    createdWardrobeItemIds.push(item.id);
+    warn.mockRestore();
+
+    const saved = await prisma.wardrobeItem.findUniqueOrThrow({ where: { id: item.id } });
+    expect(saved.brand).toBe("Aritzia");
+    expect(Number(saved.price)).toBe(89.5);
+    expect(saved.tagsExtractedAt).toBeNull();
+  });
+
   it("edits any field on an existing wardrobe item", async () => {
     userId = (await prisma.user.findFirstOrThrow()).id;
     const item = await createManualWardrobeItem({ userId, itemName: "Untagged Sweater" });

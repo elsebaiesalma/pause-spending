@@ -41,6 +41,23 @@ export function todayISO(now: Date = new Date()): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+export const MAX_BRAND_LENGTH = 60;
+const MAX_PRICE = 100000;
+
+// "49", "49.9" and "$49.99" are fine; blank means no price. Anything else is
+// an error to show next to the field, never a guessed number.
+export function parsePrice(raw: string): { ok: true; value: number | null } | { ok: false } {
+  const text = raw.trim().replace(/^\$/, "").replace(/,/g, "");
+  if (!text) return { ok: true, value: null };
+  if (!/^\d+(\.\d{1,2})?$/.test(text)) return { ok: false };
+  const value = Number(text);
+  return value > MAX_PRICE ? { ok: false } : { ok: true, value };
+}
+
+export function validatePrice(raw: string): string | null {
+  return parsePrice(raw).ok ? null : "Enter a price like 49.99.";
+}
+
 export type TagSuggestion = {
   category: string | null;
   colorFamily: ColorFamily | null;

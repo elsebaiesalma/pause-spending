@@ -9,8 +9,10 @@ import {
   MAX_NAME_LENGTH,
   addTag,
   removeTag,
+  MAX_BRAND_LENGTH,
   todayISO,
   validateName,
+  validatePrice,
   validateOwnedSince,
   type TagSuggestion,
 } from "@/lib/pieceForm";
@@ -20,6 +22,8 @@ import styles from "./pieceForm.module.css";
 export type PieceFormValues = {
   itemName: string;
   category: string;
+  brand: string;
+  price: string;
   colorFamily: string;
   colorName: string;
   styleTags: string[];
@@ -30,6 +34,8 @@ export type PieceFormValues = {
 const EMPTY: PieceFormValues = {
   itemName: "",
   category: "",
+  brand: "",
+  price: "",
   colorFamily: "",
   colorName: "",
   styleTags: [],
@@ -112,18 +118,23 @@ export function PieceForm({
   initial = EMPTY,
   cancelHref,
   submitLabel,
+  brandPriceNote,
 }: {
   mode: "add" | "edit";
   action: string;
   initial?: PieceFormValues;
   cancelHref: string;
   submitLabel: string;
+  // Set for a piece that came from an order: its brand and price are the
+  // order's, so those two fields are replaced by this note.
+  brandPriceNote?: string;
 }) {
   const [values, setValues] = useState<PieceFormValues>(initial);
-  const [errors, setErrors] = useState<{ itemName: string | null; ownedSince: string | null }>({
-    itemName: null,
-    ownedSince: null,
-  });
+  const [errors, setErrors] = useState<{
+    itemName: string | null;
+    ownedSince: string | null;
+    price: string | null;
+  }>({ itemName: null, ownedSince: null, price: null });
   const [suggest, setSuggest] = useState<SuggestState>("idle");
   const [suggestNote, setSuggestNote] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -203,13 +214,20 @@ export function PieceForm({
     return message;
   }
 
+  function checkPrice() {
+    const message = validatePrice(values.price);
+    setErrors((current) => ({ ...current, price: message }));
+    return message;
+  }
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     const nameError = checkName();
+    const priceError = brandPriceNote ? null : checkPrice();
     const dateError = checkDate();
-    if (nameError || dateError) {
+    if (nameError || priceError || dateError) {
       event.preventDefault();
-      const first = nameError ? "itemName" : "ownedSince";
-      if (first === "ownedSince") {
+      const first = nameError ? "itemName" : priceError ? "price" : "ownedSince";
+      if (first !== "itemName") {
         // The date lives under "More details", which must be open to show it.
         const details = formRef.current?.querySelector("details");
         if (details) details.open = true;
@@ -223,7 +241,7 @@ export function PieceForm({
   const hasTags = values.styleTags.length > 0 || values.useCaseTags.length > 0;
   const showTags = hasTags || suggest !== "idle" || mode === "edit";
   const categoryKnown = CATEGORIES.some((c) => c.key === values.category);
-  const detailsOpen = Boolean(initial.colorName || initial.ownedSince);
+  const detailsOpen = Boolean(initial.brand || initial.price || initial.colorName || initial.ownedSince);
 
   return (
     <form ref={formRef} action={action} method="POST" className={styles.form} onSubmit={onSubmit} noValidate>
@@ -341,6 +359,46 @@ export function PieceForm({
       <details className={`${styles.more} ${styles.wide}`} open={detailsOpen || undefined}>
         <summary>More details</summary>
         <div className={styles.moreFields}>
+          {brandPriceNote ? (
+            <p className={`${styles.hint} ${styles.wide}`}>{brandPriceNote}</p>
+          ) : (
+            <>
+              <div className={styles.field}>
+                <label htmlFor="piece-brand">Brand</label>
+                <input
+                  id="piece-brand"
+                  name="brand"
+                  value={values.brand}
+                  maxLength={MAX_BRAND_LENGTH}
+                  placeholder="e.g. Aritzia"
+                  autoComplete="off"
+                  onChange={(event) => update({ brand: event.target.value })}
+                />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="piece-price">Price</label>
+                <span className="money-field">
+                  <span aria-hidden="true">$</span>
+                  <input
+                    id="piece-price"
+                    name="price"
+                    inputMode="decimal"
+                    value={values.price}
+                    placeholder="0.00"
+                    autoComplete="off"
+                    aria-invalid={errors.price ? true : undefined}
+                    aria-describedby={errors.price ? "piece-price-error" : undefined}
+                    onChange={(event) => {
+                      update({ price: event.target.value });
+                      if (errors.price) setErrors((current) => ({ ...current, price: null }));
+                    }}
+                    onBlur={checkPrice}
+                  />
+                </span>
+                <FieldError id="piece-price-error" message={errors.price} />
+              </div>
+            </>
+          )}
           <div className={styles.field}>
             <label htmlFor="piece-color-name">Colour name</label>
             <input

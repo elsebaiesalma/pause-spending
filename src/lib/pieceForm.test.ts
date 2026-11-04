@@ -59,3 +59,20 @@ describe("toSuggestion", () => {
     ).toMatchObject({ category: null, colorFamily: null, colorName: null });
   });
 });
+
+describe("price", () => {
+  it("accepts blank, whole, decimal and $-prefixed amounts", async () => {
+    const { parsePrice } = await import("./pieceForm");
+    expect(parsePrice("")).toEqual({ ok: true, value: null });
+    expect(parsePrice(" $49.9 ")).toEqual({ ok: true, value: 49.9 });
+    expect(parsePrice("1,250")).toEqual({ ok: true, value: 1250 });
+    expect(parsePrice("0")).toEqual({ ok: true, value: 0 });
+  });
+
+  it("rejects text, negatives, extra decimals and absurd values", async () => {
+    const { parsePrice, validatePrice } = await import("./pieceForm");
+    for (const bad of ["abc", "-5", "4.999", "1e3", "999999"]) expect(parsePrice(bad)).toEqual({ ok: false });
+    expect(validatePrice("abc")).toMatch(/price/i);
+    expect(validatePrice("12.50")).toBeNull();
+  });
+});

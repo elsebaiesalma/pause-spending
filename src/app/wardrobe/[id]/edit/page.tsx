@@ -9,7 +9,10 @@ export default async function EditWardrobeItemPage({
 }: PageProps<"/wardrobe/[id]/edit">) {
   const userId = await requireUserIdOrRedirect();
   const { id } = await params;
-  const item = await prisma.wardrobeItem.findFirst({ where: { id, userId } });
+  const item = await prisma.wardrobeItem.findFirst({
+    where: { id, userId },
+    include: { sourcePurchase: { select: { merchant: true } } },
+  });
   if (!item) {
     notFound();
   }
@@ -22,9 +25,12 @@ export default async function EditWardrobeItemPage({
         action={`/api/wardrobe/${item.id}/update`}
         cancelHref="/wardrobe"
         submitLabel="Save"
+        brandPriceNote={item.sourcePurchase ? `Brand and price come from the order (${item.sourcePurchase.merchant}).` : undefined}
         initial={{
           itemName: item.itemName,
           category: (item.category ?? "").trim().toLowerCase(),
+          brand: item.brand ?? "",
+          price: item.price != null ? String(item.price) : "",
           colorFamily: item.colorFamily ?? "",
           colorName: item.colorName ?? "",
           styleTags: item.styleTags,
