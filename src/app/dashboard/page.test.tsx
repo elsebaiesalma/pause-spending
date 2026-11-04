@@ -108,7 +108,7 @@ describe("DashboardPage (Home)", () => {
     const html = await render();
 
     expect(html).toContain("Paste a link or type what caught your eye");
-    expect(html).toContain("Screenshot");
+    expect(html).toContain("Add a screenshot");
     expect(html).toContain('action="/api/desired-items/from-screenshot"');
   });
 
@@ -145,9 +145,10 @@ describe("DashboardPage (Home)", () => {
 
   describe("This month", () => {
     it("links to set a plan when none exists, with the month named, and no receipt block", async () => {
+      vi.mocked(getSavingsGoal).mockResolvedValueOnce({ name: "Winter boots", target: 800, saved: 0, lastAdded: null });
       const html = await render();
 
-      expect(html).toContain("No plan set for October yet.");
+      expect(html).toContain("No plan set for October.");
       expect(html).toContain('href="/budget?open=plan"');
       expect(html).not.toContain('action="/api/budget"');
       expect(html).not.toContain(">Left<");
@@ -160,8 +161,7 @@ describe("DashboardPage (Home)", () => {
 
       const html = await render();
 
-      expect(html).toContain("$210");
-      expect(html).toContain("of your $400 plan");
+      expect(html).not.toContain("What would help most?");
       expect(html).toMatch(/Spent<\/span><span[^>]*>\$210/);
       expect(html).toMatch(/Plan<\/span><span[^>]*>\$400/);
       expect(html).toMatch(/Left<\/span><span[^>]*>\$190/);
@@ -178,13 +178,11 @@ describe("DashboardPage (Home)", () => {
       expect(html).not.toMatch(/warning|⚠/i);
     });
 
-    it("hides the let-go line until something has been let go, then links to the let-go list", async () => {
-      expect(await render()).not.toContain("by letting");
-
+    it("shows what was saved in the at-a-glance line, linking to the let-go list", async () => {
       vi.mocked(getKeptSummary).mockResolvedValueOnce({ totalKept: 120, itemsLetGo: 2 });
       const html = await render();
 
-      expect(html).toContain("$120 saved by letting 2 things");
+      expect(html).toMatch(/<strong>\$120<\/strong> saved/);
       expect(html).toContain('href="/considering?tab=let-go"');
     });
   });
@@ -198,7 +196,7 @@ describe("DashboardPage (Home)", () => {
 
       const html = await render();
 
-      expect(html).toContain("pieces you already own");
+      expect(html).toMatch(/<strong>2<\/strong> pieces in your closet/);
       expect(html).toContain('href="/wardrobe"');
     });
 
@@ -253,8 +251,7 @@ describe("DashboardPage (Home)", () => {
 
       const html = await render();
 
-      expect(html).toContain("Paused right now");
-      expect(html).toContain("items waiting it out");
+      expect(html).toMatch(/<strong>2<\/strong> on pause/);
       vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
     });
   });
@@ -294,7 +291,6 @@ describe("DashboardPage (Home)", () => {
 
       expect(html).toContain("What would help most?");
       expect(html).toContain("Stay under a monthly amount");
-      expect(html).toContain("insightsSingle");
       expect(html).not.toContain("What works for you");
     });
 

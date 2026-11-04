@@ -9,7 +9,9 @@ import {
   goalProgress,
   isGoalStorageAvailable,
 } from "@/lib/goals/savingsGoal";
-import { GoalSheet } from "../dashboard/GoalSheet";
+import { GoalSheet, GoalStartChoice } from "../dashboard/GoalSheet";
+import { ActionToast } from "@/components/ActionToast";
+import { getKeptSummary } from "@/lib/dashboard/kept";
 import { GoalStatus } from "../dashboard/GoalStatus";
 import { SettingCard } from "./SettingCard";
 import styles from "./budget.module.css";
@@ -19,7 +21,7 @@ function money(amount: number): string {
   return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
 }
 
-// Budget & goals: a monthly plan and a savings goal, each its own switch.
+// Budget & goals: a monthly plan and a savings goal, each its own setting.
 // Use one, both or neither; Home shows what is on. The goal card is left out
 // entirely until the goals table exists, rather than showing a form that can
 // only fail.
@@ -28,10 +30,11 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
   const userId = await requireUserIdOrRedirect();
   const monthKey = currentMonthKey();
 
-  const [budget, spend, goalAvailable] = await Promise.all([
+  const [budget, spend, goalAvailable, kept] = await Promise.all([
     getBudgetForMonth(userId, monthKey),
     getMonthSpend(userId, monthKey),
     isGoalStorageAvailable(),
+    getKeptSummary(userId, "this_month"),
   ]);
   const [suggestion, goal] = await Promise.all([
     !budget ? computeSuggestedBudget(userId, monthKey) : Promise.resolve(null),
@@ -73,15 +76,18 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
                     <input type="hidden" name="returnTo" value="/budget" />
                     <label htmlFor="plan-amount">Change the plan</label>
                     <div className={styles.formRow}>
-                      <input
-                        id="plan-amount"
-                        name="amount"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        defaultValue={planAmount}
-                        required
-                      />
+                      <span className="money-field">
+                        <span aria-hidden="true">$</span>
+                        <input
+                          id="plan-amount"
+                          name="amount"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={planAmount}
+                          required
+                        />
+                      </span>
                       <button type="submit">Save plan</button>
                     </div>
                   </form>
@@ -99,16 +105,18 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
                 )}
                 <label htmlFor="plan-amount-new">Plan for {formatMonthLabel(monthKey)}</label>
                 <div className={styles.formRow}>
-                  <input
-                    id="plan-amount-new"
-                    name="amount"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="250"
-                    defaultValue={suggestion ?? ""}
-                    required
-                  />
+                  <span className="money-field">
+                    <span aria-hidden="true">$</span>
+                    <input
+                      id="plan-amount-new"
+                      name="amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      defaultValue={suggestion ?? ""}
+                      required
+                    />
+                  </span>
                   <button type="submit" className="btn-primary">
                     Turn on plan
                   </button>
@@ -171,19 +179,15 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
                   />
                   <label htmlFor="goal-amount">How much does it cost?</label>
                   <div className={styles.formRow}>
-                    <input
-                      id="goal-amount"
-                      name="amount"
-                      type="text"
-                      inputMode="decimal"
-                      required
-                      autoComplete="off"
-                      placeholder="$ 250"
-                    />
+                    <span className="money-field">
+                      <span aria-hidden="true">$</span>
+                      <input id="goal-amount" name="amount" type="text" inputMode="decimal" required autoComplete="off" />
+                    </span>
                     <button type="submit" className="btn-primary">
                       Turn on goal
                     </button>
                   </div>
+                  <GoalStartChoice isNew savedThisMonth={kept.totalKept} />
                 </form>
               }
             />
@@ -191,6 +195,7 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
         )}
         <GoalStatus />
       </div>
+      <ActionToast />
     </div>
   );
 }

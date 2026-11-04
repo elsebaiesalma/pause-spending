@@ -23,12 +23,3 @@ export function receiptTotals() {
 export function money(amount: number): string {
   return `$${amount.toFixed(2)}`;
 }
-
-// Which part of the story the scroll position is in.
-// 0 printing, 1 the coat arrives, 2 the PAUSE stamp lands, 3 the receipt tears off.
-export function receiptPhase(progress: number): 0 | 1 | 2 | 3 {
-  if (progress < 0.36) return 0;
-  if (progress < 0.6) return 1;
-  if (progress < 0.74) return 2;
-  return 3;
-}

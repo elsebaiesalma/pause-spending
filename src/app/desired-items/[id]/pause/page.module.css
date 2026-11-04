@@ -549,6 +549,9 @@
 }
 
 .overPlan {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
   margin-top: 0.216rem;
   font-size: 1rem;
   font-weight: 600;

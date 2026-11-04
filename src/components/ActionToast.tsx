@@ -20,9 +20,19 @@ function currentSearch(): string {
   return window.location.search;
 }
 
+// Goal confirmations arrive as ?goal= from /api/goal. Its errors stay inline
+// next to the form (GoalStatus), where the person can fix them.
+export const GOAL_TOASTS: Record<string, string> = {
+  saved: "Goal saved.",
+  removed: "Goal removed.",
+};
+
 export function toastMessageFor(search: string): string | null {
-  const done = new URLSearchParams(search).get("done");
-  return done ? (TOAST_MESSAGES[done] ?? null) : null;
+  const params = new URLSearchParams(search);
+  const done = params.get("done");
+  if (done && TOAST_MESSAGES[done]) return TOAST_MESSAGES[done];
+  const goal = params.get("goal");
+  return goal ? (GOAL_TOASTS[goal] ?? null) : null;
 }
 
 export function ActionToast() {
@@ -35,6 +45,7 @@ export function ActionToast() {
     // Remove the marker so a refresh doesn't repeat the toast.
     const url = new URL(window.location.href);
     url.searchParams.delete("done");
+    if (url.searchParams.get("goal") && GOAL_TOASTS[url.searchParams.get("goal")!]) url.searchParams.delete("goal");
     window.history.replaceState(null, "", url.toString());
     const timer = window.setTimeout(() => setDismissed(true), AUTO_DISMISS_MS);
     return () => window.clearTimeout(timer);

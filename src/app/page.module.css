@@ -175,6 +175,25 @@
   border: 1px solid #fff;
 }
 
+/* Secondary action on the espresso band. */
+.btnGhostLight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 999px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+}
+
+.btnGhostLight:hover {
+  border-color: #fff;
+}
+
 .btnLight:hover {
   background: var(--color-blush);
   border-color: var(--color-blush);
@@ -478,8 +497,10 @@
   padding: 4.5rem var(--gutter) 2rem;
 }
 
+/* Same content width as every section above (container minus its gutters),
+   so the footer rule and links line up with the page's left and right edges. */
 .footerInner {
-  max-width: var(--width-container);
+  max-width: calc(var(--width-container) - 2 * var(--gutter));
   margin: 0 auto;
   text-align: center;
 }

@@ -125,12 +125,14 @@ export async function getSavingsGoal(userId: string): Promise<SavingsGoal | null
 }
 
 // Changing the name or target keeps the goal's start date, so progress already
-// made isn't wiped by a rename. Returns false when the table doesn't exist yet.
-export async function saveSavingsGoal(userId: string, input: GoalInput): Promise<boolean> {
+// made isn't wiped by a rename. `startAt` only applies when the goal is new:
+// "count what I've already saved this month" starts it at the first of the
+// month instead of now. Returns false when the table doesn't exist yet.
+export async function saveSavingsGoal(userId: string, input: GoalInput, startAt?: Date): Promise<boolean> {
   try {
     await prisma.$executeRaw`
-      INSERT INTO "savings_goals" ("user_id", "name", "target_amount")
-      VALUES (${userId}::uuid, ${input.name}, ${input.target})
+      INSERT INTO "savings_goals" ("user_id", "name", "target_amount", "created_at")
+      VALUES (${userId}::uuid, ${input.name}, ${input.target}, ${startAt ?? new Date()})
       ON CONFLICT ("user_id") DO UPDATE
       SET "name" = EXCLUDED."name", "target_amount" = EXCLUDED."target_amount", "updated_at" = now()
     `;
@@ -154,4 +156,11 @@ export async function removeSavingsGoal(userId: string): Promise<void> {
 export async function restartSavingsGoal(userId: string, input: GoalInput): Promise<boolean> {
   await removeSavingsGoal(userId);
   return saveSavingsGoal(userId, input);
+}
+
+// The first moment of a "YYYY-MM" month, in UTC (the same clock the goal's
+// let-go comparison uses).
+export function monthStart(monthKey: string): Date {
+  const [year, month] = monthKey.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, 1));
 }

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { WardrobeEntry } from "@/lib/wardrobeView";
+import { GarmentSilhouette, silhouetteForItem } from "./GarmentSilhouette";
 import styles from "./page.module.css";
 
 const UNSPLASH_PREFIX = "https://images.unsplash.com/";
@@ -14,15 +15,25 @@ export function ItemImage({
   sizes,
   compact = false,
 }: {
-  item: Pick<WardrobeEntry, "imageUrl" | "displayName" | "category">;
+  item: Pick<WardrobeEntry, "imageUrl" | "displayName" | "category"> & { colorFamily?: string | null };
   sizes: string;
   // Thumbnails: the placeholder keeps its colour but drops its label.
   compact?: boolean;
 }) {
   if (!item.imageUrl) {
+    // No photo (the sample closet): the garment drawn in the item's own
+    // colour, so a closet of placeholders still reads as clothes, and a
+    // labelled tile only when there's no drawing for the category.
+    const shape = silhouetteForItem(item.category, item.displayName);
     return (
       <div className={styles.imagePlaceholder}>
-        {!compact && <span className={styles.imagePlaceholderLabel}>{item.category || "No category"}</span>}
+        {shape ? (
+          <span className={styles.imageDrawing}>
+            <GarmentSilhouette shape={shape} colorFamily={item.colorFamily ?? null} />
+          </span>
+        ) : (
+          !compact && <span className={styles.imagePlaceholderLabel}>{item.category || "No category"}</span>
+        )}
       </div>
     );
   }

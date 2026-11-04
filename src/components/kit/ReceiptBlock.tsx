@@ -1,3 +1,4 @@
+import { WarnIcon } from "@/components/WarnIcon";
 import styles from "./kit.module.css";
 
 export type ReceiptRow = { label: string; amount: string };
@@ -22,7 +23,9 @@ export function ReceiptBlock({
       ))}
       <hr className={styles.receiptRule} />
       <div className={`${styles.receiptTotal}${closing.over ? ` ${styles.receiptTotalOver}` : ""}`}>
-        <span>{closing.label}</span>
+        <span>
+          {closing.over && <WarnIcon />} {closing.label}
+        </span>
         {closing.amount && <span className={styles.receiptAmount}>{closing.amount}</span>}
       </div>
     </div>

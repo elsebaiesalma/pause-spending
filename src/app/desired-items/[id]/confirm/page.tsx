@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { COLOR_FAMILIES } from "@/lib/colorFamily";
 import { BRAND_LIST } from "@/lib/brands/matchBrand";
+import styles from "./confirm.module.css";
 
 const DEFAULT_CATEGORY_OPTIONS = [
   "tops",
@@ -62,7 +63,7 @@ export default async function ConfirmDesiredItemPage({
   const categoryOptions = await categoryOptionsFor(userId, item.category);
 
   return (
-    <div className="page">
+    <div className="page page--narrow">
       <PageHeader
         back={{ href: "/desired-items/new", label: "Pause a purchase" }}
         title="Confirm this item"
@@ -71,102 +72,134 @@ export default async function ConfirmDesiredItemPage({
 
       {extractionFailed ? (
         <p className="page__lede">
-          We couldn&apos;t automatically identify the item{" "}
-          {item.sourceType === "url" ? "from that link" : "from that screenshot"}. Please fill in the
+          We couldn&apos;t read the item {item.sourceType === "url" ? "from that link" : "from that screenshot"}. Add the
           details yourself.
         </p>
       ) : isLowConfidence ? (
         <p className="page__lede">
           {item.sourceType === "url"
-            ? "We couldn't load that page directly, so this name is a best guess from the link itself - please check it's right."
-            : "This is a low-confidence guess, not a confirmed match - please check it's right."}
+            ? "We couldn't load that page, so this name is a best guess from the link itself. Check it's right."
+            : "This is a best guess, not a confirmed match. Check it's right."}
         </p>
       ) : (
-        <p className="page__lede">Here&apos;s what we found - correct anything that&apos;s wrong before continuing.</p>
+        <p className="page__lede">Here&apos;s what we found. Fix anything that&apos;s wrong.</p>
       )}
 
-      {item.imageUrl && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.imageUrl}
-          alt={item.itemName ?? "Item"}
-          width={120}
-          height={120}
-          style={{ objectFit: "cover", marginTop: "1.25rem", marginBottom: "0.5rem" }}
-        />
-      )}
+      <form action={`/api/desired-items/${item.id}/confirm`} method="POST" className={styles.card}>
+        <div className={styles.photo}>
+          {item.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={item.imageUrl} alt={item.itemName ?? "The item"} />
+          ) : (
+            <span className={styles.noPhoto}>No photo</span>
+          )}
+        </div>
 
-      <form action={`/api/desired-items/${item.id}/confirm`} method="POST" className="section">
-        <label htmlFor="itemName">Item name</label>
-        <input id="itemName" name="itemName" defaultValue={item.itemName ?? ""} placeholder="Item name" required />
-        <label htmlFor="brand">Brand</label>
-        <input
-          id="brand"
-          name="brand"
-          list="brand-options"
-          defaultValue={item.brand ?? ""}
-          placeholder="Brand (pick one or type your own)"
-          autoComplete="off"
-        />
-        <datalist id="brand-options">
-          {BRAND_LIST.map((brand) => (
-            <option key={brand.name} value={brand.name} />
-          ))}
-        </datalist>
-        <label htmlFor="price">
-          Price{" "}
-          <small style={{ color: "var(--color-ink-soft)", fontWeight: 400 }}>
-            (needed before budget impact can be computed - leave blank if unsure)
-          </small>
-        </label>
-        <input
-          id="price"
-          name="price"
-          type="number"
-          step="0.01"
-          min="0"
-          defaultValue={item.price ? Number(item.price) : ""}
-          placeholder="Price"
-        />
-        <label htmlFor="imageUrl">Image URL</label>
-        <input id="imageUrl" name="imageUrl" defaultValue={item.imageUrl ?? ""} placeholder="Image URL" />
-        <label htmlFor="category">Category</label>
-        <select id="category" name="category" defaultValue={item.category ?? ""}>
-          <option value="">Uncategorized</option>
-          {categoryOptions.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="colorName">Color</label>
-        <input id="colorName" name="colorName" defaultValue={item.colorName ?? ""} placeholder="e.g. Espresso" />
-        <label htmlFor="colorFamily">Color family</label>
-        <select id="colorFamily" name="colorFamily" defaultValue={item.colorFamily ?? ""}>
-          <option value="">Unset</option>
-          {COLOR_FAMILIES.map((family) => (
-            <option key={family} value={family}>
-              {family}
-            </option>
-          ))}
-        </select>
-        <label htmlFor="styleTags">Style tags</label>
-        <input
-          id="styleTags"
-          name="styleTags"
-          defaultValue={item.styleTags.join(", ")}
-          placeholder="Style tags (comma separated)"
-        />
-        <button type="submit" className="btn-primary">
-          Confirm
-        </button>
+        <div className={styles.fields}>
+          <div className={styles.field}>
+            <label htmlFor="itemName">Name</label>
+            <input id="itemName" name="itemName" defaultValue={item.itemName ?? ""} required />
+          </div>
+
+          <div className={styles.pair}>
+            <div className={styles.field}>
+              <label htmlFor="brand">
+                Brand <span className={styles.optional}>Optional</span>
+              </label>
+              <input id="brand" name="brand" list="brand-options" defaultValue={item.brand ?? ""} autoComplete="off" />
+              <datalist id="brand-options">
+                {BRAND_LIST.map((brand) => (
+                  <option key={brand.name} value={brand.name} />
+                ))}
+              </datalist>
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="price">
+                Price <span className={styles.optional}>Optional</span>
+              </label>
+              <div className={styles.prefixed}>
+                <span aria-hidden="true">$</span>
+                <input
+                  id="price"
+                  name="price"
+                  type="number"
+                  inputMode="decimal"
+                  step="0.01"
+                  min="0"
+                  defaultValue={item.price ? Number(item.price) : ""}
+                  aria-describedby="price-help"
+                />
+              </div>
+            </div>
+          </div>
+          <p id="price-help" className={styles.help}>
+            With a price, PAUSE can show what this does to your monthly plan.
+          </p>
+
+          <div className={styles.pair}>
+            <div className={styles.field}>
+              <label htmlFor="category">Category</label>
+              <select id="category" name="category" defaultValue={item.category ?? ""}>
+                <option value="">Choose one</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.field}>
+              <label htmlFor="colorName">
+                Colour <span className={styles.optional}>Optional</span>
+              </label>
+              <input id="colorName" name="colorName" defaultValue={item.colorName ?? ""} placeholder="e.g. Navy" />
+            </div>
+          </div>
+
+          {/* Rarely needed, so out of the way (Polaris: progressive disclosure). */}
+          <details className={styles.more}>
+            <summary>More details</summary>
+            <div className={styles.moreFields}>
+              <div className={styles.field}>
+                <label htmlFor="imageUrl">Photo link</label>
+                <input id="imageUrl" name="imageUrl" type="url" defaultValue={item.imageUrl ?? ""} placeholder="https://" />
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="colorFamily">Colour group</label>
+                <select id="colorFamily" name="colorFamily" defaultValue={item.colorFamily ?? ""}>
+                  <option value="">Not set</option>
+                  {COLOR_FAMILIES.map((family) => (
+                    <option key={family} value={family}>
+                      {family.charAt(0).toUpperCase() + family.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.field}>
+                <label htmlFor="styleTags">Style words</label>
+                <input
+                  id="styleTags"
+                  name="styleTags"
+                  defaultValue={item.styleTags.join(", ")}
+                  aria-describedby="tags-help"
+                />
+                <p id="tags-help" className={styles.help}>
+                  Separate with commas, for example minimal, oversized.
+                </p>
+              </div>
+            </div>
+          </details>
+
+          <div className={styles.actions}>
+            <button type="submit" className="btn btn-primary">
+              Continue
+            </button>
+            <Link href="/desired-items/new" className="btn-quiet">
+              Start over
+            </Link>
+          </div>
+        </div>
       </form>
-
-      <p className="section">
-        <Link href="/desired-items/new" className="btn-quiet">
-          Cancel, start over
-        </Link>
-      </p>
     </div>
   );
 }

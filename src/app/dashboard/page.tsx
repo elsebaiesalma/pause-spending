@@ -13,7 +13,8 @@ import { ReceiptBlock } from "@/components/kit/ReceiptBlock";
 import { LocalGreeting } from "./LocalGreeting";
 import { PauseConfirmation } from "@/components/PauseConfirmation";
 import { RackSlice } from "./RackSlice";
-import { SmartAdd } from "./SmartAdd";
+import { AddItem } from "@/components/AddItem";
+import { ActionToast } from "@/components/ActionToast";
 import { isDemoEmail } from "@/lib/demo";
 import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGuide";
 import { SetupGuide } from "./SetupGuide";
@@ -83,19 +84,19 @@ export default async function DashboardPage() {
   const hasGoal = goal !== null;
   const showGoalCard = goalAvailable && hasGoal;
   const showMoneyChoice = !hasPlan && !hasGoal;
-  const showInsights = showGoalCard || showMoneyChoice || (pattern !== null && showPattern);
   const spentShare = planAmount ? Math.min(100, (spend / planAmount) * 100) : 0;
 
   return (
     <div className={`page ${styles.home}`}>
       <LocalGreeting firstName={firstName} />
       <PauseConfirmation />
+      <ActionToast />
 
       {recap && <MonthlyRecap recap={recap} />}
 
       {showGuide && <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />}
 
-      <SmartAdd searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
+      <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
 
       {needsReviewCount > 0 && (
         <div className={styles.statusLines}>
@@ -105,126 +106,106 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* The month at a glance, on the espresso band. Paused counts items
-          still waiting; it never names them (pauses end silently). */}
-      <section className={styles.metrics} aria-label="At a glance">
-        <div className={styles.metric}>
-          <span className={styles.metricLabel}>This month</span>
-          <span className={styles.metricValue}>{dollars(spend)}</span>
-          <span className={styles.metricNote}>
-            {planAmount === null ? `No plan set for ${formatMonthLabel(monthKey)} yet.` : `of your ${dollars(planAmount)} plan`}
-          </span>
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.metricLabel}>Saved</span>
-          <span className={`${styles.metricValue} ${styles.metricValueAccent}`}>{dollars(kept.totalKept)}</span>
-          <span className={styles.metricNote}>
-            {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"} let go this month
-          </span>
-        </div>
-        <div className={styles.metric}>
-          <span className={styles.metricLabel}>Paused right now</span>
-          <span className={styles.metricValue}>{pausedCount}</span>
-          <span className={styles.metricNote}>{pausedCount === 1 ? "item" : "items"} waiting it out</span>
-        </div>
-        <a href="/wardrobe" className={`${styles.metric} ${styles.metricLink}`}>
-          <span className={styles.metricLabel}>Your closet</span>
-          <span className={styles.metricValue}>{pieceCount}</span>
-          <span className={styles.metricNote}>{`${pieceCount === 1 ? "piece" : "pieces"} you already own`}</span>
-        </a>
-      </section>
+      {/* Money: the plan and the goal side by side, each optional. With
+          neither, one question takes the row. */}
+      {showMoneyChoice ? (
+        <MoneyChoice goalAvailable={goalAvailable} />
+      ) : (
+        <div className={styles.money}>
+          <section className={styles.card} aria-labelledby="month-heading">
+            <h2 id="month-heading" className={styles.cardTitle}>
+              This month
+            </h2>
+            {planAmount === null ? (
+              <p className={styles.cardText}>
+                No plan set for {formatMonthLabel(monthKey)}. Want a monthly limit?{" "}
+                <a href="/budget?open=plan" className="link">
+                  Set a plan
+                </a>
+              </p>
+            ) : (
+              <>
+                <div className={styles.planBar} aria-hidden="true">
+                  <span style={{ width: `${spentShare}%` }} />
+                </div>
+                {remaining !== null && (
+                  <ReceiptBlock
+                    rows={[
+                      { label: "Spent", amount: dollars(spend) },
+                      { label: "Plan", amount: dollars(planAmount) },
+                    ]}
+                    closing={
+                      isOver
+                        ? { label: `${dollars(Math.abs(remaining))} over your plan`, over: true }
+                        : { label: "Left", amount: dollars(remaining), over: false }
+                    }
+                  />
+                )}
+              </>
+            )}
+          </section>
 
-      {/* Goal (or the first question) and pattern side by side; either takes
-          the full width when the other has nothing to show yet. */}
-      {showInsights && (
-        <div
-          className={`${styles.insights} ${showPattern && (showGoalCard || showMoneyChoice) ? "" : styles.insightsSingle}`}
-        >
-          {showGoalCard && <GoalCard goal={goal} />}
-          {!showGoalCard && showMoneyChoice && <MoneyChoice goalAvailable={goalAvailable} />}
-          {pattern && showPattern && <PatternCard pattern={pattern} />}
+          {showGoalCard ? (
+            <GoalCard goal={goal} />
+          ) : (
+            goalAvailable && (
+              <section className={styles.card} aria-labelledby="goal-offer-heading">
+                <h2 id="goal-offer-heading" className={styles.cardTitle}>
+                  Saving for something?
+                </h2>
+                <p className={styles.cardText}>
+                  Every item you let go adds its price to a goal, like a trip or one piece you really want.
+                </p>
+                <GoalSheet
+                  mode="save"
+                  triggerLabel="Set a savings goal"
+                  triggerClassName="btn"
+                  hasGoal={false}
+                  nameMax={GOAL_NAME_MAX}
+                  savedThisMonth={kept.totalKept}
+                />
+              </section>
+            )
+          )}
         </div>
       )}
 
-      <div className={styles.cards}>
-        <section className={styles.card} aria-labelledby="month-heading">
-          <h2 id="month-heading" className={styles.cardTitle}>
-            This month
-          </h2>
-          {planAmount === null ? (
-            <p className={styles.cardText}>
-              {hasGoal
-                ? "Also want a monthly limit? Set a plan to see what each purchase does to it."
-                : "Set a monthly plan to see what each purchase does to it."}{" "}
-              <a href="/budget?open=plan" className="link">
-                Set a plan
-              </a>
-            </p>
-          ) : (
-            <>
-              <div className={styles.planBar} aria-hidden="true">
-                <span style={{ width: `${spentShare}%` }} />
-              </div>
-              {remaining !== null && (
-                <ReceiptBlock
-                  rows={[
-                    { label: "Spent", amount: dollars(spend) },
-                    { label: "Plan", amount: dollars(planAmount) },
-                  ]}
-                  closing={
-                    isOver
-                      ? { label: `${dollars(Math.abs(remaining))} over your plan`, over: true }
-                      : { label: "Left", amount: dollars(remaining), over: false }
-                  }
-                />
-              )}
-            </>
-          )}
-          {kept.itemsLetGo > 0 && (
-            <a href="/considering?tab=let-go" className={styles.keptLine}>
-              {dollars(kept.totalKept)} saved by letting {kept.itemsLetGo} {kept.itemsLetGo === 1 ? "thing" : "things"}{" "}
-              go &rarr;
-            </a>
-          )}
-        </section>
+      {/* Everything else at a glance, as one quiet line. Paused counts items
+          still waiting; it never names them (pauses end silently). */}
+      <p className={styles.glance}>
+        <a href="/considering?tab=let-go">
+          <strong>{dollars(kept.totalKept)}</strong> saved
+        </a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="/considering">
+          <strong>{pausedCount}</strong> on pause
+        </a>
+        <span aria-hidden="true">&middot;</span>
+        <a href="/wardrobe">
+          <strong>{pieceCount}</strong> {pieceCount === 1 ? "piece" : "pieces"} in your closet
+        </a>
+      </p>
 
-        <section className={styles.card} aria-labelledby="closet-heading">
+      {showPattern && pattern && <PatternCard pattern={pattern} />}
+
+      <section className={styles.card} aria-labelledby="closet-heading">
+        <div className={styles.cardHead}>
           <h2 id="closet-heading" className={styles.cardTitle}>
             Recently added
           </h2>
-          {rackItems.length > 0 && (
-            <>
-              <RackSlice items={rackItems} />
-              <a href="/wardrobe?view=rack" className={styles.closetLink}>
-                See your closet &rarr;
-              </a>
-            </>
+          {pieceCount > 0 && (
+            <a href="/wardrobe?view=rack" className={styles.quietLink}>
+              See your closet &rarr;
+            </a>
           )}
-          {rackItems.length === 0 &&
-            (pieceCount === 0 ? (
-              <a href="/wardrobe#add-to-wardrobe" className={styles.quietLink}>
-                Add your first piece &rarr;
-              </a>
-            ) : (
-              <a href="/wardrobe?view=rack" className={styles.quietLink}>
-                See your closet &rarr;
-              </a>
-            ))}
-        </section>
-      </div>
-
-      {goalAvailable && hasPlan && !hasGoal && (
-        <p className={styles.alsoTry}>
-          Saving for something?{" "}
-          <GoalSheet
-            mode="save"
-            triggerLabel="Set a savings goal"
-            triggerClassName="btn-quiet"
-            hasGoal={false}
-            nameMax={GOAL_NAME_MAX}
-          />
-        </p>
-      )}
+        </div>
+        {rackItems.length > 0 && <RackSlice items={rackItems} />}
+        {pieceCount === 0 && (
+          <a href="/wardrobe#add-to-wardrobe" className={styles.quietLink}>
+            Add your first piece &rarr;
+          </a>
+        )}
+      </section>
 
       <QuoteBand text={quote.text} source={quote.source} />
     </div>

@@ -275,3 +275,55 @@
   gap: 0.25rem 0.5rem;
   color: var(--color-ink-soft);
 }
+
+/* Plan and goal: two equal cards, same height, same top edge. */
+.money {
+  display: grid;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+@media (min-width: 760px) {
+  .money {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.money > * {
+  height: 100%;
+}
+
+/* The rest of the month as one quiet line of links. */
+.glance {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.375rem 0.75rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-ink-soft);
+}
+
+.glance a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.glance a:hover {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.glance strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* Title left, its link right, on one baseline. */
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}

@@ -1,6 +1,18 @@
 import { swatchFor, isLightSwatch } from "@/lib/colorSwatch";
 
-export type SilhouetteShape = "tee" | "knit" | "trousers" | "jeans" | "coat" | "boot" | "sneaker" | "bag";
+export type SilhouetteShape =
+  | "tee"
+  | "knit"
+  | "trousers"
+  | "jeans"
+  | "coat"
+  | "boot"
+  | "sneaker"
+  | "bag"
+  | "dress"
+  | "scarf"
+  | "belt"
+  | "sunglasses";
 
 // Maps a seeded item's category + name to one of the 8 fixed silhouette
 // shapes below. Only ever called for source: "seed" rows (see page.tsx) -
@@ -15,6 +27,12 @@ export function silhouetteForItem(category: string | null, itemName: string): Si
   if (cat === "shoes") return name.includes("boot") ? "boot" : "sneaker";
   if (cat === "bottoms") return name.includes("jean") ? "jeans" : "trousers";
   if (cat === "tops") return "tee";
+  if (cat === "dresses") return "dress";
+  if (cat === "accessories") {
+    if (name.includes("belt")) return "belt";
+    if (name.includes("sunglass") || name.includes("glasses")) return "sunglasses";
+    return "scarf";
+  }
   return null;
 }
 
@@ -27,6 +45,10 @@ const OUTLINES: Record<SilhouetteShape, string> = {
   boot: "M40,26 L60,26 L60,76 L80,76 L80,94 L32,94 L32,80 L40,80 Z",
   sneaker: "M18,86 L24,70 L45,60 L70,64 L83,78 L83,92 L16,92 Z",
   bag: "M30,54 L70,54 L76,100 L24,100 Z",
+  dress: "M42,20 L58,20 L60,40 L56,52 L76,108 L24,108 L44,52 L40,40 Z",
+  scarf: "M36,24 L64,24 L64,40 L56,40 L58,104 L46,104 L48,52 L36,40 Z",
+  belt: "M14,56 L86,56 L86,70 L14,70 Z",
+  sunglasses: "M16,54 L84,54 L84,58 L80,58 L76,74 L58,74 L54,60 L46,60 L42,74 L24,74 L20,58 L16,58 Z",
 };
 
 // A couple of light detail strokes per shape so the placeholder reads as a
@@ -41,6 +63,10 @@ const DETAILS: Record<SilhouetteShape, string[]> = {
   boot: ["M32,80 L80,80"],
   sneaker: ["M22,88 L79,88", "M30,74 Q45,66 62,68"],
   bag: ["M40,54 Q50,32 60,54"],
+  dress: ["M44,52 L56,52"],
+  scarf: ["M48,92 L58,92", "M47,98 L58,98"],
+  belt: ["M60,58 L60,68 L70,68 L70,58 Z", "M65,63 L76,63"],
+  sunglasses: [],
 };
 
 export function GarmentSilhouette({

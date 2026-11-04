@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { WarnIcon } from "@/components/WarnIcon";
 import { assemblePauseScreen } from "@/lib/pauseScreen/assemblePauseScreen";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
@@ -273,7 +274,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
               </p>
               {budget.spendAfterPurchase > budget.budgetAmount && (
                 <p className={styles.overPlan}>
-                  ${(budget.spendAfterPurchase - budget.budgetAmount).toFixed(0)} over your plan
+                  <WarnIcon />${(budget.spendAfterPurchase - budget.budgetAmount).toFixed(0)} over your plan
                 </p>
               )}
             </>

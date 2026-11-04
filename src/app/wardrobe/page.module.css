@@ -125,13 +125,12 @@
   gap: calc(var(--space-2) * 0.72) var(--space-2);
 }
 
+/* Chips wrap onto a second line instead of running off the edge, so every
+   category is visible and nothing is cut in half. */
 .chipRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
 .chipRow::-webkit-scrollbar {
@@ -284,6 +283,12 @@
   align-items: center;
   justify-content: center;
   background: var(--color-fill);
+}
+
+.imageDrawing {
+  display: block;
+  width: 58%;
+  height: 72%;
 }
 
 .imagePlaceholderLabel {
