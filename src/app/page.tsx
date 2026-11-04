@@ -121,8 +121,8 @@ export default function Home() {
           </span>
           <h1 className={styles.heroHeadline}>Before you buy it, see what you already own.</h1>
           <p className={styles.heroSub}>
-            PAUSE puts the thing you&apos;re about to buy next to the pieces already in your closet,
-            then gives you a moment to decide. Reflection, not restriction.
+            PAUSE lines up what you want with the pieces you already have, then gives you a moment to
+            decide. Reflection, not restriction.
           </p>
           <div className={styles.heroActions}>
             {cta}

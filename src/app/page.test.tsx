@@ -10,7 +10,7 @@ import Home from "./page";
 describe("Home (landing page)", () => {
   it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("PAUSE puts the thing you&#x27;re about to buy");
+    expect(html).toContain("PAUSE lines up what you want with the pieces you already have");
     expect(html).not.toMatch(/CALIB/i);
   });
 
