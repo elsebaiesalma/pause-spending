@@ -43,7 +43,7 @@
 }
 
 .noPhoto {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -64,7 +64,7 @@
   flex-wrap: wrap;
   gap: 0.25rem;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .field input,
@@ -87,13 +87,13 @@
 
 .optional {
   font-weight: 400;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
 .help {
   margin: -0.5rem 0 0;
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -127,7 +127,7 @@
 .more summary {
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
 }
 
 .moreFields {

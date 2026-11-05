@@ -42,7 +42,7 @@
   border-color: transparent;
   background: transparent;
   color: rgba(255, 255, 255, 0.75);
-  font-size: 1rem;
+  font-size: var(--text-md);
 }
 
 .recap .close:hover {
@@ -52,7 +52,7 @@
 
 .eyebrow {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--text-md);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -91,7 +91,7 @@
 }
 
 .metric dt {
-  font-size: 1.0625rem;
+  font-size: var(--text-md);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.75);
 }
@@ -116,7 +116,7 @@
 
 .metric dd.note {
   font-family: var(--font-body);
-  font-size: 1.0625rem;
+  font-size: var(--text-md);
   line-height: 1.3;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -164,7 +164,7 @@
   padding: 1rem 1.125rem;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
-  font-size: 1rem;
+  font-size: var(--text-md);
   line-height: 1.4;
   color: #fff;
   max-width: none;

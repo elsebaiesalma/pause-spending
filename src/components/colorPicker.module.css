@@ -8,7 +8,7 @@
 .picker legend {
   padding: 0;
   margin-bottom: 0.375rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-ink);
 }
@@ -30,7 +30,7 @@
   border: 1px solid var(--color-line-strong);
   border-radius: 999px;
   background: var(--color-surface);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 
@@ -74,7 +74,7 @@
   height: 1rem;
   border-radius: 50%;
   border: 1px dashed var(--color-ink-soft);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   line-height: 1;
 }
 
@@ -86,7 +86,7 @@
 }
 
 .other label {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 
@@ -99,6 +99,6 @@
 
 .hint {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
