@@ -75,35 +75,4 @@ To keep it honest, most of the youth numbers come from industry surveys, and the
 
 Next.js 16 and React 19, Prisma 7 on Neon Postgres, and Auth.js for sessions. The Anthropic API tags clothes and suggests outfits. Vitest runs the tests, and Vercel hosts the site.
 
-## Run the code yourself
-
-You don't need any of this to try PAUSE. The live site runs in any browser. This part is only for developers who want the code on their own machine.
-
-You need Node 24 and a Postgres database.
-
-1. Install packages with `npm install`.
-2. Create a `.env` file with the variables below.
-3. Apply the schema with `npx prisma migrate deploy`.
-4. Start the app with `npm run dev` and open localhost on port 3000.
-
-Run the tests with `npm test`.
-
-### Required variables
-
-`DATABASE_URL` points to your Postgres database.
-
-`AUTH_SECRET` signs your sessions.
-
-`ANTHROPIC_API_KEY` turns on tagging and outfit suggestions. Without it the app still runs, but it skips those steps.
-
-### Optional variables
-
-`GMAIL_ENABLED=true` brings back Google sign in and Gmail import. You also need `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` and `TOKEN_ENCRYPTION_KEY`.
-
-`BRAVE_SEARCH_API_KEY` turns on product search.
-
-`CRON_SECRET` protects the scheduled sync route.
-
-`TEST_DATABASE_URL` points to a separate database for tests.
-
 Built by Salma Elsebaie.
