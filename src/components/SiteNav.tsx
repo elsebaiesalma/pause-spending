@@ -52,6 +52,7 @@ export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: He
   return (
     <header className={`site-header${isLanding ? " site-header--overlay" : ""}`}>
       <div className="site-header__inner">
+        {showNav && <MobileMenu pathname={pathname} />}
         {/* Signed-in pages keep the logo inside the app; only the landing page and
             signed-out visitors go to "/". */}
         <Link href={initials !== null && !isLanding ? "/dashboard" : "/"} className="site-header__brand">
@@ -82,20 +83,10 @@ export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: He
           {isLanding && !gmailEnabled ? (
             // The landing page always offers the demo, signed in or not.
             <>
-              {initials !== null && (
-                <Link href="/dashboard" className="site-header__link">
-                  Open app
-                </Link>
-              )}
               <DemoButton label="Try the demo" pendingLabel="Setting up…" className="site-header__link" />
             </>
           ) : initials !== null ? (
             <>
-              {isLanding && (
-                <Link href="/dashboard" className="site-header__link">
-                  Open app
-                </Link>
-              )}
               <AccountMenu initials={initials} isDemo={isDemo} signOutAction={signOutAction} current={isUnder(pathname, "/account") || isUnder(pathname, "/budget")} />
             </>
           ) : (
@@ -112,6 +103,32 @@ export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: He
         </div>
       </div>
     </header>
+  );
+}
+
+// Phones: a hamburger beside the logo lists the three places. Native
+// <details>, keyed by path so it closes once a link is followed.
+function MobileMenu({ pathname }: { pathname: string }) {
+  return (
+    <details className="mobile-menu" key={pathname}>
+      <summary className="mobile-menu__button" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      </summary>
+      <div className="mobile-menu__panel">
+        {LINKS.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="mobile-menu__item"
+            aria-current={isActive(pathname, link) ? "page" : undefined}
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -163,17 +180,15 @@ function AccountMenu({
   );
 }
 
-// Home · Decisions · (+) Pause · Closet
+// Decisions · PAUSE · Closet. Home is the logo and the menu beside it, so the
+// Pause action can sit in the middle.
 export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   if (!signedIn || isPublicPath(pathname)) return null;
-  const [home, decisions, closet] = LINKS;
+  const [, decisions, closet] = LINKS;
 
   return (
     <nav className="tab-bar" aria-label="Primary">
-      <Link href={home.href} className="tab-bar__item" aria-current={isActive(pathname, home) ? "page" : undefined}>
-        {home.label}
-      </Link>
       <Link
         href={decisions.href}
         className="tab-bar__item"
@@ -187,9 +202,12 @@ export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
         aria-current={pathname === PAUSE_HREF ? "page" : undefined}
       >
         <span className="tab-bar__plus" aria-hidden="true">
-          +
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" focusable="false">
+            <rect x="3" y="2" width="3.5" height="12" rx="1" />
+            <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
+          </svg>
         </span>
-        Pause
+        PAUSE
       </Link>
       <Link href={closet.href} className="tab-bar__item" aria-current={isActive(pathname, closet) ? "page" : undefined}>
         {closet.label}

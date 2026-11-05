@@ -130,8 +130,11 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
                     }}
                   >
                     <span className={styles.pauseIcon} aria-hidden="true">
+                      {/* SVG both ways: the "▶" character turns into a colour emoji on iPhone. */}
                       {mode === "paused" ? (
-                        "▶"
+                        <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" focusable="false">
+                          <path d="M4 2.6v10.8a.8.8 0 0 0 1.2.7l8.6-5.4a.8.8 0 0 0 0-1.4L5.2 1.9A.8.8 0 0 0 4 2.6z" />
+                        </svg>
                       ) : (
                         <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" focusable="false">
                           <rect x="3" y="2" width="3.5" height="12" rx="1" />

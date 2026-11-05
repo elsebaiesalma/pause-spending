@@ -37,15 +37,15 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
             <span aria-hidden="true">&#10005;</span>
           </button>
           <div className={styles.head}>
-            <div>
-              <p className={styles.eyebrow}>Your month</p>
+            <p className={styles.eyebrow}>Your month</p>
+            <div className={styles.titleRow}>
               <h2 id="recap-heading" className={styles.title}>
                 Your {monthLabel} in PAUSE
               </h2>
+              <a href={`/considering?tab=let-go&month=${recap.monthKey}`} className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0}>
+                See {monthLabel}&rsquo;s decisions
+              </a>
             </div>
-            <a href={`/considering?tab=let-go&month=${recap.monthKey}`} className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0}>
-              See {monthLabel}&rsquo;s decisions
-            </a>
           </div>
 
           <dl className={styles.metrics}>
