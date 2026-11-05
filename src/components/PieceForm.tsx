@@ -426,9 +426,26 @@ export function PieceForm({
                     setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
                   }}
                 />
-                <button type="button" className="btn" onClick={() => setDateOpen(false)}>
-                  Done
-                </button>
+                {/* Secondary on the left, the action that closes on the right. */}
+                <div className={styles.dateActions}>
+                  {values.ownedSince ? (
+                    <button
+                      type="button"
+                      className="btn-quiet"
+                      onClick={() => {
+                        update({ ownedSince: "" });
+                        setErrors((current) => ({ ...current, ownedSince: validateOwnedSince("", today) }));
+                      }}
+                    >
+                      Clear
+                    </button>
+                  ) : (
+                    <span />
+                  )}
+                  <button type="button" className="btn" onClick={() => setDateOpen(false)}>
+                    Done
+                  </button>
+                </div>
               </div>
             )}
             <FieldError id="piece-owned-since-error" message={errors.ownedSince} />

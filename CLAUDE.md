@@ -43,6 +43,13 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Look board:** Back (swipe or button) with unsaved changes opens the same "Leave without saving?" dialog, via a guard history entry that copies Next's `history.state`.
 - **Owned since:** Clear sits under the wheel and the gap above it is gone.
 
+## Mobile pass 2 (2026-11-05, branch `mobile-pass-2`)
+
+- **One "Undecided" colour:** `deciding` and `undecided` share the rose `badge` in `STATUS_BADGE` (one was neutral grey, so the same word showed two colours).
+- **Owned since wheel:** 3 rows tall, months loop (December above January; three copies re-centred in `Wheel`), Clear (quiet, left) and Done (outlined, right) on one row under it, in `PieceForm`.
+- **Landing, phones:** below 700px the urge graph is replaced by `UrgeTexts` (four texts to yourself, loud to quiet, same `URGE_MARKS` words).
+- **Recap card:** "See decisions" (short label on phones) sits beside "Your month"; the tip's lightbulb is vertically centred.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.

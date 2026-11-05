@@ -4,15 +4,6 @@
   max-width: 20rem;
 }
 
-.picked {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
 /* The two wheels share one highlight band across the middle row. */
 .columns {
   position: relative;
@@ -29,7 +20,7 @@
   position: absolute;
   left: 0.5rem;
   right: 0.5rem;
-  top: calc(50% + 0.75rem - 1.25rem);
+  top: calc(50% - 0.5rem);
   height: 2.5rem;
   border-radius: 8px;
   background: var(--color-blush);
@@ -58,7 +49,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  height: 12.5rem;
+  height: 7.5rem;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
@@ -67,7 +58,7 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 30%, #000 70%, transparent 100%);
   /* Room above and below so the first and last row can reach the middle. */
-  padding-block: 5rem;
+  padding-block: 2.5rem;
   box-sizing: border-box;
 }
 

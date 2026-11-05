@@ -4,6 +4,7 @@ import { HeroPreview } from "@/components/HeroPreview";
 import { DemoButton } from "@/components/DemoButton";
 import { ReceiptHero } from "./ReceiptHero";
 import { UrgeCurve } from "./UrgeCurve";
+import { UrgeTexts } from "./UrgeTexts";
 import { isGmailEnabled } from "@/lib/demo";
 import styles from "./page.module.css";
 
@@ -181,7 +182,13 @@ export default function Home() {
               intent to buy. A 10-minute wait did not: people kept shopping while they waited.
             </p>
           </div>
-          <UrgeCurve />
+          {/* The graph needs width; phones get the same four moments as texts. */}
+          <div className={styles.urgeDesktop}>
+            <UrgeCurve />
+          </div>
+          <div className={styles.urgePhone}>
+            <UrgeTexts />
+          </div>
           <p className={styles.chartPayoff}>
             The default is <strong>pause for 24 hours</strong>.{" "}
             <span className={styles.statSourceLight}>Moser, University of Michigan, 2020</span>

@@ -6,23 +6,29 @@ import styles from "./monthYearWheel.module.css";
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const ROW_REM = 2.5;
 
-type Column = { label: string; items: string[]; index: number | null; onPick: (index: number) => void };
+type Column = { label: string; items: string[]; index: number | null; onPick: (index: number) => void; loop?: boolean };
 
 // One scrolling column that snaps its centre row under the highlight band: drag
 // or scroll it, click a row, or use the arrow keys.
-function Wheel({ label, items, index, onPick }: Column) {
+function Wheel({ label, items, index, onPick, loop = false }: Column) {
   const listRef = useRef<HTMLUListElement>(null);
   const settle = useRef<number | undefined>(undefined);
   const touched = useRef(false);
   const id = useId();
+  const n = items.length;
+  // A looping wheel (months) shows three copies and re-centres on the middle
+  // one, so December sits above January and the wheel never runs out.
+  const rows = loop ? [...items, ...items, ...items] : items;
+  const offset = loop ? n : 0;
 
   // Keep the list scrolled to the chosen row when the value changes from
   // outside the wheel (Clear, or the other wheel setting a default).
   useEffect(() => {
     const list = listRef.current;
-    if (!list || index === null || touched.current) return;
+    if (!list || touched.current) return;
     const rowPx = parseFloat(getComputedStyle(list).fontSize) * ROW_REM;
-    list.scrollTop = index * rowPx;
+    // Unset: a looping wheel still starts in its middle copy.
+    list.scrollTop = (offset + (index ?? 0)) * rowPx;
   }, [index]);
 
   function rowPx() {
@@ -36,25 +42,33 @@ function Wheel({ label, items, index, onPick }: Column) {
     settle.current = window.setTimeout(() => {
       const list = listRef.current;
       if (!list) return;
-      const next = Math.min(items.length - 1, Math.max(0, Math.round(list.scrollTop / rowPx())));
+      let row = Math.min(rows.length - 1, Math.max(0, Math.round(list.scrollTop / rowPx())));
+      if (loop && (row < n || row >= 2 * n)) {
+        // Same month, one copy over: jump without the person seeing it.
+        row = row < n ? row + n : row - n;
+        list.scrollTop = row * rowPx();
+      }
+      const next = loop ? row - n : row;
       if (next !== index) onPick(next);
       touched.current = false;
     }, 120);
   }
 
+  // `next` is a position in the shown rows (for a loop, in the middle copy
+  // that is offset by one set of items).
   function move(next: number) {
-    const clamped = Math.min(items.length - 1, Math.max(0, next));
+    const clamped = Math.min(rows.length - 1, Math.max(0, next));
     touched.current = false;
     listRef.current?.scrollTo({ top: clamped * rowPx(), behavior: "smooth" });
-    onPick(clamped);
+    onPick(((clamped % n) + n) % n);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLUListElement>) {
-    const current = index ?? 0;
+    const current = offset + (index ?? 0);
     if (event.key === "ArrowDown") move(current + 1);
     else if (event.key === "ArrowUp") move(current - 1);
-    else if (event.key === "Home") move(0);
-    else if (event.key === "End") move(items.length - 1);
+    else if (event.key === "Home") move(offset);
+    else if (event.key === "End") move(offset + n - 1);
     else return;
     event.preventDefault();
   }
@@ -70,16 +84,17 @@ function Wheel({ label, items, index, onPick }: Column) {
         role="listbox"
         tabIndex={0}
         aria-labelledby={`${id}-label`}
-        aria-activedescendant={index === null ? undefined : `${id}-${index}`}
+        aria-activedescendant={index === null ? undefined : `${id}-${offset + index}`}
         onScroll={onScroll}
         onKeyDown={onKeyDown}
       >
-        {items.map((item, i) => (
+        {rows.map((item, i) => (
           <li
-            key={item}
+            key={`${item}-${i}`}
             id={`${id}-${i}`}
             role="option"
-            aria-selected={index === i}
+            aria-hidden={loop && (i < n || i >= 2 * n) ? true : undefined}
+            aria-selected={index === i - offset}
             className={styles.row}
             onClick={() => move(i)}
           >
@@ -135,6 +150,7 @@ export function MonthYearWheel({
           label="Month"
           items={MONTHS}
           index={current ? current.month : null}
+          loop
           onPick={(month) => emit(current?.year ?? defaultYear, month)}
         />
         <Wheel
@@ -144,15 +160,6 @@ export function MonthYearWheel({
           onPick={(i) => emit(years[i], current?.month ?? defaultMonth)}
         />
       </div>
-      {/* The field above already shows the month; this only clears it, and sits
-          under the wheel so nothing opens a gap between the field and the wheel. */}
-      {current && (
-        <div className={styles.picked}>
-          <button type="button" className="btn-quiet" onClick={() => onChange("")}>
-            Clear
-          </button>
-        </div>
-      )}
       {name && <input type="hidden" name={name} value={value} />}
     </div>
   );

@@ -559,3 +559,17 @@
   color: #fff;
   text-decoration: underline;
 }
+
+/* The urge graph from 700px up, the text thread below it. */
+.urgeDesktop {
+  display: none;
+}
+
+@media (min-width: 700px) {
+  .urgeDesktop {
+    display: block;
+  }
+  .urgePhone {
+    display: none;
+  }
+}
