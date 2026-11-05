@@ -1,44 +1,66 @@
 # Mock wardrobe images
 
-`data/mock-wardrobe.json` expects these files in this folder. Nothing here is loaded
-until you run `npx tsx scripts/seedMockWardrobe.ts --confirm`; the script links an
-image only if the file exists, so you can add them gradually and re-run it.
+`data/mock-wardrobe.json` expects these files in this folder. The seed script
+(`npx tsx scripts/seedMockWardrobe.ts --confirm`) links an image only if the file
+exists here, and the demo only uses files listed in `data/mock-images.json`
+(serverless functions cannot see `public/`). Add a file here and to that list.
 
-**What to look for:** one garment (or pair, for shoes) on its own, no person, no
-visible brand logos or text, plain or neutral background, portrait. The wardrobe
-cards are 4:5, so aim for about 800 x 1000 px, saved as JPEG. Use photos you have the
-right to use (your own, or Unsplash, which needs no attribution).
+These are stock photos supplied by the project owner. Each was cropped to the
+garment and saved as an 800 x 1000 JPEG (4:5, the wardrobe card ratio). Confirm
+each photo's licence allows use on a public demo before making the repo public.
+Three items deliberately have no image, so the placeholder card stays in the demo.
 
 | File | Used by | Suggested search term |
 | --- | --- | --- |
-| `tee-white.jpg` | The three white tees (Everlane, Uniqlo, COS) | white t-shirt flat lay |
-| `blouse-cream.jpg` | Aritzia silk-blend cowl blouse | cream silk blouse on hanger |
-| `sweater-navy.jpg` | Uniqlo merino crew sweater | navy crew neck sweater flat lay |
-| `sweater-grey.jpg` | Everlane cashmere crew | grey cashmere sweater folded |
-| `cardigan-cream.jpg` | COS chunky wool cardigan | cream chunky knit cardigan |
-| `coat-black-wool.jpg` | The two black wool coats (Aritzia, Zara) | black wool coat on hanger |
-| `jacket-down-navy.jpg` | Uniqlo ultra light down jacket | navy puffer jacket flat lay |
-| `trench-stone.jpg` | Everlane modern trench | beige trench coat on hanger |
-| `jeans-blue.jpg` | Levi's 501 jeans | mid wash blue jeans flat lay |
-| `jeans-black.jpg` | Madewell perfect vintage jean | washed black jeans flat lay |
-| `trousers-grey.jpg` | Aritzia pleated wide-leg trousers | grey pleated wide leg trousers |
-| `skirt-navy.jpg` | COS pleated midi skirt | navy pleated midi skirt |
-| `pants-black-leggings.jpg` | Lululemon Align pant | black high rise leggings flat lay |
-| `dress-black-knit.jpg` | Aritzia sculpt knit midi dress | black knit midi dress on hanger |
-| `dress-pink-slip.jpg` | Zara satin slip dress | blush pink satin slip dress |
-| `sneakers-white.jpg` | Veja Campo sneakers | white leather sneakers no logo |
-| `boots-black-lace.jpg` | Dr. Martens 1460 boots | black leather lace-up boots |
-| `boots-brown-chelsea.jpg` | Blundstone Original 500 | brown leather chelsea boots |
-| `sandals-brown.jpg` | Birkenstock Arizona sandals | brown suede two-strap sandals |
-| `tote-navy.jpg` | Longchamp Le Pliage tote | navy nylon tote bag |
-| `bag-black-shoulder.jpg` | Coach Tabby shoulder bag | black leather shoulder bag |
-| `backpack-yellow.jpg` | Fjällräven Kånken backpack | yellow mini backpack |
-| `sunglasses-black.jpg` | Ray-Ban Wayfarer | black wayfarer sunglasses flat lay |
-| `scarf-plaid.jpg` | Frank And Oak plaid scarf | red navy plaid wool scarf |
-
-Three items deliberately have no image (`"image": null`), to show the designed
-placeholder card: the Frank And Oak Oxford shirt, the Reformation wrap dress and
-the Roots leather belt.
-
-A file name listed above that is missing from this folder is not an error: that item
-just shows the placeholder until the file is added and the seed script is re-run.
+| `bag-corduroy-rust.jpg` | Mango Corduroy Baguette Shoulder Bag | corduroy baguette shoulder bag |
+| `bag-woven-tan.jpg` | Massimo Dutti Woven Leather Shoulder Bag | woven leather shoulder bag |
+| `belt-suede-brown.jpg` | Mango Suede Belt with Gold Buckle | suede belt with gold buckle |
+| `blazer-taupe.jpg` | COS Pinstripe Tailored Blazer | pinstripe tailored blazer |
+| `blouse-black-pin.jpg` | Free People Safety-Pin Peplum Blouse | safety-pin peplum blouse |
+| `blouse-blue-tie.jpg` | H&M Tie-Front Smocked Blouse | tie-front smocked blouse |
+| `cami-navy-satin.jpg` | Aritzia Satin Slip Cami | satin slip cami |
+| `cardigan-lilac.jpg` | Uniqlo Fine Knit V-Neck Cardigan | fine knit v-neck cardigan |
+| `coat-faux-fur.jpg` | Mango Faux Fur Hooded Jacket | faux fur hooded jacket |
+| `coat-grey-wool.jpg` | Aritzia Oversized Double-Breasted Wool Coat | oversized double-breasted wool coat |
+| `coat-pinstripe-grey.jpg` | Zara Oversized Pinstripe Long Coat | oversized pinstripe long coat |
+| `coat-teddy-red.jpg` | Zara Teddy Faux Shearling Coat | teddy faux shearling coat |
+| `dress-pleated-blue.jpg` | Mango Pleated Halter Maxi Dress | pleated halter maxi dress |
+| `dress-ruffle-green.jpg` | Mango Ruffle Off-Shoulder Maxi Dress | ruffle off-shoulder maxi dress |
+| `dress-slip-green.jpg` | Zara Lace-Trim Velvet Slip Dress | lace-trim velvet slip dress |
+| `heels-burgundy-velvet.jpg` | Steve Madden Velvet Ankle-Strap Pumps | velvet ankle-strap pumps |
+| `heels-red-tstrap.jpg` | Aldo T-Strap Pointed Heels | t-strap pointed heels |
+| `jacket-bomber-rust.jpg` | Uniqlo Lightweight Bomber Jacket | lightweight bomber jacket |
+| `jacket-denim-lined.jpg` | Lee Storm Rider Denim Jacket | storm rider denim jacket |
+| `jacket-leather-black.jpg` | Zara Faux Leather Bomber Jacket | faux leather bomber jacket |
+| `jacket-suede-olive.jpg` | Mango Faux Suede Bomber Jacket | faux suede bomber jacket |
+| `jeans-acne-navy.jpg` | Acne Studios Bootcut Raw Denim Jeans | bootcut raw denim jeans |
+| `jeans-madewell-light.jpg` | Madewell Perfect Vintage Straight Jeans | perfect vintage straight jeans |
+| `jeans-plum.jpg` | Zara Wide-Leg Cotton Jeans | wide-leg cotton jeans |
+| `jeans-wide-dark.jpg` | Levi's Ribcage Wide-Leg Jeans | ribcage wide-leg jeans |
+| `jeans-wide-light.jpg` | Gap High Rise Wide-Leg Jeans | high rise wide-leg jeans |
+| `loafers-brown-dark.jpg` | Everlane The Suede Penny Loafer | the suede penny loafer |
+| `loafers-brown-tan.jpg` | Zara Suede Penny Loafers | suede penny loafers |
+| `poncho-cream.jpg` | Roots Fringed Knit Poncho | fringed knit poncho |
+| `shirt-linen-cream.jpg` | Aritzia Relaxed Linen Shirt | relaxed linen shirt |
+| `shirt-linen-yellow.jpg` | Uniqlo Premium Linen Shirt | premium linen shirt |
+| `shirt-ruched-green.jpg` | COS Textured Ruched Shirt | textured ruched shirt |
+| `shorts-denim.jpg` | Levi's 501 Original Cut-Off Shorts | 501 original cut-off shorts |
+| `shorts-gingham.jpg` | Zara Gingham Boxer Shorts | gingham boxer shorts |
+| `skirt-bubble-white.jpg` | Aritzia Poplin Bubble Mini Skirt | poplin bubble mini skirt |
+| `sweater-brown.jpg` | Everlane Mohair-Blend Crew Sweater | mohair-blend crew sweater |
+| `sweater-crochet-cream.jpg` | Anthropologie Open-Knit Cropped Sweater | open-knit cropped sweater |
+| `sweater-pink-chunky.jpg` | Everlane Chunky Alpaca Crew Sweater | chunky alpaca crew sweater |
+| `sweater-ribbed-cream.jpg` | COS Ribbed Boat-Neck Sweater | ribbed boat-neck sweater |
+| `sweatshirt-red.jpg` | Roots Relaxed Funnel-Neck Sweatshirt | relaxed funnel-neck sweatshirt |
+| `tank-green-ribbed.jpg` | Aritzia Cotton Rib Tank | cotton rib tank |
+| `tank-navy.jpg` | Everlane Ribbed Racerback Tank | ribbed racerback tank |
+| `tank-silver.jpg` | Mango Metallic Rib Tank | metallic rib tank |
+| `tank-tan.jpg` | Gap Cropped Rib Tank | cropped rib tank |
+| `tank-white.jpg` | Aritzia Cotton Rib Crop Tank | cotton rib crop tank |
+| `tee-black-model.jpg` | Gap Vintage Soft Crew Tee | vintage soft crew tee |
+| `tee-black.jpg` | Uniqlo Supima Cotton Crew Neck Tee | supima cotton crew neck tee |
+| `tee-white-flat.jpg` | Everlane The Organic Cotton Crew Tee | the organic cotton crew tee |
+| `tee-white-hanger.jpg` | COS Boxy Heavyweight Tee | boxy heavyweight tee |
+| `top-crochet-red.jpg` | Zara Crochet Halter Top | crochet halter top |
+| `top-crochet-striped.jpg` | Mango Striped Crochet Tie Top | striped crochet tie top |
+| `trousers-cream.jpg` | Zara Pleated High-Waist Trousers | pleated high-waist trousers |
