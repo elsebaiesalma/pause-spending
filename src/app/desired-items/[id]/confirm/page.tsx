@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { ColorPickerField } from "@/components/ColorPicker";
 import { commonColors } from "@/lib/pieceForm";
+import { PhotoField } from "@/components/PhotoField";
+import { isPhotoStorageAvailable } from "@/lib/photos/photoStore";
 import { BRAND_LIST } from "@/lib/brands/matchBrand";
 import styles from "./confirm.module.css";
 
@@ -62,6 +64,7 @@ export default async function ConfirmDesiredItemPage({
   const extractionFailed = !item.itemName;
   const isLowConfidence = item.itemNameConfidence === "low";
   const categoryOptions = await categoryOptionsFor(userId, item.category);
+  const photosEnabled = await isPhotoStorageAvailable();
   const closetColors = await prisma.wardrobeItem.findMany({
     where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
     select: { colorFamily: true },
@@ -90,7 +93,7 @@ export default async function ConfirmDesiredItemPage({
         <p className="page__lede">Here&apos;s what we found. Fix anything that&apos;s wrong.</p>
       )}
 
-      <form action={`/api/desired-items/${item.id}/confirm`} method="POST" className={styles.card}>
+      <form action={`/api/desired-items/${item.id}/confirm`} method="POST" encType="multipart/form-data" className={styles.card}>
         <div className={styles.photo}>
           {item.imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -165,10 +168,7 @@ export default async function ConfirmDesiredItemPage({
           <details className={styles.more}>
             <summary>More details</summary>
             <div className={styles.moreFields}>
-              <div className={styles.field}>
-                <label htmlFor="imageUrl">Photo link</label>
-                <input id="imageUrl" name="imageUrl" type="url" defaultValue={item.imageUrl ?? ""} placeholder="https://" />
-              </div>
+              {photosEnabled && <PhotoField currentUrl={item.imageUrl} alt={item.itemName ?? "The item"} />}
               <div className={styles.field}>
                 <label htmlFor="styleTags">Style words</label>
                 <input

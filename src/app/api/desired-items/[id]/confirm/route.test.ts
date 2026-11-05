@@ -231,4 +231,22 @@ describe("POST /api/desired-items/[id]/confirm", () => {
       expect(unchanged.userConfirmed).toBe(fixture.userB.desiredItem.userConfirmed);
     });
   });
+
+  it("leaves the stored photo alone when the form has none, and clears it only when asked", async () => {
+    const user = await prisma.user.findFirstOrThrow();
+    const item = await prisma.desiredItem.create({
+      data: { userId: user.id, sourceType: "url", itemName: "Tee", imageUrl: "https://example.com/tee.jpg" },
+    });
+    createdIds.push(item.id);
+    vi.mocked(auth).mockResolvedValue({ user: { id: user.id } } as never);
+
+    const kept = await POST(buildRequest({ itemName: "Tee" }), await ctxFor(item.id));
+    expect(kept.status).toBe(303);
+    expect((await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } })).imageUrl).toBe(
+      "https://example.com/tee.jpg"
+    );
+
+    await POST(buildRequest({ itemName: "Tee", removePhoto: "1" }), await ctxFor(item.id));
+    expect((await prisma.desiredItem.findUniqueOrThrow({ where: { id: item.id } })).imageUrl).toBeNull();
+  });
 });

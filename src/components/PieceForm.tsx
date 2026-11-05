@@ -16,6 +16,7 @@ import {
 } from "@/lib/pieceForm";
 import { ColorPicker } from "./ColorPicker";
 import { MonthYearWheel } from "./MonthYearWheel";
+import { PhotoField } from "./PhotoField";
 import { WarnIcon } from "./WarnIcon";
 import styles from "./pieceForm.module.css";
 
@@ -120,6 +121,8 @@ export function PieceForm({
   submitLabel,
   brandPriceNote,
   commonColors,
+  photosEnabled = false,
+  photoUrl = null,
 }: {
   mode: "add" | "edit";
   action: string;
@@ -131,6 +134,9 @@ export function PieceForm({
   brandPriceNote?: string;
   // The colours this closet has most of; the picker shows these first.
   commonColors: readonly string[];
+  // Photo upload shows only once photo storage exists (prisma/manual/photos.sql).
+  photosEnabled?: boolean;
+  photoUrl?: string | null;
 }) {
   const [values, setValues] = useState<PieceFormValues>(initial);
   const [errors, setErrors] = useState<{
@@ -256,7 +262,7 @@ export function PieceForm({
   const detailsOpen = Boolean(initial.brand || initial.price || initial.ownedSince);
 
   return (
-    <form ref={formRef} action={action} method="POST" className={styles.form} onSubmit={onSubmit} noValidate>
+    <form ref={formRef} action={action} method="POST" encType="multipart/form-data" className={styles.form} onSubmit={onSubmit} noValidate>
       <div className={styles.field}>
         <label htmlFor="piece-name">
           Name <span className={styles.required}>(required)</span>
@@ -338,6 +344,11 @@ export function PieceForm({
       <details className={`${styles.more} ${styles.wide}`} open={detailsOpen || undefined}>
         <summary>More details</summary>
         <div className={styles.moreFields}>
+          {photosEnabled && (
+            <div className={`${styles.field} ${styles.wide}`}>
+              <PhotoField currentUrl={photoUrl} alt="Your photo of this piece" />
+            </div>
+          )}
           {brandPriceNote ? (
             <p className={`${styles.hint} ${styles.wide}`}>{brandPriceNote}</p>
           ) : (
