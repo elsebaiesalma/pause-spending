@@ -62,6 +62,11 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Landing, phones:** `UrgeTexts` is titled "Sound familiar?" and plays once when scrolled into view (typing dots, then each bubble, one by one; static with reduced motion or no script). Laptop keeps the graph.
 - **Vercel:** deployment protection changed 2026-11-05 from `all_except_custom_domains` to `preview`, so production `.vercel.app` URLs are public and previews still need a Vercel login.
 
+## Mobile pass 5 (2026-11-05, branch `mobile-pass-5`)
+
+- **Tab bar colour:** all three tabs use the dark ink (inactive was grey, which read as a different shade next to Closet). The current tab is bold with a rose underline.
+- **Owned since:** Cancel removes the chosen date (it no longer restores the earlier one), on phone and laptop.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
