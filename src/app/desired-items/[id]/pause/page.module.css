@@ -999,6 +999,12 @@
   flex: 0 0 auto;
 }
 
+/* Next and See the cost match the 48px of Style what you already own and the
+   pause buttons on this card, so every outlined button here is one height. */
+.stepNav :global(.btn) {
+  min-height: 3rem;
+}
+
 .replaceSelect {
   box-sizing: border-box;
   width: 100%;
