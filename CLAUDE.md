@@ -87,6 +87,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 - The build-a-look button reads **"Style what you already own"** (it was "Build this look from your closet"), so it is clear the outfit is made from pieces the person owns, not the item they are considering. The "Or picture it with what you own" line above it is gone.
 - The last question has no Skip: its fields are optional, so "See the cost" is already the skip. Questions 1 and 2 keep Back, Skip and Next.
+- A divider (`.lookQuestion`) sets the button apart from the two reason fields on phone and laptop, and the button runs the full width on laptop too (it overrides `.action-group`'s 24rem cap), lined up with the fields.
 
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
