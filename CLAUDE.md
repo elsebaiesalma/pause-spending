@@ -67,6 +67,10 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Tab bar colour:** all three tabs use the dark ink (inactive was grey, which read as a different shade next to Closet). The current tab is bold with a rose underline.
 - **Owned since:** Cancel removes the chosen date (it no longer restores the earlier one), on phone and laptop.
 
+## Mobile pass 6 (2026-11-05, branch `mobile-pass-6`)
+
+- **Goal and budget sheets:** Cancel comes first in the source. On phones the column is reversed so Save goal / Save plan sits on top with Cancel below, full width. From 600px the pair is right-aligned and adjacent, Cancel on the left and Save on the right. Button sizes did not change. Shared `.sheetActions` in `GoalCard.module.css`.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
