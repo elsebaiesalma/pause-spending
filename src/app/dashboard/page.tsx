@@ -3,6 +3,9 @@ import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { formatMonthLabel } from "@/lib/monthLabel";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { TIMEZONE_COOKIE } from "@/lib/timezone";
+import { TimezoneCookie } from "./TimezoneCookie";
 import { currentMonthKey, getBudgetForMonth, getMonthSpend } from "@/lib/budget";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { quoteForDay } from "@/lib/dashboard/dailyQuote";
@@ -49,6 +52,7 @@ export default async function DashboardPage() {
   await sweepEndedPauses(userId);
 
   const monthKey = currentMonthKey();
+  const timeZone = (await cookies()).get(TIMEZONE_COOKIE)?.value;
 
   const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, goalAvailable] =
     await Promise.all([
@@ -63,7 +67,10 @@ export default async function DashboardPage() {
     }),
     prisma.desiredItem.count({ where: { userId, pauseStatus: "waiting" } }),
     getSetupProgress(userId),
-    loadMonthlyRecap(userId, new Date(), { allMonth: isDemoEmail(session.user?.email) }),
+    loadMonthlyRecap(userId, new Date(), {
+      allMonth: isDemoEmail(session.user?.email),
+      timeZone: timeZone ?? null,
+    }),
     getSavingsGoal(userId),
     isGoalStorageAvailable(),
   ]);
@@ -87,6 +94,7 @@ export default async function DashboardPage() {
 
   return (
     <div className={`page ${styles.home}`}>
+      <TimezoneCookie />
       <LocalGreeting firstName={firstName} />
       <PauseConfirmation />
       <ActionToast />

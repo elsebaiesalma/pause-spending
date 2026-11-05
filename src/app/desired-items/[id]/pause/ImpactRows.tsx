@@ -45,13 +45,16 @@ export function ImpactRows({
         role="img"
         aria-label={`${money(spent)} already spent, plus ${money(item)} for this item, of a ${money(budget)} plan`}
       >
-        <span className={styles.impactSpent} style={{ width: pct(spent) }} />
-        <span className={styles.impactItem} style={{ left: pct(spent), width: pct(item) }} />
+        <div className={styles.impactFill}>
+          <span className={styles.impactSpent} style={{ width: pct(spent) }} />
+          <span className={styles.impactItem} style={{ left: pct(spent), width: pct(item) }} />
+        </div>
         {over > 0 && <span className={styles.impactMarker} style={{ left: pct(budget) }} />}
       </div>
       <p className={styles.impactKey}>
         <span data-key="spent">Spent</span>
         <span data-key="item">This item</span>
+        {over > 0 && <span data-key="plan">Your plan</span>}
       </p>
 
       {over > 0 && (

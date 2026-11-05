@@ -130,8 +130,9 @@ export async function createDemoSession(): Promise<{ sessionToken: string; expir
 export const DEMO_HISTORY_SOURCE = "demo_history";
 
 // A little decision history, so Decisions isn't empty and Home's monthly recap
-// has a last month to look back on. monthsAgo 0 is this month (one Undecided,
-// one Let go); 1 is last month (the recap); 2 gives the recap its comparison.
+// has this month to look back on (demo accounts see the current month's recap).
+// monthsAgo 0 is this month: one Undecided, four Let go and one Bought.
+// 1 is last month and gives the recap its comparison.
 // Each one is a real sample-closet piece with its photo, kept out of
 // data/mock-wardrobe.json so nothing is both owned and wanted; each still has a
 // close match left in the closet (the COS tee for the Everlane tee, and so on).
