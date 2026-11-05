@@ -46,7 +46,7 @@ export function HeroPreview() {
           </div>
         </div>
 
-        <p className={styles.reason}>Same color · same category</p>
+        <p className={styles.reason}>same color · same category</p>
 
         <div className={styles.budget}>
           <div className={styles.bar}>

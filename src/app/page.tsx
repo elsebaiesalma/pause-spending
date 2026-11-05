@@ -56,13 +56,13 @@ export default function Home() {
   const steps = [
     {
       title: "Add what caught your eye",
-      body: "Type what you're thinking of buying. Confirm the name and price, and add a photo if you like, before anything else happens.",
+      body: "Type in the piece you're considering. Confirm its name and price, and add a photo if you like.",
     },
     {
       title: "See it next to your closet",
       body: gmail
-        ? "Your closet is built from real order confirmations. If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan."
-        : "If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan.",
+        ? "Your closet is built from real order confirmations. PAUSE shows the closest piece you already own, and how this purchase would affect your monthly budget."
+        : "PAUSE shows the closest piece you already own, and how this purchase would affect your monthly budget.",
     },
     {
       title: "Pause, then decide",
@@ -76,8 +76,8 @@ export default function Home() {
       a: "No. Nothing is blocked. PAUSE adds a moment between wanting something and buying it, and shows you what you already own. The decision stays yours.",
     },
     {
-      q: "What happens when a pause ends?",
-      a: "The item moves to Undecided without a notification. A reminder would bring the urge right back, so PAUSE stays quiet. You can come back to it whenever you like.",
+      q: "Why clothing?",
+      a: "Clothes are where \"I already own something like this\" happens most. Seeing the near-duplicate next to the new thing is the most useful pause.",
     },
     {
       q: "Where does my closet come from?",
@@ -86,14 +86,15 @@ export default function Home() {
         : "In the demo, from a sample closet, so you can try the whole flow right away. Each visitor gets their own copy.",
     },
     {
-      q: "Why clothing?",
-      a: "Clothes are where \"I already own something like this\" happens most. Seeing the near-duplicate next to the new thing is the most useful pause.",
-    },
-    {
       q: "Can I use my real orders to build my closet?",
       a: "Not yet. We're building a version that links your email and fills your closet automatically, with your privacy first. Until then, try everything with the demo.",
     },
+    {
+      q: "What happens when a pause ends?",
+      a: "The item moves to Undecided without a notification. A reminder would bring the urge right back, so PAUSE stays quiet. You can come back to it whenever you like.",
+    },
   ];
+
 
   const cta = gmail ? (
     <a href="/connect/gmail" className={styles.btnPrimary}>
@@ -182,7 +183,7 @@ export default function Home() {
           </div>
           <UrgeCurve />
           <p className={styles.chartPayoff}>
-            The default is <strong>Pause for 24 hours</strong>.{" "}
+            The default is <strong>pause for 24 hours</strong>.{" "}
             <span className={styles.statSourceLight}>Moser, University of Michigan, 2020</span>
           </p>
           <div className={styles.findings}>

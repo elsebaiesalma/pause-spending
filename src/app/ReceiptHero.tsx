@@ -87,7 +87,7 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
             “I don’t have anything like it.” Your closet might disagree.
           </h1>
           <p className={styles.body}>
-            PAUSE shows you what you already own before you buy.
+            Add a pause between wanting it and buying it.
           </p>
           <div className={styles.actions}>{actions}</div>
           {note && <p className={styles.note}>{note}</p>}
