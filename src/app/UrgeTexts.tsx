@@ -27,7 +27,10 @@ export function UrgeTexts() {
     if (!window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
     if (!("IntersectionObserver" in window)) return;
 
-    // Hide the messages until the thread is on screen.
+    // Hide the messages until the thread is on screen. This has to be an effect: the server
+    // render (and any visitor without script or with reduced motion) must show every message,
+    // and only the browser can tell whether to animate, so the state cannot start hidden.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShown(0);
     const timers: number[] = [];
     const step = (count: number) => {

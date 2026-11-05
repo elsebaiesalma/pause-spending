@@ -29,7 +29,7 @@ function Wheel({ label, items, index, onPick, loop = false }: Column) {
     const rowPx = parseFloat(getComputedStyle(list).fontSize) * ROW_REM;
     // Unset: a looping wheel still starts in its middle copy.
     list.scrollTop = (offset + (index ?? 0)) * rowPx;
-  }, [index]);
+  }, [index, offset]);
 
   function rowPx() {
     const list = listRef.current;

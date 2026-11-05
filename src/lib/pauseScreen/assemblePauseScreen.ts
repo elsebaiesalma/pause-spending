@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import type { DesiredItem, WardrobeItem } from "@prisma/client";
+import type { DesiredItem } from "@prisma/client";
 import { ensureDesiredItemTagged } from "@/lib/tagging/tagDesiredItem";
 import { findSimilarWardrobeItems, type SimilarWardrobeItem } from "@/lib/tagging/similarity";
 import { generateRedundancyExplanation } from "./redundancyExplanation";

@@ -80,6 +80,35 @@ The wanting fades. For shoppers who care a lot about things, happiness peaks bef
 
 Young shoppers feel that regret. 53% of Gen Z say they're doing or considering a no buy approach (Intuit Credit Karma, 2025). That reads less like a wish to stop shopping and more like a wish to stop buying things they don't end up wanting. A checkpoint at the moment you buy helps you keep the purchases you'll be glad about.
 
+## Run it locally
+
+You need Node 24 and a Neon Postgres database. The app reaches the database through Neon's serverless driver, so a plain local Postgres will not work unless you swap that adapter.
+
+Install the packages.
+
+```
+npm install
+```
+
+Create a file named .env with these values.
+
+```
+DATABASE_URL=your Neon connection string
+AUTH_SECRET=any long random string
+ANTHROPIC_API_KEY=your Anthropic key
+```
+
+The Anthropic key is optional. Without it the demo still runs, but the AI features, like tagging colours and suggesting outfits, do not.
+
+Create the tables, then start the app.
+
+```
+npx prisma migrate deploy
+npm run dev
+```
+
+Open localhost on port 3000 and click Try the demo. Gmail sign in stays hidden unless you set GMAIL_ENABLED to true and add Google OAuth keys. To run the tests, point TEST_DATABASE_URL at a separate Neon branch and run npm test.
+
 ## Built with
 
 Next.js 16 and React 19, Prisma 7 on Neon Postgres, and Auth.js for sessions. The Anthropic API tags clothes and suggests outfits. Vitest runs the tests, and Vercel hosts the site.

@@ -256,13 +256,6 @@ describe("DashboardPage (Home)", () => {
   });
 
   describe("recap and goal", () => {
-    const START = new Date("2026-10-01T12:00:00Z");
-    const finished = (hours: number, outcome: "dropped" | "proceeded") => ({
-      pausedAt: START,
-      waitUntil: new Date(START.getTime() + hours * 3_600_000),
-      outcome,
-    });
-
     afterEach(() => {
       vi.mocked(loadMonthlyRecap).mockResolvedValue(null);
       vi.mocked(getSavingsGoal).mockResolvedValue(null);
