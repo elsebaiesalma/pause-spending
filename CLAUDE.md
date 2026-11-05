@@ -71,6 +71,10 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 - **Goal and budget sheets:** Cancel comes first in the source. On phones the column is reversed so Save goal / Save plan sits on top with Cancel below, full width. From 600px the pair is right-aligned and adjacent, Cancel on the left and Save on the right. Button sizes did not change. Shared `.sheetActions` in `GoalCard.module.css`.
 
+## Mobile pass 7 (2026-11-05, branch `mobile-pass-7`)
+
+- **Goal and budget sheets:** `.sheetForm` sets `max-width: none`, so the form fills the dialog instead of stopping at the global 26rem cap. Inputs and the Cancel / Save pair now end at the dialog's right padding.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
