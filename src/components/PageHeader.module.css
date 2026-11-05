@@ -31,7 +31,7 @@
 
 .title {
   margin: 0;
-  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-size: var(--heading-xl);
   line-height: 1.05;
   text-wrap: balance;
 }

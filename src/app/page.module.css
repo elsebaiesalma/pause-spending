@@ -62,7 +62,7 @@
 
 .sectionHeading {
   composes: display;
-  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  font-size: var(--heading-lg);
   line-height: 1.08;
   margin: 0;
   text-wrap: balance;
@@ -244,7 +244,7 @@
 
 .bandHeading {
   composes: display;
-  font-size: clamp(1.625rem, 3vw, 2.25rem);
+  font-size: var(--heading-lg);
   line-height: 1.1;
   margin: 0 0 2.5rem;
   max-width: 30ch;
@@ -340,7 +340,7 @@
 
 .stepTitle {
   composes: display;
-  font-size: 1.375rem;
+  font-size: var(--heading-md);
   line-height: 1.15;
   margin: 1rem 0 0.5rem;
 }
@@ -403,7 +403,7 @@
 
 .findingTitle {
   composes: display;
-  font-size: 1.25rem;
+  font-size: var(--heading-md);
   line-height: 1.2;
   margin: 0 0 0.625rem;
 }
@@ -507,7 +507,7 @@
 
 .footerHeadline {
   composes: display;
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-size: var(--heading-xl);
   line-height: 1.05;
   margin: 0 0 0.75rem;
   color: #fff;

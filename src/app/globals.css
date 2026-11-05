@@ -45,6 +45,14 @@
   --radius-card: 16px;
   --radius-tile: 12px;
 
+  /* Heading scale: four sizes, used by every heading in the app.
+     xl = page titles, lg = section headings, md = card and dialog titles,
+     sm = small card titles. */
+  --heading-xl: clamp(2rem, 4.5vw, 3rem);
+  --heading-lg: clamp(1.625rem, 3vw, 2.25rem);
+  --heading-md: 1.375rem;
+  --heading-sm: 1.125rem;
+
   --font-display: var(--font-clash), "Clash Display", sans-serif;
   --font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-space-mono), "Courier New", monospace;
@@ -117,11 +125,11 @@ h3 {
 }
 
 h1 {
-  font-size: clamp(2.43rem, 4vw, 3.51rem);
+  font-size: var(--heading-xl);
 }
 
 h2 {
-  font-size: clamp(1.62rem, 2.5vw, 1.998rem);
+  font-size: var(--heading-lg);
   margin-top: calc(var(--space-5) * 0.72);
   margin-bottom: calc(var(--space-2) * 0.72);
 }
@@ -1096,7 +1104,7 @@ a:focus-visible {
 
 .confirm-dialog__title {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--heading-md);
 }
 
 .confirm-dialog__body {

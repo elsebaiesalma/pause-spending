@@ -37,7 +37,7 @@
   margin: 0.75rem 0 0;
   font-family: var(--font-display), sans-serif;
   font-weight: 600;
-  font-size: clamp(2rem, 4.2vw, 3rem);
+  font-size: var(--heading-xl);
   line-height: 1.02;
   color: #fff;
   text-wrap: balance;
