@@ -7,7 +7,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 ## Resume here
 
 **Done**
-- Still want it: the page, outfit suggestions (validated, ids only, description built from names), a "Build it from your closet" button into the Lookbook board, go-to-store with the once-per-visit prompt, and undecided items on Considering. The lower-priced and secondhand sections (and `resaleSites.json`) were removed 2026-10-13.
+- Still want it: the page, outfit suggestions (validated, ids only, description built from names), a "Style what you already own" button into the Lookbook board, go-to-store with the once-per-visit prompt, and undecided items on Considering. The lower-priced and secondhand sections (and `resaleSites.json`) were removed 2026-10-13.
 - Store-visit columns (`went_to_store_at`, `store_visit_answer`) are applied and recorded on BOTH Neon branches (migration `20260926090000_add_desired_item_store_visit`, checksums match the file). They are in `schema.prisma`, `prisma generate` has run, and `src/lib/stillWantIt/storeVisit.ts` now uses the generated client, every query scoped by `userId`. Database tests cover undecided items (excluded from Kept and from the 60-day sweep, re-asked on the next visit) and cross-tenant access. Commits `44f0b53`, `0877fba`, `5e20fcc`.
 - One model constant per feature, each with an env override.
 - Feedback pass (2026-10-06, commit `0c2dd82`): global spacing about 28% tighter vertically, body 16px, no text under 12px; one shared header and tab bar in the root layout (`src/components/SiteNav.tsx`) for every signed-in route, with the nav, initials circle and one centered container (`--width-container`) shared by header and pages; new Account page (`/account`, `/settings` redirects to it); Wardrobe seed placeholders, brand stripped from displayed names, add-to-wardrobe in the header with a 15-colour dropdown; landing copy, sourced stats, image slots, and a first-visit Welcome intro on Connect Gmail.
@@ -82,6 +82,11 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Removed duplicate colour tokens:** `--color-sage`, `--color-clay` (use `--color-rose`), `--color-ink-faint` (use `--color-ink-soft`), `--color-accent-dim` (use `--color-accent`).
 - The urge-text bubbles no longer overshoot (`cubic-bezier(0.2, 0.7, 0.2, 1)`). The rack sway keeps its overshoot on purpose.
 - **Two shadows** in `globals.css`: `--shadow-float` (menus, toasts, small pop-ups, the landing preview card) and `--shadow-overlay` (dialogs and sheets). The receipt paper keeps its own deep shadow, and the focus ring and goal pulse are not shadows in this sense.
+
+## Pause screen, last question (2026-11-05, branch `pause-last-step`)
+
+- The build-a-look button reads **"Style what you already own"** (it was "Build this look from your closet"), so it is clear the outfit is made from pieces the person owns, not the item they are considering. The "Or picture it with what you own" line above it is gone.
+- The last question has no Skip: its fields are optional, so "See the cost" is already the skip. Questions 1 and 2 keep Back, Skip and Next.
 
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
@@ -241,7 +246,7 @@ Future schema changes still go through `npx prisma migrate deploy`, run by the u
 - **Opening is instant.** The suggestion is a promise (`buildSuggestion` in `page.tsx`, 6 s timeout, `src/lib/looks/suggestion.ts`) read by `SuggestionSlot` in the board. While it is pending the board says "Styling a suggestion…" and Start blank stays enabled. If it arrives before anything has been touched it is placed; if the person has already changed anything (a piece, Start blank, the name) it is dropped (`receiveSuggestion`). A placed suggestion becomes the "saved" baseline, so leaving after it is not unsaved work.
 - **Unsaved changes.** `hasUnsavedChanges` (`src/lib/looks/dirty.ts`) compares the name and every piece's id, place, size and stacking. Close asks "Leave without saving?" (Save, Leave, Keep editing) in a native `<dialog>` when there is unsaved work, and a `beforeunload` warning covers closing the tab.
 - **Lookbook tab** (`/lookbook`): count, New look, thumbnails (`LookThumb`), rename and delete. "Built instead of [item]" is text only.
-- **Pause screen:** "Build this look from your closet" sits in "A moment to think". A saved look for the item counts as a reflection answer for the Buy anyway gate (`hasReflectionAnswer`). The reflection fields are kept in sessionStorage across the trip to the board.
+- **Pause screen:** "Style what you already own" (the build-a-look button) sits in "A moment to think". A saved look for the item counts as a reflection answer for the Buy anyway gate (`hasReflectionAnswer`). The reflection fields are kept in sessionStorage across the trip to the board.
 - API: `/api/looks` (POST) and `/api/looks/[id]` (PUT, PATCH rename, DELETE), all scoped by the session user.
 - Dependencies install with a plain `npm install` or `npm ci` (no `--legacy-peer-deps`): `@types/node` is `^22` to satisfy vitest 5's peer range, and `engines.node` is `24.x`.
 
