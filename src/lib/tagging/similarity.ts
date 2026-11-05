@@ -13,7 +13,35 @@ export type SimilarityProbe = {
   colorFamily?: string | null;
   styleTags?: string[];
   useCaseTags?: string[];
+  // Only used to order the shortlist (see rankSimilarItems), never to decide
+  // who is on it.
+  itemName?: string | null;
 };
+
+function lastWord(name: string | null | undefined): string | null {
+  const word = name?.trim().split(/\s+/).pop()?.toLowerCase();
+  return word ? word : null;
+}
+
+// Puts the closest owned piece first. The shortlist alone has no order, and
+// the pause screen shows its first item next to the wanted one, so without
+// this a white tee could be shown beside a green tank that merely shares a
+// tag. Same colour family counts most, then each shared tag, then the garment
+// word at the end of the name ("Tee" with "Tee", not with "Tank"), which breaks
+// ties between pieces that tag identically. Equal scores keep their fetch order.
+export function rankSimilarItems(items: WardrobeItem[], probe: SimilarityProbe): WardrobeItem[] {
+  const shared = (a: string[] | undefined, b: string[]) => (a ?? []).filter((tag) => b.includes(tag)).length;
+  const noun = lastWord(probe.itemName);
+  const score = (item: WardrobeItem) =>
+    (probe.colorFamily && item.colorFamily === probe.colorFamily ? 4 : 0) +
+    shared(probe.styleTags, item.styleTags) +
+    shared(probe.useCaseTags, item.useCaseTags) +
+    (noun && lastWord(item.itemName) === noun ? 0.5 : 0);
+  return items
+    .map((item, index) => ({ item, index, score: score(item) }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((entry) => entry.item);
+}
 
 // Shortlists active wardrobe items with meaningful overlap against a
 // probe (e.g. a desired item's own extracted tags): same category is
@@ -46,7 +74,7 @@ export async function findSimilarWardrobeItems(
     return [];
   }
 
-  return prisma.wardrobeItem.findMany({
+  const items = await prisma.wardrobeItem.findMany({
     where: {
       userId,
       status: "active",
@@ -54,5 +82,7 @@ export async function findSimilarWardrobeItems(
       OR: overlapConditions,
       ...devWardrobeWhere(),
     },
+    orderBy: { id: "asc" },
   });
+  return rankSimilarItems(items, probe);
 }

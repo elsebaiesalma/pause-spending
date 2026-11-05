@@ -92,6 +92,7 @@ export async function assemblePauseScreen(
     category: tagged.category,
     colorFamily: tagged.colorFamily,
     styleTags: tagged.styleTags,
+    itemName: tagged.itemName,
   };
 
   const [similarItems, reflection] = await Promise.all([

@@ -21,14 +21,12 @@ import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGui
 import { SetupGuide } from "./SetupGuide";
 import { CollapsibleGuide } from "./CollapsibleGuide";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
-import { loadPausePattern } from "@/lib/dashboard/pausePattern";
 import { GOAL_NAME_MAX, getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
 import { MonthlyRecap } from "./MonthlyRecap";
 import { GoalCard } from "./GoalCard";
 import { GoalSheet } from "./GoalSheet";
 import { EDIT_BUTTON_CLASS, MoneyCard } from "./MoneyCard";
 import { MoneyChoice } from "./MoneyChoice";
-import { PatternCard } from "./PatternCard";
 import styles from "./page.module.css";
 import { BudgetSheet } from "./BudgetSheet";
 
@@ -52,7 +50,7 @@ export default async function DashboardPage() {
 
   const monthKey = currentMonthKey();
 
-  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, pattern, goalAvailable] =
+  const [budget, spend, needsReviewCount, kept, wardrobeRows, pausedCount, setupProgress, recap, goal, goalAvailable] =
     await Promise.all([
     getBudgetForMonth(userId, monthKey),
     getMonthSpend(userId, monthKey),
@@ -67,7 +65,6 @@ export default async function DashboardPage() {
     getSetupProgress(userId),
     loadMonthlyRecap(userId, new Date(), { allMonth: isDemoEmail(session.user?.email) }),
     getSavingsGoal(userId),
-    loadPausePattern(userId),
     isGoalStorageAvailable(),
   ]);
 
@@ -81,7 +78,6 @@ export default async function DashboardPage() {
 
   const steps = setupSteps(setupProgress);
   const showGuide = nextStep(steps) !== null;
-  const showPattern = pattern !== null && pattern.decided > 0;
   // Plan and goal are each optional. Whichever is on leads; the other is one
   // quiet line, never a second filled button. With neither, ask which would help.
   const hasPlan = planAmount !== null;
@@ -215,8 +211,6 @@ export default async function DashboardPage() {
           </a>
         </li>
       </ul>
-
-      {showPattern && pattern && <PatternCard pattern={pattern} />}
 
       <section className={styles.card} aria-labelledby="closet-heading">
         <div className={styles.cardHead}>

@@ -21,10 +21,6 @@ vi.mock("@/lib/dashboard/monthlyRecap", async (importOriginal) => ({
   loadMonthlyRecap: vi.fn().mockResolvedValue(null),
 }));
 
-vi.mock("@/lib/dashboard/pausePattern", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/dashboard/pausePattern")>()),
-  loadPausePattern: vi.fn().mockResolvedValue(null),
-}));
 
 vi.mock("@/lib/goals/savingsGoal", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/goals/savingsGoal")>()),
@@ -51,7 +47,6 @@ import { sweepEndedPauses } from "@/lib/considering/consideringMeta";
 import { getBudgetForMonth, getMonthSpend } from "@/lib/budget";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
-import { buildPausePattern, loadPausePattern } from "@/lib/dashboard/pausePattern";
 import { getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
 import DashboardPage from "./page";
 
@@ -256,7 +251,7 @@ describe("DashboardPage (Home)", () => {
     });
   });
 
-  describe("recap, goal and pattern", () => {
+  describe("recap and goal", () => {
     const START = new Date("2026-10-01T12:00:00Z");
     const finished = (hours: number, outcome: "dropped" | "proceeded") => ({
       pausedAt: START,
@@ -266,7 +261,6 @@ describe("DashboardPage (Home)", () => {
 
     afterEach(() => {
       vi.mocked(loadMonthlyRecap).mockResolvedValue(null);
-      vi.mocked(loadPausePattern).mockResolvedValue(null);
       vi.mocked(getSavingsGoal).mockResolvedValue(null);
     });
 
@@ -315,33 +309,14 @@ describe("DashboardPage (Home)", () => {
       expect(html).toContain("Set a savings goal");
     });
 
-    it("shows the goal beside the pattern once there are finished pauses", async () => {
+    it("shows the goal card, and no separate pattern card (the recap carries the tip)", async () => {
       vi.mocked(getSavingsGoal).mockResolvedValueOnce({ name: "Winter boots", target: 800, saved: 540, lastAdded: null });
-      vi.mocked(loadPausePattern).mockResolvedValueOnce(
-        buildPausePattern([
-          finished(24, "dropped"),
-          finished(24, "proceeded"),
-          finished(168, "dropped"),
-          finished(168, "dropped"),
-          finished(168, "proceeded"),
-        ])
-      );
 
       const html = await render();
 
       expect(html).toContain("Winter boots");
       expect(html).toContain("$260 to go");
-      expect(html).toContain("What works for you");
-      expect(html).not.toContain("insightsSingle");
-    });
-
-    it("hides the pattern when it can't be read", async () => {
-      vi.mocked(loadPausePattern).mockResolvedValueOnce(null);
-
-      const html = await render();
-
       expect(html).not.toContain("What works for you");
-      expect(html).not.toContain("Your pattern shows up");
     });
   });
 
