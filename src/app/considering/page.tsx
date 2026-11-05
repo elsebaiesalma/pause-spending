@@ -12,7 +12,9 @@ import { prisma } from "@/lib/prisma";
 import { ActionToast } from "@/components/ActionToast";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader, Tabs } from "@/components/PageHeader";
-import { inMonth, monthOptions, parseMonthParam } from "@/lib/considering/monthFilter";
+import { cookies } from "next/headers";
+import { TIMEZONE_COOKIE } from "@/lib/timezone";
+import { inMonth, monthOptions, parseMonthParam, resolveMonth } from "@/lib/considering/monthFilter";
 import { DecisionRow } from "./DecisionRow";
 import { MonthFilter } from "./MonthFilter";
 import styles from "./page.module.css";
@@ -50,7 +52,8 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
   const userId = await requireUserIdOrRedirect();
   const params = (await props?.searchParams) ?? {};
   const tab: DecisionsTab = parseDecisionsTab(params.tab);
-  const month = parseMonthParam(params.month);
+  const monthParam = parseMonthParam(params.month);
+  const month = resolveMonth(monthParam, (await cookies()).get(TIMEZONE_COOKIE)?.value);
 
   const [all, allLetGoRows, allBought, allNotDecided] = await Promise.all([
     assembleConsidering(userId),
@@ -65,7 +68,8 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
   ]);
 
   // The month filter narrows every tab by when the item was added.
-  const onPause = all.onPause.filter((row) => inMonth(row.item.createdAt, month));
+  // On pause is never filtered: it is what is waiting right now.
+  const onPause = all.onPause;
   const undecided = all.undecided.filter((row) => inMonth(row.item.createdAt, month));
   const saved = all.saved.filter((row) => inMonth(row.item.createdAt, month));
   const letGoRows = allLetGoRows.filter((row) => inMonth(row.item.createdAt, month));
@@ -116,14 +120,14 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
       <Tabs
         label="Decisions"
         items={tabs.map((t) => ({
-          href: tabHref(t.key, month),
+          href: tabHref(t.key, monthParam),
           label: t.label,
           count: counts[t.key],
           current: t.key === tab,
         }))}
       />
       <ActionToast />
-      <MonthFilter tab={tab} month={month} options={options} />
+      {tab !== "paused" && <MonthFilter tab={tab} month={month} options={options} />}
 
       {tab === "paused" &&
         (onPause.length === 0 ? (

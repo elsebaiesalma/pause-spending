@@ -16,25 +16,25 @@ export function MonthFilter({
 }) {
   const router = useRouter();
   return (
-    <label className={styles.monthFilter}>
-      <span>Month</span>
+    <div className={styles.monthFilter}>
       <select
-        value={month ?? ""}
+        aria-label="Month"
+        value={month ?? "all"}
         onChange={(event) => {
           const params = new URLSearchParams();
           if (tab !== "paused") params.set("tab", tab);
-          if (event.target.value) params.set("month", event.target.value);
+          params.set("month", event.target.value);
           const query = params.toString();
           router.push(query ? `/considering?${query}` : "/considering");
         }}
       >
-        <option value="">All time</option>
+        <option value="all">All time</option>
         {options.map((option) => (
           <option key={option.key} value={option.key}>
             {option.label}
           </option>
         ))}
       </select>
-    </label>
+    </div>
   );
 }
