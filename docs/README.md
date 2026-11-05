@@ -9,7 +9,7 @@ The thinking behind PAUSE, in the order it happened.
 - `implementation/plan.md` is the build plan.
 - `summary.md` ties them together.
 - `pdd.sop.md` is the process I followed to produce these documents.
-- `mockups/` and `superdesign/` hold early visual explorations. The shipped app has moved on from them.
+- `mockups/` holds early visual explorations. The shipped app has moved on from them.
 
 ## What changed after the plan
 
