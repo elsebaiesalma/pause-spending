@@ -15,7 +15,6 @@ The thinking behind PAUSE, in the order it happened.
 
 These documents describe the first plan, from September 2026. The app has moved on, and that's on purpose. I kept the plan as it was so you can see where it started.
 
-
 The ORM is Prisma, the database is Neon Postgres and the site runs on Vercel.
 
 Reading Gmail is built but switched off. Google has to review any app that reads Gmail before real people can connect, so the demo comes first. Outlook was never built.
