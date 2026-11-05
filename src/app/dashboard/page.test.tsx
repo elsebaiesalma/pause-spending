@@ -182,7 +182,7 @@ describe("DashboardPage (Home)", () => {
       vi.mocked(getKeptSummary).mockResolvedValueOnce({ totalKept: 120, itemsLetGo: 2 });
       const html = await render();
 
-      expect(html).toMatch(/<strong>\$120<\/strong> saved/);
+      expect(html).toMatch(/<strong>\$120<\/strong><span>saved/);
       expect(html).toContain('href="/considering?tab=let-go"');
     });
   });
@@ -196,7 +196,7 @@ describe("DashboardPage (Home)", () => {
 
       const html = await render();
 
-      expect(html).toMatch(/<strong>2<\/strong> pieces in your closet/);
+      expect(html).toMatch(/<strong>2<\/strong><span>pieces in your closet/);
       expect(html).toContain('href="/wardrobe"');
     });
 
@@ -251,7 +251,7 @@ describe("DashboardPage (Home)", () => {
 
       const html = await render();
 
-      expect(html).toMatch(/<strong>2<\/strong> on pause/);
+      expect(html).toMatch(/<strong>2<\/strong><span>on pause/);
       vi.mocked(prisma.desiredItem.count).mockResolvedValue(0);
     });
   });

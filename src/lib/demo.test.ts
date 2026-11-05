@@ -14,9 +14,9 @@ describe("shiftToCurrentMonth", () => {
     const newest = shifted.reduce((max, i) => (i.purchasedAt > max ? i.purchasedAt : max), "");
     expect(newest.slice(0, 7)).toBe("2026-11");
 
-    // The original newest is Sept 2026, so everything moves two months.
+    // The original newest is Oct 2026, so everything moves one month.
     const original = items.find((i) => i.purchasedAt.startsWith("2025-11-14"))!;
-    expect(shifted.find((i) => i.key === original.key)!.purchasedAt).toBe("2026-01-14");
+    expect(shifted.find((i) => i.key === original.key)!.purchasedAt).toBe("2025-12-14");
   });
 
   it("never dates a purchase in the future or on a day the month doesn't have", () => {

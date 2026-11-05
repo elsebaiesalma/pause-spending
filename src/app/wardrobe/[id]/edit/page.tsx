@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { PageHeader } from "@/components/PageHeader";
+import { isPhotoStorageAvailable } from "@/lib/photos/photoStore";
 import { PieceForm } from "@/components/PieceForm";
 import { commonColors } from "@/lib/pieceForm";
 
@@ -23,6 +24,8 @@ export default async function EditWardrobeItemPage({
     select: { colorFamily: true },
   });
 
+  const photosEnabled = await isPhotoStorageAvailable();
+
   return (
     <div className="page">
       <PageHeader back={{ href: "/wardrobe", label: "Closet" }} title="Edit piece" subtitle={item.itemName} />
@@ -31,6 +34,8 @@ export default async function EditWardrobeItemPage({
         action={`/api/wardrobe/${item.id}/update`}
         cancelHref="/wardrobe"
         submitLabel="Save"
+        photosEnabled={photosEnabled}
+        photoUrl={item.imageUrl}
         commonColors={commonColors(closetColors.map((row) => row.colorFamily))}
         brandPriceNote={item.sourcePurchase ? `Brand and price come from the order (${item.sourcePurchase.merchant}).` : undefined}
         initial={{

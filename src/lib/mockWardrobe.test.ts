@@ -12,9 +12,9 @@ const items = parseMockWardrobe(raw);
 const readme = readFileSync(path.join("public", "mock", "README.md"), "utf8");
 
 describe("data/mock-wardrobe.json", () => {
-  it("is valid and about thirty items", () => {
-    expect(items.length).toBeGreaterThanOrEqual(28);
-    expect(items.length).toBeLessThanOrEqual(32);
+  it("is valid and about fifty-five items", () => {
+    expect(items.length).toBeGreaterThanOrEqual(50);
+    expect(items.length).toBeLessThanOrEqual(60);
   });
 
   it("uses only the 15 color families, and every category the wardrobe knows", () => {
@@ -39,12 +39,12 @@ describe("data/mock-wardrobe.json", () => {
     }
   });
 
-  it("includes the near-duplicates on purpose: three white tees and two black wool coats", () => {
+  it("includes the near-duplicates on purpose: three white tops and two grey coats", () => {
     const whiteTees = items.filter((i) => i.category === "tops" && i.colorFamily === "white");
-    const blackCoats = items.filter((i) => i.category === "outerwear" && i.colorFamily === "black");
+    const greyCoats = items.filter((i) => i.category === "outerwear" && i.colorFamily === "grey");
     expect(whiteTees).toHaveLength(3);
-    expect(blackCoats).toHaveLength(2);
-    // The three tees are enough to make Tops "well stocked".
+    expect(greyCoats).toHaveLength(2);
+    // Three white tops make Tops "well stocked", and four blue bottoms (jeans and cut-offs) do the same for Bottoms.
     const clusters = findClusters(
       items.map((item) => ({
         id: item.key,
@@ -54,7 +54,7 @@ describe("data/mock-wardrobe.json", () => {
         status: "active",
       }))
     );
-    expect(clusters.map((c) => `${c.categoryKey}:${c.colorFamily}:${c.itemIds.length}`)).toEqual(["tops:white:3"]);
+    expect(clusters.map((c) => `${c.categoryKey}:${c.colorFamily}:${c.itemIds.length}`)).toEqual(["bottoms:blue:4", "tops:white:3"]);
   });
 
   it("includes the messy cases on purpose: 3 with no image, 2 with no price, 2 needing review", () => {

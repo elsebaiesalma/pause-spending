@@ -37,7 +37,7 @@
   margin: 0.75rem 0 0;
   font-family: var(--font-display), sans-serif;
   font-weight: 600;
-  font-size: clamp(2.4rem, 6.5vw, 4.25rem);
+  font-size: clamp(2rem, 4.2vw, 3rem);
   line-height: 1.02;
   color: #fff;
   text-wrap: balance;
@@ -200,10 +200,13 @@
    without hiding the lines; full strength once the receipt is hovered or the
    button focused. */
 .pause {
+  /* Centred with inset and auto margins, not a transform: the global
+     button:active rule sets its own transform and would shift the button. */
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  margin: auto;
+  width: max-content;
+  height: fit-content;
   min-height: 2.5rem;
   padding: 0.5rem 1.125rem;
   gap: 0.5rem;

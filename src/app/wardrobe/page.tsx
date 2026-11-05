@@ -6,6 +6,7 @@ import { buildConcentration } from "@/lib/wardrobeClusters";
 import { CATEGORIES, OTHER_CATEGORY, type Sort, type WardrobeEntry } from "@/lib/wardrobeView";
 import { PageHeader } from "@/components/PageHeader";
 import { ClosetTabs } from "@/components/ClosetTabs";
+import { isPhotoStorageAvailable } from "@/lib/photos/photoStore";
 import { PieceForm } from "@/components/PieceForm";
 import { commonColors } from "@/lib/pieceForm";
 import { ClosetConcentration } from "./ClosetConcentration";
@@ -55,6 +56,8 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
   );
   const wellStocked = concentration.filter((row) => row.wellStocked).map((row) => row.key);
 
+  const photosEnabled = await isPhotoStorageAvailable();
+
   const addPanel = (
     <section id="add-to-wardrobe" className={styles.addPanel}>
       <h2>Add a piece</h2>
@@ -64,6 +67,7 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
         cancelHref="#"
         submitLabel="Add to closet"
         commonColors={commonColors(rows.map((row) => row.colorFamily))}
+        photosEnabled={photosEnabled}
       />
     </section>
   );

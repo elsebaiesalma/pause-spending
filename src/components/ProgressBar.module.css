@@ -15,6 +15,10 @@
   transform-origin: left;
 }
 
+.tinted {
+  background: color-mix(in srgb, var(--color-espresso, #2a1208) calc(var(--tint, 1) * 100%), var(--color-blush, #edd9d0));
+}
+
 .rose {
   background: var(--color-rose, #c98a92);
 }

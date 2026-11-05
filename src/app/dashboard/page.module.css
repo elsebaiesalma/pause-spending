@@ -293,31 +293,57 @@
   height: 100%;
 }
 
-/* The rest of the month as one quiet line of links. */
+/* The rest of the month as three labelled figures in one card, so they read
+   as a set. Stacked on phones, side by side from 640px. */
 .glance {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.375rem 0.75rem;
+  display: grid;
+  grid-template-columns: 1fr;
   margin: 0;
-  font-size: 0.9375rem;
-  color: var(--color-ink-soft);
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .glance {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.glance li + li {
+  border-top: 1px solid var(--color-line);
+}
+
+@media (min-width: 640px) {
+  .glance li + li {
+    border-top: 0;
+    border-left: 1px solid var(--color-line);
+  }
 }
 
 .glance a {
-  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 1rem 1.25rem;
+  color: var(--color-ink-soft);
+  font-size: 0.9375rem;
   text-decoration: none;
 }
 
 .glance a:hover {
-  color: var(--color-ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  background: var(--color-bg-alt);
 }
 
 .glance strong {
   color: var(--color-ink);
-  font-weight: 700;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 /* Title left, its link right, on one baseline. */

@@ -7,7 +7,6 @@ import { requireUserIdOrRedirect } from "@/lib/session";
 import { signOut } from "@/lib/auth";
 import { isDemoEmail, isGmailEnabled } from "@/lib/demo";
 import { PageHeader } from "@/components/PageHeader";
-import { ShowGuideButton } from "./ShowGuideButton";
 import styles from "./page.module.css";
 
 export default async function AccountPage() {
@@ -117,8 +116,6 @@ export default async function AccountPage() {
           </a>
         </div>
       </section>
-
-      <ShowGuideButton />
 
       <section className={styles.block}>
         <h2 className={styles.heading}>

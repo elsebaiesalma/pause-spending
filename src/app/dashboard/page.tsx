@@ -19,7 +19,7 @@ import { ActionToast } from "@/components/ActionToast";
 import { isDemoEmail } from "@/lib/demo";
 import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGuide";
 import { SetupGuide } from "./SetupGuide";
-import { DismissibleGuide } from "./DismissibleGuide";
+import { CollapsibleGuide } from "./CollapsibleGuide";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
 import { loadPausePattern } from "@/lib/dashboard/pausePattern";
 import { GOAL_NAME_MAX, getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
@@ -98,9 +98,9 @@ export default async function DashboardPage() {
       {recap && <MonthlyRecap recap={recap} />}
 
       {showGuide && (
-        <DismissibleGuide>
+        <CollapsibleGuide>
           <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />
-        </DismissibleGuide>
+        </CollapsibleGuide>
       )}
 
       <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
@@ -192,21 +192,29 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Everything else at a glance, as one quiet line. Paused counts items
-          still waiting; it never names them (pauses end silently). */}
-      <p className={styles.glance}>
-        <a href="/considering?tab=let-go">
-          <strong>{dollars(kept.totalKept)}</strong> saved
-        </a>
-        <span aria-hidden="true">&middot;</span>
-        <a href="/considering">
-          <strong>{pausedCount}</strong> on pause
-        </a>
-        <span aria-hidden="true">&middot;</span>
-        <a href="/wardrobe">
-          <strong>{pieceCount}</strong> {pieceCount === 1 ? "piece" : "pieces"} in your closet
-        </a>
-      </p>
+      {/* Everything else at a glance: three labelled figures in one card, each
+          a link. Paused counts items still waiting; it never names them
+          (pauses end silently). */}
+      <ul className={styles.glance} aria-label="At a glance">
+        <li>
+          <a href="/considering?tab=let-go">
+            <strong>{dollars(kept.totalKept)}</strong>
+            <span>saved by letting things go</span>
+          </a>
+        </li>
+        <li>
+          <a href="/considering">
+            <strong>{pausedCount}</strong>
+            <span>on pause</span>
+          </a>
+        </li>
+        <li>
+          <a href="/wardrobe">
+            <strong>{pieceCount}</strong>
+            <span>{pieceCount === 1 ? "piece" : "pieces"} in your closet</span>
+          </a>
+        </li>
+      </ul>
 
       {showPattern && pattern && <PatternCard pattern={pattern} />}
 

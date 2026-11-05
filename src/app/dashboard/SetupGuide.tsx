@@ -53,7 +53,7 @@ export function SetupGuide({ steps, isDemo }: { steps: SetupStep[]; isDemo: bool
       >
         <span style={{ width: `${(doneCount / steps.length) * 100}%` }} />
       </div>
-      <ol className={styles.steps}>
+      <ol className={styles.steps} id="setup-guide-steps">
         {steps.map((step) => {
           const isNext = next?.id === step.id;
           return (

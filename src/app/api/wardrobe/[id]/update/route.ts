@@ -5,6 +5,8 @@ import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
 import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
 import { resolveColor } from "@/lib/colorResolve";
+import { prisma } from "@/lib/prisma";
+import { deletePhotoByUrl, photoChangeFromForm } from "@/lib/photos/photoStore";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -44,6 +46,13 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
   // A typed colour ("Other") is filed under its closest family; a chosen family is kept.
   const color = await resolveColor({ colorFamily, colorName: form.get("colorName")?.toString() });
 
+  const photo = await photoChangeFromForm(userId, form);
+  if (photo.change === "error") return NextResponse.json({ error: photo.message }, { status: 400 });
+  const before =
+    photo.change === "none"
+      ? null
+      : await prisma.wardrobeItem.findFirst({ where: { id, userId }, select: { imageUrl: true } });
+
   try {
     await updateWardrobeItem(id, userId, {
       itemName,
@@ -56,6 +65,7 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
       styleTags: parseTags(form.get("styleTags")?.toString() ?? null),
       useCaseTags: parseTags(form.get("useCaseTags")?.toString() ?? null),
       ownedSince: ownedSinceRaw ? new Date(ownedSinceRaw) : null,
+      ...(photo.change === "set" ? { imageUrl: photo.url } : photo.change === "remove" ? { imageUrl: null } : {}),
     });
   } catch (error) {
     if (isRecordNotFoundError(error)) {
@@ -64,5 +74,9 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
     throw error;
   }
 
-  return NextResponse.redirect(new URL("/wardrobe", request.url));
+  // The replaced or removed photo is no longer needed.
+  if (before) await deletePhotoByUrl(userId, before.imageUrl);
+
+  // 303: the form posts multipart, which a 307 would re-send to the next page.
+  return NextResponse.redirect(new URL("/wardrobe", request.url), 303);
 }

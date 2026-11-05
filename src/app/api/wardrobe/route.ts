@@ -4,6 +4,7 @@ import { requireUserId } from "@/lib/session";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
 import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
 import { resolveColor } from "@/lib/colorResolve";
+import { photoChangeFromForm } from "@/lib/photos/photoStore";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -42,6 +43,9 @@ export async function POST(request: NextRequest) {
   // A typed colour ("Other") is filed under its closest family; a chosen family is kept.
   const color = await resolveColor({ colorFamily, colorName: form.get("colorName")?.toString() });
 
+  const photo = await photoChangeFromForm(userId, form);
+  if (photo.change === "error") return NextResponse.json({ error: photo.message }, { status: 400 });
+
   await createManualWardrobeItem({
     userId,
     itemName,
@@ -53,7 +57,9 @@ export async function POST(request: NextRequest) {
     styleTags: parseTags(form.get("styleTags")?.toString() ?? null),
     useCaseTags: parseTags(form.get("useCaseTags")?.toString() ?? null),
     ownedSince: ownedSinceRaw ? new Date(ownedSinceRaw) : null,
+    imageUrl: photo.change === "set" ? photo.url : null,
   });
 
-  return NextResponse.redirect(new URL("/wardrobe", request.url));
+  // 303: the form posts multipart, which a 307 would re-send to the next page.
+  return NextResponse.redirect(new URL("/wardrobe", request.url), 303);
 }
