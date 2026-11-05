@@ -5,7 +5,7 @@
 
 .caption {
   margin: 0 0 var(--space-2);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -28,7 +28,7 @@
 }
 
 .hour {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--color-ink-soft);
@@ -61,13 +61,13 @@
 .item[data-step="2"] .bubble {
   background: var(--color-rose);
   color: var(--color-espresso);
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
 }
 
 .item[data-step="3"] .bubble {
   background: var(--color-blush);
   color: var(--color-ink-soft);
-  font-size: 1rem;
+  font-size: var(--text-md);
 }
 
 /* While the thread plays, a message is invisible until it has "arrived". The
@@ -83,7 +83,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .item[data-shown] {
-    animation: textIn 320ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+    animation: textIn 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 }
 

@@ -15,7 +15,7 @@
   background: var(--color-espresso);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #fff;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   box-shadow: 0 12px 32px rgba(42, 18, 8, 0.25);
   animation: toast-in 0.25s ease-out;
 }
@@ -34,7 +34,7 @@
   border-radius: 50%;
   background: transparent;
   color: #fff;
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   line-height: 1;
 }
 

@@ -6,7 +6,7 @@
 .sectionLabel {
   font-family: var(--font-body);
   font-weight: 700;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-soft);
@@ -66,10 +66,10 @@
 
 .rowBrand {
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--color-ink-faint);
+  color: var(--color-ink-soft);
 }
 
 .list {
@@ -77,7 +77,7 @@
 }
 
 .rowName {
-  font-size: 1rem;
+  font-size: var(--text-md);
   font-weight: 600;
   text-decoration: underline;
   text-decoration-color: transparent;
@@ -92,7 +92,7 @@
    larger Clash Display treatment .item-row__price uses elsewhere. This
    page is about the user's own reasoning, not a highlighted number. */
 .rowPrice {
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-ink-soft);
   white-space: nowrap;
 }
@@ -103,13 +103,13 @@
   align-items: center;
   gap: 0.25rem 0.5rem;
   margin-top: 0.375rem;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
 .rowReflection {
   margin-top: 0.252rem;
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-ink-soft);
   font-style: italic;
 }
@@ -118,10 +118,10 @@
   display: inline-block;
   margin-top: 0.252rem;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-ink-faint);
+  color: var(--color-ink-soft);
 }
 
 .rowActions {
@@ -152,7 +152,7 @@
 
 .totalLabel {
   margin-top: 0.144rem;
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-on-espresso-soft);
 }
 
@@ -179,7 +179,7 @@
 
 .keptLabel {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -188,7 +188,7 @@
 
 .keptName {
   display: block;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
