@@ -5,9 +5,8 @@
 exists here, and the demo only uses files listed in `data/mock-images.json`
 (serverless functions cannot see `public/`). Add a file here and to that list.
 
-These are stock photos supplied by the project owner. Each was cropped to the
-garment and saved as an 800 x 1000 JPEG (4:5, the wardrobe card ratio). Confirm
-each photo's licence allows use on a public demo before making the repo public.
+These photos come from Pexels, under a subscribed account. Each was cropped to
+the garment and saved as an 800 x 1000 JPEG (4:5, the wardrobe card ratio).
 Every closet piece has a photo. `loafers-brown-tan.jpg` is the demo sample item (see `SAMPLE_ITEM` in `src/lib/demo.ts`), not a closet piece.
 
 | File | Used by | Suggested search term |

@@ -52,7 +52,7 @@ is meant to interrupt.
 
 **Open questions for when this is spec'd out:** how "faded" surfaces in the dashboard/stats
 alongside purchased/dropped; what "notification" means given the app is currently in-app-only, no
-email/push (see `design/detailed-design.md`'s stated constraint) - a daily digest may need to be an
+email/push (see `docs/design/detailed-design.md`'s stated constraint) - a daily digest may need to be an
 in-app badge, not an actual push notification, unless that constraint is being revisited too.
 
 **Added 2026-09-25:** the pause screen (`src/app/desired-items/[id]/pause/page.tsx`) now collects
