@@ -891,3 +891,10 @@
   width: auto;
   flex: 0 0 auto;
 }
+
+.replaceSelect {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 28rem;
+  min-height: 2.75rem;
+}

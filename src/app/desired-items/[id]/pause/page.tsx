@@ -5,6 +5,7 @@ import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
 import { ItemArt } from "@/components/ItemArt";
+import { listActiveWardrobeItems } from "@/lib/wardrobe";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
 import { compareAttributes, similarityBand } from "@/lib/pauseScreen/attributeMatch";
 import { BuildLookButton } from "./BuildLookButton";
@@ -67,6 +68,20 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
   // matching is rule-based and has no finer ranking.
   const [closest, ...others] = similarItems;
   const rows = closest ? compareAttributes(desiredItem, closest) : [];
+
+  // The dropdown lists the closest match first, then the other similar pieces,
+  // then the rest of the closet in the same category. Its default is what
+  // PAUSE matched, unless an earlier answer was saved.
+  const sameCategory = desiredItem.category
+    ? (await listActiveWardrobeItems(userId)).filter((item) => item.category === desiredItem.category)
+    : [];
+  const replaceOptions = [...similarItems, ...sameCategory.filter((item) => !similarItems.some((s) => s.id === item.id))];
+  const savedReplaces = reflection?.replacesNothing
+    ? REFLECTION_NOTHING_VALUE
+    : reflection?.replacesWardrobeItemId && replaceOptions.some((item) => item.id === reflection.replacesWardrobeItemId)
+      ? reflection.replacesWardrobeItemId
+      : null;
+  const replacesDefault = savedReplaces ?? closest?.id ?? "";
 
   return (
     <div className="page">
@@ -183,32 +198,24 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                 title: "replaces",
                 body: (
                   <div className={styles.question}>
-                    <p className={styles.questionLabel}>What would this replace?</p>
-                    <div className={styles.chipRow} role="radiogroup" aria-label="What would this replace?">
-                      {similarItems.map((item) => (
-                        <label key={item.id} className={styles.chipOption}>
-                          <input
-                            type="radio"
-                            name="reflectionReplaces"
-                            value={item.id}
-                            defaultChecked={reflection?.replacesWardrobeItemId === item.id}
-                          />
-                          <span>{item.itemName}</span>
-                        </label>
+                    <label htmlFor="reflection-replaces" className={styles.questionLabel}>
+                      What would this replace?
+                    </label>
+                    <select
+                      id="reflection-replaces"
+                      name="reflectionReplaces"
+                      className={styles.replaceSelect}
+                      defaultValue={replacesDefault}
+                    >
+                      {!closest && <option value="">Choose one</option>}
+                      {replaceOptions.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.itemName}
+                        </option>
                       ))}
-                      <label className={styles.chipOption}>
-                        <input
-                          type="radio"
-                          name="reflectionReplaces"
-                          value={REFLECTION_NOTHING_VALUE}
-                          defaultChecked={reflection?.replacesNothing ?? false}
-                        />
-                        <span>Nothing, it&apos;s new to me</span>
-                      </label>
-                    </div>
+                      <option value={REFLECTION_NOTHING_VALUE}>Nothing, it&apos;s new to me</option>
+                    </select>
                   </div>
-
-
                 ),
               },
               {
