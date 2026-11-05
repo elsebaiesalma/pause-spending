@@ -7,7 +7,7 @@
     "colorFamily": "blue",
     "colorName": "Light Wash",
     "price": 79,
-    "purchasedAt": "2026-05-20",
+    "purchasedAt": "2026-10-02",
     "tags": [
       "denim",
       "casual",
@@ -23,7 +23,7 @@
     "colorFamily": "cream",
     "colorName": "Ivory",
     "price": 98,
-    "purchasedAt": "2026-04-18",
+    "purchasedAt": "2026-10-04",
     "tags": [
       "linen",
       "relaxed",
@@ -314,7 +314,7 @@
     "colorFamily": "blue",
     "colorName": "Powder Blue",
     "price": 45,
-    "purchasedAt": "2026-05-08",
+    "purchasedAt": "2026-10-03",
     "tags": [
       "romantic",
       "summer"
@@ -405,7 +405,7 @@
     "colorFamily": "metallic",
     "colorName": "Silver",
     "price": 36,
-    "purchasedAt": "2026-10-02",
+    "purchasedAt": "2026-07-30",
     "tags": [
       "party"
     ],
@@ -451,7 +451,7 @@
     "colorFamily": "brown",
     "colorName": "Camel",
     "price": 25,
-    "purchasedAt": "2026-10-03",
+    "purchasedAt": "2026-07-02",
     "tags": [
       "basic",
       "casual"
@@ -511,7 +511,7 @@
     "colorFamily": "orange",
     "colorName": "Terracotta",
     "price": 79.9,
-    "purchasedAt": "2026-10-05",
+    "purchasedAt": "2026-09-27",
     "tags": [
       "casual",
       "layering"
@@ -648,7 +648,7 @@
     "colorFamily": "navy",
     "colorName": "Midnight Navy",
     "price": 58,
-    "purchasedAt": "2026-10-04",
+    "purchasedAt": "2026-10-05",
     "tags": [
       "party",
       "satin"

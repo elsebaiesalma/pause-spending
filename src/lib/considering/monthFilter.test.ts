@@ -1,13 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { inMonth, monthOptions, parseMonthParam } from "./monthFilter";
+import { inMonth, monthOptions, parseMonthParam, resolveMonth } from "./monthFilter";
 
 describe("parseMonthParam", () => {
   it("accepts a month key and rejects anything else", () => {
     expect(parseMonthParam("2026-11")).toBe("2026-11");
     expect(parseMonthParam(["2026-10", "2026-11"])).toBe("2026-10");
+    expect(parseMonthParam("all")).toBe("all");
     expect(parseMonthParam("2026-13")).toBeNull();
     expect(parseMonthParam("november")).toBeNull();
     expect(parseMonthParam(undefined)).toBeNull();
+  });
+});
+
+describe("resolveMonth", () => {
+  it("defaults to the current month on the person's clock, and all means no filter", () => {
+    const at = new Date("2026-12-01T03:00:00Z");
+    expect(resolveMonth(null, "America/Toronto", at)).toBe("2026-11");
+    expect(resolveMonth(null, null, at)).toBe("2026-12");
+    expect(resolveMonth("2026-09", "America/Toronto", at)).toBe("2026-09");
+    expect(resolveMonth("all", "America/Toronto", at)).toBeNull();
   });
 });
 

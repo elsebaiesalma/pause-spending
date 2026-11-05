@@ -24,10 +24,10 @@
   background: var(--color-espresso, #2a1208);
   color: #fff;
   border-radius: var(--radius-card);
-  padding: var(--space-3);
+  padding: calc(var(--space-3) * 1.25);
   padding-right: 4rem;
   display: grid;
-  gap: calc(var(--space-2) * 0.72);
+  gap: calc(var(--space-2) * 1.1);
 }
 
 /* Min 44px tap target in the top-right corner. */
@@ -87,8 +87,8 @@
   grid-row: span 3;
   grid-template-rows: subgrid;
   align-items: start;
-  row-gap: 2px;
-  padding: calc(var(--space-1) * 0.72) var(--space-2);
+  row-gap: 6px;
+  padding: calc(var(--space-1) * 1.1) var(--space-2);
   border-left: 1px solid rgba(255, 255, 255, 0.18);
 }
 
@@ -149,7 +149,7 @@
   align-items: flex-start;
   gap: 0.625rem;
   margin: 0;
-  padding: 0.75rem 0.875rem;
+  padding: 1rem 1.125rem;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.08);
   font-size: 1rem;
