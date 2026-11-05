@@ -75,6 +75,11 @@ export function UrgeCurve() {
 
   return (
     <figure className={styles.chart} ref={rootRef} data-lit={URGE_MARKS.length}>
+      {/* Phones: the rotated axis title is longer than the plot is tall, so it
+          moves above the chart as a plain caption. */}
+      <p className={styles.yCaption} aria-hidden="true">
+        Urge to buy
+      </p>
       <div className={styles.plot}>
         <div className={styles.yAxis} aria-hidden="true">
           <span>High</span>

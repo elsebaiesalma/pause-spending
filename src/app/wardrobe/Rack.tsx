@@ -9,8 +9,8 @@ import styles from "./rack.module.css";
 
 export type ScrollTarget = { key: string; nonce: number };
 
-const SWAY_MAX_DEG = 3.5;
-const SWAY_PER_PX = 0.12;
+const SWAY_MAX_DEG = 4;
+const SWAY_PER_PX = 0.14;
 const SWAY_SETTLE_MS = 120;
 const DRAG_THRESHOLD_PX = 5;
 
@@ -254,7 +254,10 @@ export function Rack({
   return (
     <section className={styles.rackSection} aria-label="Rack view">
       <div className={styles.controls}>
-        <p className={styles.hint}>Scroll, drag or use the arrows</p>
+        <p className={styles.hint}>
+          <span className={styles.hintTouch}>Swipe to scroll through your closet</span>
+          <span className={styles.hintMouse}>Scroll, drag or use the arrows</span>
+        </p>
         <div className={styles.arrows}>
           <button type="button" className={styles.arrow} onClick={() => scrollByPage(-1)} disabled={atStart} aria-label="Scroll rack left">
             <span aria-hidden="true">←</span>

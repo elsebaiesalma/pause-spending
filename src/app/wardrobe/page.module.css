@@ -167,6 +167,20 @@
   background: var(--color-bg);
 }
 
+/* Phones tuck the later categories behind the "more" pill; wider screens
+   show every chip and have no use for it. */
+@media (max-width: 699px) {
+  .chipExtra {
+    display: none;
+  }
+}
+
+@media (min-width: 700px) {
+  .chipMore {
+    display: none;
+  }
+}
+
 .chip:hover {
   background: transparent;
   border-color: var(--color-ink);

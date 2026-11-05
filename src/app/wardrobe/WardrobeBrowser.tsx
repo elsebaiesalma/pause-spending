@@ -51,6 +51,8 @@ export function WardrobeBrowser({
   const [category, setCategory] = useState(initialCategory);
   const [sort, setSort] = useState<Sort>(initialSort);
   const [scrollTarget, setScrollTarget] = useState<ScrollTarget | null>(null);
+  // Phones show All plus the first category; the rest sit behind a "more" pill.
+  const [chipsOpen, setChipsOpen] = useState(false);
 
   const counts = useMemo(() => {
     const byKey = new Map<string, number>();
@@ -111,11 +113,11 @@ export function WardrobeBrowser({
           <button type="button" className={styles.chip} aria-current={chipActive("all") ? "true" : undefined} onClick={() => chooseCategory("all")}>
             All ({items.length})
           </button>
-          {chips.map((chip) => (
+          {chips.map((chip, index) => (
             <button
               key={chip.key}
               type="button"
-              className={styles.chip}
+              className={`${styles.chip} ${index > 0 && !chipsOpen && !chipActive(chip.key) ? styles.chipExtra : ""}`}
               aria-current={chipActive(chip.key) ? "true" : undefined}
               onClick={() => chooseCategory(chip.key)}
             >
@@ -123,6 +125,17 @@ export function WardrobeBrowser({
               {wellStocked.includes(chip.key) && <span className={styles.chipTag}>Well stocked</span>}
             </button>
           ))}
+          {chips.length > 1 && (
+            <button
+              type="button"
+              className={`${styles.chip} ${styles.chipMore}`}
+              aria-expanded={chipsOpen}
+              aria-label={chipsOpen ? "Show fewer categories" : "Show more categories"}
+              onClick={() => setChipsOpen((open) => !open)}
+            >
+              {chipsOpen ? "Less" : "•••"}
+            </button>
+          )}
         </div>
 
         <div className={styles.sortRow}>

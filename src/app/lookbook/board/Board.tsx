@@ -119,6 +119,24 @@ export function Board({
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
+  // Phones have no beforeunload prompt, and the back swipe or back button
+  // would drop the work silently. While there are unsaved changes, one extra
+  // history entry catches Back, re-adds itself and asks the same question the
+  // Close button does.
+  useEffect(() => {
+    if (!dirty) return;
+    // Next's router marks its own entries in history.state; an entry without
+    // that mark makes it reload the page on Back, so the mark is copied.
+    const guard = () => window.history.pushState({ ...window.history.state, lookGuard: true }, "");
+    guard();
+    const onPop = () => {
+      guard();
+      setConfirmOpen(true);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [dirty]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;

@@ -46,7 +46,7 @@ export function AddItem({ searchAvailable, primary = true }: { searchAvailable: 
             setValue(event.target.value);
             if (error) setError(null);
           }}
-          placeholder="Type what caught your eye, like “black ankle boots”"
+          placeholder="Type what caught your eye, like “black shirt”"
           autoComplete="off"
           className={styles.input}
           aria-invalid={error ? true : undefined}

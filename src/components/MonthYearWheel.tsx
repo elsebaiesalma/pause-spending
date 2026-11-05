@@ -129,14 +129,6 @@ export function MonthYearWheel({
 
   return (
     <div className={styles.wheel}>
-      <div className={styles.picked} aria-live="polite">
-        {/* The field above already shows the month; this row only clears it. */}
-        {current && (
-          <button type="button" className="btn-quiet" onClick={() => onChange("")}>
-            Clear
-          </button>
-        )}
-      </div>
       <div className={styles.columns} data-unset={!current || undefined}>
         <span className={styles.band} aria-hidden="true" />
         <Wheel
@@ -152,6 +144,15 @@ export function MonthYearWheel({
           onPick={(i) => emit(years[i], current?.month ?? defaultMonth)}
         />
       </div>
+      {/* The field above already shows the month; this only clears it, and sits
+          under the wheel so nothing opens a gap between the field and the wheel. */}
+      {current && (
+        <div className={styles.picked}>
+          <button type="button" className="btn-quiet" onClick={() => onChange("")}>
+            Clear
+          </button>
+        </div>
+      )}
       {name && <input type="hidden" name={name} value={value} />}
     </div>
   );

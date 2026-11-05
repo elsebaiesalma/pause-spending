@@ -33,6 +33,16 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Email sync must dedupe against a "proceeded" desired item when a matching order arrives (for when email parsing resumes). "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
+## Mobile pass (2026-11-05, branch `mobile-pass`)
+
+- **Phone nav:** the tab bar is Decisions, PAUSE (centre, pause icon), Closet. Home is the logo and a hamburger beside it (`MobileMenu` in `SiteNav.tsx`) listing Home, Decisions, Closet. Landing header shows only "Try the demo".
+- **Receipt hero:** the Resume button uses an SVG triangle. The "▶" character became a colour emoji on iPhone.
+- **Urge chart:** below 700px the rotated axis title becomes a caption above the chart (High and Low stay on the axis).
+- **Recap card:** the button sits beside the title, a horizontal line separates the top and bottom metric pairs on phones, and the tip reaches toward the card edges.
+- **Closet:** phones show All plus the first category and a "•••" pill for the rest. The rack sway never worked because `.track` redeclared `--sway`; it is now set on the scroller only. Rack hint reads "Swipe to scroll through your closet" on touch.
+- **Look board:** Back (swipe or button) with unsaved changes opens the same "Leave without saving?" dialog, via a guard history entry that copies Next's `history.state`.
+- **Owned since:** Clear sits under the wheel and the gap above it is gone.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
