@@ -29,5 +29,8 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.redirect(new URL(`/desired-items/${desiredItem.id}/confirm`, request.url));
+  // 303, not the default 307: a 307 sends the browser back with the same POST
+  // and its multipart body, and Next then tries to run that as a Server Action
+  // on the confirm page ("Failed to find Server Action", a 500).
+  return NextResponse.redirect(new URL(`/desired-items/${desiredItem.id}/confirm`, request.url), 303);
 }

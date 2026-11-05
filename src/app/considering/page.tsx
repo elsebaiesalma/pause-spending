@@ -236,6 +236,14 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
                         : { label: "Bought", className: "badge badge--neutral" }
                     }
                     meta={pauseLengthLabel(pausedAt, item.waitUntil) ?? (pausedAt ? undefined : "Bought without a pause")}
+                    actions={
+                      <form action={`/api/desired-items/${item.id}/resolve`} method="POST">
+                        <input type="hidden" name="outcome" value="dropped" />
+                        <button type="submit" className="btn-quiet">
+                          Mark as returned
+                        </button>
+                      </form>
+                    }
                   />
                 );
               })}

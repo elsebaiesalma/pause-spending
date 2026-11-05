@@ -102,33 +102,48 @@
   max-width: none;
 }
 
-.dismissible {
+.collapsible {
   position: relative;
 }
 
-.close {
+.toggle {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 2.75rem;
-  height: 2.75rem;
-  display: grid;
-  place-items: center;
+  top: 0.75rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
   border: 0;
-  border-radius: 50%;
   background: none;
   color: var(--color-ink-soft);
-  font-size: 1.5rem;
-  line-height: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
 }
 
-.close:hover {
-  background: var(--color-bg-alt);
+.toggle:hover {
   color: var(--color-ink);
 }
 
-/* Leave room so the count never sits under the close button. */
-.dismissible .header {
-  padding-right: 2.5rem;
+.chevron {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+
+.collapsible[data-minimized="true"] .chevron {
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.collapsible[data-minimized="true"] .steps {
+  display: none;
+}
+
+/* Leave room so the count never sits under the button. */
+.collapsible .header {
+  padding-right: 6rem;
 }

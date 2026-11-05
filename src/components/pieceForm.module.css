@@ -166,3 +166,56 @@
   gap: 1rem;
   flex-wrap: wrap;
 }
+
+/* ---------- Owned since: a field that opens the wheels ---------- */
+
+.dateTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 20rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 10px;
+  background: var(--color-surface, #fff);
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dateTrigger [data-empty] {
+  color: var(--color-ink-soft);
+}
+
+.dateTrigger[aria-expanded="true"] {
+  border-color: var(--color-espresso);
+}
+
+.dateChevron {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.dateChevron[data-open] {
+  transform: rotate(-135deg) translate(-1px, -1px);
+}
+
+.datePanel {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 20rem;
+  margin-top: 0.5rem;
+}
+
+.datePanel > button {
+  justify-self: start;
+}

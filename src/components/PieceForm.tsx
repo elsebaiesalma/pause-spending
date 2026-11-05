@@ -141,6 +141,7 @@ export function PieceForm({
   const [suggest, setSuggest] = useState<SuggestState>("idle");
   const [suggestNote, setSuggestNote] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
   const tagsTouched = useRef(false);
   const lastAsked = useRef("");
   const submitting = useRef(false);
@@ -148,6 +149,12 @@ export function PieceForm({
   const today = todayISO();
   const thisYear = new Date().getFullYear();
   const years = Array.from({ length: 41 }, (_, i) => thisYear - i);
+  const ownedLabel = (() => {
+    const match = /^(\d{4})-(\d{2})/.exec(values.ownedSince);
+    return match
+      ? `${new Date(Number(match[1]), Number(match[2]) - 1, 1).toLocaleString("en-US", { month: "long" })} ${match[1]}`
+      : null;
+  })();
 
   // Leaving with half a form filled asks first; submitting never does.
   useEffect(() => {
@@ -236,7 +243,8 @@ export function PieceForm({
         const details = formRef.current?.querySelector("details");
         if (details) details.open = true;
       }
-      formRef.current?.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
+      const target = first === "ownedSince" ? "#piece-owned-since" : `[name="${first}"]`;
+      formRef.current?.querySelector<HTMLElement>(target)?.focus();
       return;
     }
     submitting.current = true;
@@ -374,15 +382,44 @@ export function PieceForm({
             <span className={styles.fieldLabel} id="piece-owned-since-label">
               Owned since
             </span>
-            <MonthYearWheel
-              name="ownedSince"
-              value={values.ownedSince}
-              years={years}
-              onChange={(next) => {
-                update({ ownedSince: next });
-                setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
-              }}
-            />
+            <input type="hidden" name="ownedSince" value={values.ownedSince} />
+            <button
+              type="button"
+              id="piece-owned-since"
+              className={styles.dateTrigger}
+              aria-haspopup="true"
+              aria-expanded={dateOpen}
+              aria-labelledby="piece-owned-since-label piece-owned-since"
+              aria-describedby={errors.ownedSince ? "piece-owned-since-error" : undefined}
+              onClick={() => setDateOpen((open) => !open)}
+            >
+              <span data-empty={!ownedLabel || undefined}>{ownedLabel ?? "Select month and year"}</span>
+              <span className={styles.dateChevron} aria-hidden="true" data-open={dateOpen || undefined} />
+            </button>
+            {dateOpen && (
+              <div
+                className={styles.datePanel}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.stopPropagation();
+                    setDateOpen(false);
+                    formRef.current?.querySelector<HTMLElement>("#piece-owned-since")?.focus();
+                  }
+                }}
+              >
+                <MonthYearWheel
+                  value={values.ownedSince}
+                  years={years}
+                  onChange={(next) => {
+                    update({ ownedSince: next });
+                    setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
+                  }}
+                />
+                <button type="button" className="btn" onClick={() => setDateOpen(false)}>
+                  Done
+                </button>
+              </div>
+            )}
             <FieldError id="piece-owned-since-error" message={errors.ownedSince} />
           </div>
         </div>

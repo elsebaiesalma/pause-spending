@@ -108,7 +108,9 @@ export function MonthYearWheel({
 }: {
   value: string;
   onChange: (next: string) => void;
-  name: string;
+  // Left out when the caller keeps its own hidden input (a wheel that mounts
+  // only while it is open).
+  name?: string;
   years: number[];
 }) {
   const current = parts(value);
@@ -150,7 +152,7 @@ export function MonthYearWheel({
           onPick={(i) => emit(years[i], current?.month ?? defaultMonth)}
         />
       </div>
-      <input type="hidden" name={name} value={value} />
+      {name && <input type="hidden" name={name} value={value} />}
     </div>
   );
 }

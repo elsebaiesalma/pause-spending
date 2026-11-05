@@ -16,8 +16,8 @@ function isPublicPath(pathname: string): boolean {
 // inside Decisions.
 const LINKS = [
   { href: "/dashboard", label: "Home", match: ["/dashboard"] },
-  { href: "/wardrobe", label: "Closet", match: ["/wardrobe", "/lookbook"] },
   { href: "/considering", label: "Decisions", match: ["/considering", "/desired-items"] },
+  { href: "/wardrobe", label: "Closet", match: ["/wardrobe", "/lookbook"] },
 ] as const;
 
 const PAUSE_HREF = "/desired-items/new";
@@ -153,19 +153,23 @@ function AccountMenu({
   );
 }
 
-// Home · Closet · (+) Pause · Decisions
+// Home · Decisions · (+) Pause · Closet
 export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
   if (!signedIn || isPublicPath(pathname)) return null;
-  const [home, closet, decisions] = LINKS;
+  const [home, decisions, closet] = LINKS;
 
   return (
     <nav className="tab-bar" aria-label="Primary">
       <Link href={home.href} className="tab-bar__item" aria-current={isActive(pathname, home) ? "page" : undefined}>
         {home.label}
       </Link>
-      <Link href={closet.href} className="tab-bar__item" aria-current={isActive(pathname, closet) ? "page" : undefined}>
-        {closet.label}
+      <Link
+        href={decisions.href}
+        className="tab-bar__item"
+        aria-current={isActive(pathname, decisions) ? "page" : undefined}
+      >
+        {decisions.label}
       </Link>
       <Link
         href={PAUSE_HREF}
@@ -177,12 +181,8 @@ export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
         </span>
         Pause
       </Link>
-      <Link
-        href={decisions.href}
-        className="tab-bar__item"
-        aria-current={isActive(pathname, decisions) ? "page" : undefined}
-      >
-        {decisions.label}
+      <Link href={closet.href} className="tab-bar__item" aria-current={isActive(pathname, closet) ? "page" : undefined}>
+        {closet.label}
       </Link>
     </nav>
   );
