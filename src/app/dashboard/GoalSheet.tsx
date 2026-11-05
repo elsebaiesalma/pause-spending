@@ -89,11 +89,13 @@ export function GoalSheet({
           <GoalStartChoice isNew={!initial && mode === "save"} savedThisMonth={savedThisMonth} />
 
           <div className={styles.sheetActions}>
-            <button type="submit" className="btn-primary">
-              Save goal
-            </button>
+            {/* Cancel first in the source so keyboard order matches the laptop layout (Cancel left,
+                Save right). Phones flip the column so Save sits on top. */}
             <button type="button" className="btn-quiet" onClick={() => dialogRef.current?.close()}>
               Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              Save goal
             </button>
           </div>
         </form>

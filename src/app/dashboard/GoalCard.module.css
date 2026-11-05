@@ -245,6 +245,8 @@
 .sheetActions {
   display: flex;
   flex-wrap: wrap;
+  /* Polaris: the pair sits together at the right, main action last. */
+  justify-content: flex-end;
   align-items: center;
   gap: var(--space-2);
   margin-top: var(--space-1);
