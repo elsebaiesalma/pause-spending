@@ -48,6 +48,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Home order: greeting, Get to know PAUSE, monthly recap (with a lightbulb tip), add box. "Add a piece" opens right under Closet's tabs. Reason fields have examples ("e.g. I'd wear it every week"). The date wheel shows only Clear above it.
 - Concentration bars: `RANK_SHADES` in `ClosetConcentration.tsx` (espresso, plum, deep rose, rose, pink, light pink), one per distinct count, on a paler track.
 - **Closest match is ranked** (2026-11-05): `rankSimilarItems` in `src/lib/tagging/similarity.ts` orders the shortlist (same colour family, then shared tags, then the garment word at the end of the name), so the pause screen's "You own" piece is the best match, not the database's first row. The "What works for you" Home card (`PatternCard`, `pausePattern.ts`) was removed; the recap tip carries that message.
+- **Pause compare (2026-11-05):** both sides show a brand line (owned brand from the purchase merchant, else `brand`), a brand-stripped name in the same display style (`.compareTitle`), and a colour dot meta row; "Also in your closet" cards do the same. The cost bar animates (spent fills, then this item grows; off with reduced motion). The closet badge reads "Similar pieces" (it marks a 3+ near-duplicate cluster, not the biggest category). Greeting says evening until 5am.
 - Decided against hover sub-menus in the nav (no hover on phones; Closet already has Pieces | Looks tabs).
 
 ## Polaris pass 3 (2026-11-04, branch `polaris-pass`)

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { DesiredItem, WardrobeItem } from "@prisma/client";
 import { ensureDesiredItemTagged } from "@/lib/tagging/tagDesiredItem";
-import { findSimilarWardrobeItems } from "@/lib/tagging/similarity";
+import { findSimilarWardrobeItems, type SimilarWardrobeItem } from "@/lib/tagging/similarity";
 import { generateRedundancyExplanation } from "./redundancyExplanation";
 import { matchReason } from "./matchReason";
 import { getReflectionAnswer, type ReflectionAnswer } from "./reflection";
@@ -26,7 +26,7 @@ export type BudgetImpact =
 
 export type PauseScreenPayload = {
   desiredItem: DesiredItem;
-  similarItems: WardrobeItem[];
+  similarItems: SimilarWardrobeItem[];
   // Keyed by WardrobeItem.id - a short, honest reason each item was
   // shortlisted (e.g. "same color · same category"), never a fabricated
   // similarity score. See matchReason.ts.

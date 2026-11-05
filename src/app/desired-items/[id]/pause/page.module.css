@@ -191,7 +191,11 @@
   object-fit: cover;
 }
 
+/* Both names (the wanted h1 and the owned p) share one style, so they line up. */
 .compareTitle {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
   margin: 0.125rem 0 0;
   font-size: clamp(1.25rem, 3vw, 1.75rem);
   line-height: 1.15;
@@ -907,6 +911,49 @@
 
 .impactItem {
   background: var(--color-rose);
+}
+
+/* The bar fills when this step comes into view: what you've spent first, then
+   this item grows on top of it, so its share of the plan is what moves. The
+   step is display:none until shown, which restarts the animation each visit. */
+.impactSpent,
+.impactItem {
+  transform-origin: left center;
+  animation: impactGrow 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.impactItem {
+  animation-delay: 650ms;
+}
+
+.impactMarker {
+  animation: impactFade 300ms ease-out 1300ms both;
+}
+
+@keyframes impactGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes impactFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .impactSpent,
+  .impactItem,
+  .impactMarker {
+    animation: none;
+  }
 }
 
 .impactMarker {

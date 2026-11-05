@@ -5,6 +5,7 @@ import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { REFLECTION_NOTHING_VALUE } from "@/lib/pauseScreen/reflectionForm";
 import { ColorDot } from "@/components/ColorDot";
 import { ItemArt } from "@/components/ItemArt";
+import { stripBrandPrefix } from "@/lib/wardrobeDisplay";
 import { listActiveWardrobeItems } from "@/lib/wardrobe";
 import { hasLookForDesiredItem } from "@/lib/looks/looks";
 import { compareAttributes, similarityBand } from "@/lib/pauseScreen/attributeMatch";
@@ -15,6 +16,12 @@ import styles from "./page.module.css";
 
 const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
 const NEED_SCALE = [1, 2, 3, 4, 5, 6, 7];
+
+// A piece made from an order keeps its brand on the purchase; a hand-added one
+// keeps what was typed. Shown as its own line, like the wanted item's brand.
+function brandOf(item: { brand?: string | null; sourcePurchase?: { merchant: string } | null }): string | null {
+  return item.sourcePurchase?.merchant ?? item.brand ?? null;
+}
 
 export default async function PauseScreenPage({ params }: PageProps<"/desired-items/[id]/pause">) {
   const userId = await requireUserIdOrRedirect();
@@ -67,6 +74,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
   // rest are listed below it. "Closest" is the database's own order, since
   // matching is rule-based and has no finer ranking.
   const [closest, ...others] = similarItems;
+  // Same brand line and name style on both sides, so the two names line up.
+  const closestBrand = closest ? brandOf(closest) : null;
   const rows = closest ? compareAttributes(desiredItem, closest) : [];
 
   // The dropdown lists the closest match first, then the other similar pieces,
@@ -114,9 +123,13 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
               <div className={styles.compareImage}>
                 <ItemArt item={closest} />
               </div>
-              <p className={styles.compareName}>{closest.itemName}</p>
+              {closestBrand && <p className={styles.brand}>{closestBrand}</p>}
+              <p className={styles.compareTitle}>{stripBrandPrefix(closest.itemName, closestBrand)}</p>
               {closest.ownedSince && (
-                <p className={styles.metaLine}>Bought {MONTH_YEAR_FORMAT.format(closest.ownedSince)}</p>
+                <div className={styles.metaLine}>
+                  <ColorDot colorFamily={closest.colorFamily} />
+                  <span>Bought {MONTH_YEAR_FORMAT.format(closest.ownedSince)}</span>
+                </div>
               )}
             </div>
           ) : (
@@ -177,7 +190,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                   <div className={styles.similarImage}>
                     <ItemArt item={item} />
                   </div>
-                  <p className={styles.similarName}>{item.itemName}</p>
+                  {brandOf(item) && <p className={styles.brand}>{brandOf(item)}</p>}
+                  <p className={styles.similarName}>{stripBrandPrefix(item.itemName, brandOf(item))}</p>
                   {item.ownedSince && (
                     <p className={styles.similarMeta}>Bought {MONTH_YEAR_FORMAT.format(item.ownedSince)}</p>
                   )}
@@ -285,7 +299,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                       type="text"
                       name="reflectionReasonAgainst"
                       maxLength={140}
-                      placeholder="e.g. I already own something close"
+                      placeholder="e.g. I own something similar"
                       defaultValue={reflection?.reasonAgainst ?? ""}
                     />
                   </label>
