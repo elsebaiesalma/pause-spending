@@ -1,95 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PAUSE
 
-## Getting Started
+You see a jacket online. You want it right now. Two days later you barely remember it.
 
-First, run the development server:
+PAUSE uses that gap. Before you buy a piece of clothing, you add it to PAUSE. It shows you the closest thing you already own and what the purchase does to your monthly budget. Then you choose. Pause for 24 hours, pause for 7 days, or decide on the spot.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+I built PAUSE because checkout keeps getting faster. One tap, saved cards, buy now pay later. The urge to buy peaks quickly and fades just as quickly. Waiting is the cheapest tool you have, and most shopping apps work hard to take it away.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Try it
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open the live site and click Try the demo. You get your own sample closet with 43 pieces, a $300 monthly plan and a few past decisions. Nothing you do there touches anyone else's demo, and you can start over any time from the menu.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How it works
 
-## Gmail integration
+1. Add the piece you want. Type what caught your eye, then confirm the name and price.
+2. Compare. PAUSE puts it next to the closest piece you own and shows which details match, like colour, category and style. It also shows how the price fits your monthly plan.
+3. Decide. The default is a 24 hour pause. You can also pause for 7 days, decide later, let it go or buy anyway.
 
-This app connects to Gmail via OAuth (`gmail.readonly`) to read receipt emails. Two things to know
-before deploying this anywhere beyond local development:
+## What you'll find in the app
 
-- **The Google OAuth app runs in Testing mode**, which caps it at 100 test users (added manually in
-  the Google Cloud Console) and requires re-consenting periodically per Google's testing-mode token
-  lifetime.
-- **`gmail.readonly` is a Google-restricted scope.** Moving the OAuth app out of Testing mode into
-  Production for real (non-test) users requires passing Google's third-party security assessment
-  first - see [Google's restricted scope
-  requirements](https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification).
-  Until that's done, only manually-added test users can connect their Gmail account.
+Home greets you and shows your month in PAUSE, with a tip drawn from your own decisions. It also tracks your monthly plan and your savings goal.
 
-## Browser worker (Playwright)
+Decisions holds everything you've added, in four tabs called On pause, Undecided, Let go and Bought.
 
-`urlExtractor.ts`'s "paste a product URL" path tries a plain `fetch()` first, then falls back to a
-separate Playwright rendering service (`/playwright-worker`) for retailers that block or serve an
-empty JS-only shell to non-browser requests. That service deploys independently (Railway, Render, or
-Fly - not Vercel serverless), because a real Chromium process needs more memory and wall-clock time
-than a serverless function budget allows, and most serverless platforms can't run Playwright's
-browser binaries at all. See `playwright-worker/README.md` for its API and deployment steps. It's
-optional: if `BROWSER_WORKER_URL`/`BROWSER_WORKER_AUTH_TOKEN` are unset, that fallback is simply
-skipped and extraction goes straight to "needs manual entry".
+Closet holds what you own. You can browse it as a grid or as a clothing rack, see which categories you own the most of, and build outfits from pieces you already have.
 
-## Item search
+Budget and goals lets you set a monthly plan, a savings goal, or both. Every item you let go adds its price to your goal. PAUSE never moves real money. It only counts what you chose not to spend.
 
-The "what are you thinking of buying" search box (`desired-items/new`) uses the
-[Brave Search API](https://brave.com/search/api/) to find candidate product pages, which are then
-run through the same extraction pipeline as the URL-paste path. Brave has no free tier: it's
-$5 per 1,000 queries, with $5 of free usage credit per month (roughly 1,000 free queries/month
-before charges apply) - confirm current pricing at signup, since this can change. Set
-`BRAVE_SEARCH_API_KEY` to enable it; if unset, the search box is disabled and the item-entry flow
-falls back to URL paste, screenshot upload, and manual entry.
+## Product decisions
 
-**Known limitation: search can't reliably find one *specific* SKU for a long-tail or recently
-relisted item, even with the correct name.** Confirmed by testing against real, previously-failed
-URLs:
+Pauses end silently. You get no reminder and no notification. A reminder brings the urge right back, so the item quietly moves to Undecided and waits for you there.
 
-- **Retailers recycle numeric product IDs.** A direct Brave search for one Zara product's exact ID
-  (`p09598154`) returned ten *different* Zara products under that same number - old listings get
-  replaced, and the specific page a URL once pointed to may no longer exist at all. No search
-  strategy can find a page that isn't there anymore.
-- **Long-tail SKUs are sparsely indexed.** A specific Shein product (by numeric ID) wasn't
-  surfaced by Brave under any phrasing tried, including a direct ID search - Shein's catalog is
-  enormous, and an individual low-volume listing often isn't well-indexed by general web search.
+PAUSE never shows a similarity percentage. Matching runs on simple rules, so the app shows which details match and a plain label like Very similar. A score like 87% would claim a precision the app doesn't have.
 
-Because of this, search-sourced candidates are deliberately framed as "closest matches," not exact
-finds, and the confirm step always requires the user to verify what was found. Two things exist
-specifically to route around this limitation rather than fight it:
+The copy never scolds you. Saved only ever means money you kept. Buy anyway is always one tap away. PAUSE adds a moment of friction, not a wall.
 
-- **URL paste never substitutes a search result for the pasted link.** If direct extraction of the
-  pasted URL fails, the item's name is guessed from the URL's own slug (marked low-confidence) -
-  never replaced by an unrelated search candidate, since the user's pasted link already IS the
-  exact item, even when a page can't be scraped.
-- **Screenshot upload** is the reliable path for exactly the retailers search handles worst (heavy
-  anti-bot blocking on direct fetches) - it's promoted ahead of URL paste on mobile viewports for
-  this reason.
+The demo comes first. Gmail order import is built but switched off. Google requires a security review before real users can grant read access to their inbox, so the demo lets anyone try the full product today.
 
-## Learn More
+## What's next
 
-To learn more about Next.js, take a look at the following resources:
+1. Turn on order import from Gmail once Google approves it.
+2. Match a Buy anyway decision to its order email so one purchase never counts twice.
+3. Let you choose how long Undecided items wait before they move to Let go. Today it's 60 days.
+4. Test the layout on more real phones.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## The research behind it
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+PAUSE grew out of reading on young adult overconsumption, the power of delay and how fast the urge to buy fades. The app quotes one study in particular. The further ahead people ordered, the less they spent and the fewer indulgent items they chose (Milkman, Rogers and Bazerman, 2010).
 
-## Deploy on Vercel
+## Built with
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Next.js 16 and React 19, Prisma 7 on Neon Postgres, and Auth.js for sessions. The Anthropic API tags clothes and suggests outfits. Vitest runs the tests, and Vercel hosts the site.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Run it yourself
+
+You need Node 24 and a Postgres database.
+
+1. Install packages with `npm install`.
+2. Create a `.env` file with the variables below.
+3. Apply the schema with `npx prisma migrate deploy`.
+4. Start the app with `npm run dev` and open localhost on port 3000.
+
+Run the tests with `npm test`.
+
+### Required variables
+
+`DATABASE_URL` points to your Postgres database.
+
+`AUTH_SECRET` signs your sessions.
+
+`ANTHROPIC_API_KEY` turns on tagging and outfit suggestions. Without it the app still runs, but it skips those steps.
+
+### Optional variables
+
+`GMAIL_ENABLED=true` brings back Google sign in and Gmail import. You also need `GOOGLE_OAUTH_CLIENT_ID`, `GOOGLE_OAUTH_CLIENT_SECRET` and `TOKEN_ENCRYPTION_KEY`.
+
+`BRAVE_SEARCH_API_KEY` turns on product search.
+
+`CRON_SECRET` protects the scheduled sync route.
+
+`TEST_DATABASE_URL` points to a separate database for tests.
+
+Built by Salma Elsebaie.
