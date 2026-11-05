@@ -201,7 +201,6 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
                   key={item.id}
                   item={item}
                   meta={automatic ? "Moved automatically after 60 days" : undefined}
-                  pillBesideName
                   kept={keptPairs[item.id]}
                   note={keptPairs[item.id] ? undefined : "Would have been new to your closet"}
                   actions={
