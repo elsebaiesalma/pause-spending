@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: () => {} }),
+  redirect: () => {},
+}));
+
 vi.mock("@/lib/auth", () => ({
   auth: vi.fn(),
 }));

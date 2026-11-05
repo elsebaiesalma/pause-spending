@@ -12,7 +12,9 @@ import { prisma } from "@/lib/prisma";
 import { ActionToast } from "@/components/ActionToast";
 import { EmptyState } from "@/components/EmptyState";
 import { PageHeader, Tabs } from "@/components/PageHeader";
+import { inMonth, monthOptions, parseMonthParam } from "@/lib/considering/monthFilter";
 import { DecisionRow } from "./DecisionRow";
+import { MonthFilter } from "./MonthFilter";
 import styles from "./page.module.css";
 
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
@@ -21,6 +23,14 @@ function savedDaysAgoLabel(days: number): string {
   if (days === 0) return "Undecided since today";
   if (days === 1) return "Undecided for 1 day";
   return `Undecided for ${days} days`;
+}
+
+function tabHref(tab: DecisionsTab, month: string | null): string {
+  const params = new URLSearchParams();
+  if (tab !== "paused") params.set("tab", tab);
+  if (month) params.set("month", month);
+  const query = params.toString();
+  return query ? `/considering?${query}` : "/considering";
 }
 
 function LetGoButton({ id }: { id: string }) {
@@ -40,8 +50,9 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
   const userId = await requireUserIdOrRedirect();
   const params = (await props?.searchParams) ?? {};
   const tab: DecisionsTab = parseDecisionsTab(params.tab);
+  const month = parseMonthParam(params.month);
 
-  const [{ onPause, undecided, saved, letGo }, letGoRows, bought, notDecided] = await Promise.all([
+  const [all, allLetGoRows, allBought, allNotDecided] = await Promise.all([
     assembleConsidering(userId),
     listLetGoItems(userId),
     listBoughtItems(userId),
@@ -52,6 +63,31 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
       orderBy: { createdAt: "desc" },
     }),
   ]);
+
+  // The month filter narrows every tab by when the item was added.
+  const onPause = all.onPause.filter((row) => inMonth(row.item.createdAt, month));
+  const undecided = all.undecided.filter((row) => inMonth(row.item.createdAt, month));
+  const saved = all.saved.filter((row) => inMonth(row.item.createdAt, month));
+  const letGoRows = allLetGoRows.filter((row) => inMonth(row.item.createdAt, month));
+  const bought = allBought.filter((item) => inMonth(item.createdAt, month));
+  const notDecided = allNotDecided.filter((item) => inMonth(item.createdAt, month));
+  const letGo = month
+    ? {
+        itemsLetGo: letGoRows.length,
+        totalKept: letGoRows.reduce((sum, row) => sum + (row.item.price ? Number(row.item.price) : 0), 0),
+      }
+    : all.letGo;
+  const options = monthOptions(
+    [
+      ...all.onPause.map((row) => row.item.createdAt),
+      ...all.undecided.map((row) => row.item.createdAt),
+      ...all.saved.map((row) => row.item.createdAt),
+      ...allLetGoRows.map((row) => row.item.createdAt),
+      ...allBought.map((item) => item.createdAt),
+      ...allNotDecided.map((item) => item.createdAt),
+    ],
+    month
+  );
 
   // Only the tab being shown needs these (the let-go pairing reads the closet;
   // the bought badge reads when each pause started).
@@ -80,13 +116,14 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
       <Tabs
         label="Decisions"
         items={tabs.map((t) => ({
-          href: t.key === "paused" ? "/considering" : `/considering?tab=${t.key}`,
+          href: tabHref(t.key, month),
           label: t.label,
           count: counts[t.key],
           current: t.key === tab,
         }))}
       />
       <ActionToast />
+      <MonthFilter tab={tab} month={month} options={options} />
 
       {tab === "paused" &&
         (onPause.length === 0 ? (
