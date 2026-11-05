@@ -45,7 +45,7 @@
 
 .line {
   margin: 0.4rem 0 0;
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-ink-soft);
 }
 
@@ -95,7 +95,7 @@
   margin: 0;
   padding: var(--space-3);
   text-align: center;
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-ink-soft);
   pointer-events: none;
 }
@@ -176,7 +176,7 @@
   min-height: 3rem;
   display: flex;
   align-items: center;
-  font-size: 1rem;
+  font-size: var(--text-md);
   color: var(--color-ink-soft);
 }
 
@@ -188,7 +188,7 @@
 .selectionName {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-soft);
@@ -217,7 +217,7 @@
 
 /* The arrow glyphs read small at label size. */
 .buttons > button span {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   line-height: 1;
 }
 
@@ -262,7 +262,7 @@
   padding: 0.75rem var(--gutter) calc(0.75rem + env(safe-area-inset-bottom));
   background: var(--color-bg);
   border-top: 1px solid var(--color-line-strong);
-  box-shadow: 0 -4px 16px rgba(42, 18, 8, 0.12);
+  box-shadow: 0 -8px 24px rgba(42, 18, 8, 0.14);
 }
 
 .drawer[data-open="true"] {
@@ -412,13 +412,13 @@
   background: var(--color-fill);
   color: var(--color-fill-ink);
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .drawerName {
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -431,7 +431,7 @@
 .loading {
   margin: auto;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-ink-soft);

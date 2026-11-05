@@ -16,7 +16,7 @@
 
 .sub {
   margin: 0 0 0.5rem;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -76,7 +76,7 @@
 }
 
 .description {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 

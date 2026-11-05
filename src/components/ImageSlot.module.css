@@ -14,7 +14,7 @@
   justify-content: center;
   gap: 0.35rem;
   background: color-mix(in srgb, var(--color-ink) 6%, transparent);
-  color: var(--color-ink-faint);
+  color: var(--color-ink-soft);
   font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -23,12 +23,12 @@
 }
 
 .caption {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
 .path {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   text-transform: none;
   letter-spacing: 0.04em;
 }

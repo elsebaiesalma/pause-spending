@@ -65,7 +65,7 @@
 
 .cardDescription {
   margin: 0.25rem 0 0;
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -86,7 +86,7 @@
   border-radius: 999px;
   background: var(--color-bg-alt);
   border: 1px solid var(--color-line);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-ink-soft);
 }
@@ -123,7 +123,7 @@
 
 .valueNote {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -134,7 +134,7 @@
 }
 
 .form label {
-  font-size: 0.9375rem;
+  font-size: var(--text-sm);
   font-weight: 500;
 }
 

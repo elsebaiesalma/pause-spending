@@ -44,13 +44,13 @@
 .field legend {
   padding: 0;
   margin-bottom: 0.375rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-ink);
 }
 
 .fieldLabel {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   color: var(--color-ink);
 }
@@ -62,13 +62,13 @@
 
 .error {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-warn);
 }
 
 .hint {
   margin: 0.25rem 0 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
   min-height: 1.25rem;
 }
@@ -84,7 +84,7 @@
 
 .tagLabel {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-ink-soft);
 }
 
@@ -105,7 +105,7 @@
   padding: 0.25rem 0.25rem 0.25rem 0.75rem;
   border-radius: 999px;
   background: var(--color-blush, #edd9d0);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
 }
 
 .chip button {
@@ -116,7 +116,7 @@
   border-radius: 50%;
   background: none;
   color: var(--color-ink);
-  font-size: 1.125rem;
+  font-size: var(--text-lg);
   line-height: 1;
   cursor: pointer;
 }
@@ -129,7 +129,7 @@
   width: 8rem;
   min-height: 2rem;
   padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   border-radius: 999px;
 }
 
@@ -141,7 +141,7 @@
 
 .more > summary {
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
   padding: 0.25rem 0;
 }

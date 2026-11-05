@@ -75,6 +75,14 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 - **Goal and budget sheets:** `.sheetForm` sets `max-width: none`, so the form fills the dialog instead of stopping at the global 26rem cap. Inputs and the Cancel / Save pair now end at the dialog's right padding.
 
+## Type, token and heading cleanup (2026-11-05, branch `heading-scale`)
+
+- **Heading scale** in `globals.css`: `--heading-xl` (page titles), `--heading-lg` (section headings), `--heading-md` (card and dialog titles, 22px), `--heading-sm` (small card titles, 18px). Every heading reads one of these.
+- **Text scale on Polaris's 12 / 14 / 16 steps:** `--text-xs` 12, `--text-sm` 14, `--text-md` 16, `--text-lg` 18, `--text-xl` 20. The old 13, 15, 17 and 19px sizes were folded into these. The logo, big numerals and the urge-text bubbles keep their own sizes.
+- **Removed duplicate colour tokens:** `--color-sage`, `--color-clay` (use `--color-rose`), `--color-ink-faint` (use `--color-ink-soft`), `--color-accent-dim` (use `--color-accent`).
+- The urge-text bubbles no longer overshoot (`cubic-bezier(0.2, 0.7, 0.2, 1)`). The rack sway keeps its overshoot on purpose.
+- **Two shadows** in `globals.css`: `--shadow-float` (menus, toasts, small pop-ups, the landing preview card) and `--shadow-overlay` (dialogs and sheets). The receipt paper keeps its own deep shadow, and the focus ring and goal pulse are not shadows in this sense.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
