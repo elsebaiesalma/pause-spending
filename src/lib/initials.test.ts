@@ -12,7 +12,7 @@ describe("initialsFor", () => {
   });
 
   it("falls back to the email's local part, then to a question mark", () => {
-    expect(initialsFor(null, "elsebaie.salma@gmail.com")).toBe("EL");
+    expect(initialsFor(null, "jane.doe@example.com")).toBe("JA");
     expect(initialsFor("  ", "")).toBe("?");
     expect(initialsFor(undefined, undefined)).toBe("?");
   });

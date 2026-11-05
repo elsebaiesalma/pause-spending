@@ -16,7 +16,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 **Waiting on the user**
 - Visual check of the Still want it page and the Considering "Went to the store" section, on desktop and phone. Only DOM measurements of the new layout were taken (2026-10-06); no screenshots have been looked at yet.
-- Decide when to make `elsebaiesalma/pause-spending` public (see the README and `docs/`). The repo is on GitHub (private), default branch `main`.
+- The repo `elsebaiesalma/pause-spending` is being made public. A private archive, `pause-spending-archive`, holds the full history including old branches and the removed `playwright-worker` and `docs/superdesign` folders. Never run `git push --mirror` to it again (it would delete archive-only branches); use `git push --all`.
 - Supply the landing images in `public/images/`: `hero`, `pause-screen` (a real screenshot of our Pause screen), `sample-1`, `sample-2`, as .jpg, .jpeg, .png, .webp or .avif. Until a file exists the slot shows a neutral placeholder naming the expected file (`src/components/ImageSlot.tsx`).
 - Check the Welcome intro on Connect Gmail in a real browser (first visit only, tap to skip, none with reduced motion), and the phone layout of the new tab bar.
 
@@ -164,7 +164,7 @@ The product name is always written **PAUSE** in all caps when it is used as a pr
 
 ## Docs and mockups
 
-- `docs/` holds the original thinking: rough idea, requirements Q&A, research, design, implementation plan, the PDD process file, early mockups (`docs/mockups/`) and Superdesign output (`docs/superdesign/`). These are history; the shipped app has moved on. Page-by-page state lives in the sections above, not in a stale list.
+- `docs/` holds the original thinking: rough idea, requirements Q&A, research, design, implementation plan, the PDD process file, early mockups (`docs/mockups/`). These are history; the shipped app has moved on. Page-by-page state lives in the sections above, not in a stale list.
 
 ## Schema state: applied on both branches (as of 2026-10-05)
 
