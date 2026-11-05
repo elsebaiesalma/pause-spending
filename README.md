@@ -1,4 +1,9 @@
-# PAUSE
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/pause-logo-dark.svg">
+    <img src="docs/brand/pause-logo.svg" alt="PAUSE" height="48">
+  </picture>
+</h1>
 
 It's 11pm and you're scrolling. A creator you follow posts a haul. A jacket shows up in your feed, then again in an ad, then again in a shop you opened "just to look." You want it right now. Two days later you barely remember it.
 
