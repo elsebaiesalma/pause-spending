@@ -382,21 +382,6 @@
     "image": "blazer-taupe.jpg"
   },
   {
-    "key": "roots-sweatshirt-red",
-    "brand": "Roots",
-    "name": "Relaxed Funnel-Neck Sweatshirt",
-    "category": "tops",
-    "colorFamily": "red",
-    "colorName": "Tomato Red",
-    "price": 85,
-    "purchasedAt": "2026-02-22",
-    "tags": [
-      "casual",
-      "loungewear"
-    ],
-    "image": "sweatshirt-red.jpg"
-  },
-  {
     "key": "zara-coat-pinstripe-grey",
     "brand": "Zara",
     "name": "Oversized Pinstripe Long Coat",

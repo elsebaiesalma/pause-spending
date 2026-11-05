@@ -51,7 +51,6 @@ Every closet piece has a photo. `loafers-brown-tan.jpg` is the demo sample item 
 | `sweater-crochet-cream.jpg` | Anthropologie Open-Knit Cropped Sweater | open-knit cropped sweater |
 | `sweater-pink-chunky.jpg` | Everlane Chunky Alpaca Crew Sweater | chunky alpaca crew sweater |
 | `sweater-ribbed-cream.jpg` | COS Ribbed Boat-Neck Sweater | ribbed boat-neck sweater |
-| `sweatshirt-red.jpg` | Roots Relaxed Funnel-Neck Sweatshirt | relaxed funnel-neck sweatshirt |
 | `tank-green-ribbed.jpg` | Aritzia Cotton Rib Tank | cotton rib tank |
 | `tank-navy.jpg` | Everlane Ribbed Racerback Tank | ribbed racerback tank |
 | `tank-silver.jpg` | Mango Metallic Rib Tank | metallic rib tank |

@@ -648,6 +648,10 @@
   align-items: center;
   gap: 0.75rem;
   margin: 0.5rem 0 0;
+  /* Global paragraphs are capped at a reading width; this rule must run as
+     wide as the buttons above and the text row below, or the three look
+     misaligned. */
+  max-width: none;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-ink-soft);

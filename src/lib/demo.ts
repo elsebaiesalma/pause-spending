@@ -17,7 +17,10 @@ import demoDecisionsJson from "../../data/demo-decisions.json";
 // (scripts/seedMockWardrobe.ts) never chooses one.
 export const DEMO_EMAIL_DOMAIN = "demo.pause.test";
 const DEMO_SESSION_DAYS = 30;
-const DEMO_MONTHLY_BUDGET = 250;
+// The newest mock purchase (the $259 pinstripe coat) lands in the current month, so
+// the plan sits just above it: a new demo starts under plan, and the sample item
+// ($119) is what tips it over.
+const DEMO_MONTHLY_BUDGET = 300;
 
 // Google sign-in and the Gmail connection are parked while the demo is the way
 // in. Set GMAIL_ENABLED=true to bring both back; the code is untouched.
