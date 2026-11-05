@@ -148,8 +148,6 @@ export function PieceForm({
   const [suggestNote, setSuggestNote] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
-  // The date when the picker opened, so Cancel can put it back.
-  const dateBefore = useRef("");
   const tagsTouched = useRef(false);
   const lastAsked = useRef("");
   const submitting = useRef(false);
@@ -405,7 +403,6 @@ export function PieceForm({
               aria-labelledby="piece-owned-since-label piece-owned-since"
               aria-describedby={errors.ownedSince ? "piece-owned-since-error" : undefined}
               onClick={() => {
-                if (!dateOpen) dateBefore.current = values.ownedSince;
                 setDateOpen((open) => !open);
               }}
             >
@@ -433,7 +430,7 @@ export function PieceForm({
                 />
                 {/* Full-width and stacked like a phone's own picker sheet. Set is the
                     outlined secondary (the form's "Add to closet" stays the page's one
-                    filled button); Cancel is plain text and puts the old date back. */}
+                    filled button); Cancel is plain text and removes the choice. */}
                 <div className={styles.dateActions}>
                   <button type="button" className="btn" onClick={() => setDateOpen(false)}>
                     Set
@@ -442,8 +439,8 @@ export function PieceForm({
                     type="button"
                     className="btn-quiet"
                     onClick={() => {
-                      update({ ownedSince: dateBefore.current });
-                      setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(dateBefore.current, today) }));
+                      update({ ownedSince: "" });
+                      setErrors((current) => ({ ...current, ownedSince: validateOwnedSince("", today) }));
                       setDateOpen(false);
                     }}
                   >
