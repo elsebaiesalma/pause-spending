@@ -120,7 +120,7 @@ export function WardrobeBrowser({
               onClick={() => chooseCategory(chip.key)}
             >
               {chip.label} ({counts.get(chip.key)})
-              {wellStocked.includes(chip.key) && <span className={styles.chipTag}>Similar pieces</span>}
+              {wellStocked.includes(chip.key) && <span className={styles.chipTag}>Well stocked</span>}
             </button>
           ))}
         </div>

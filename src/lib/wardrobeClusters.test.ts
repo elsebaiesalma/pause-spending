@@ -107,6 +107,27 @@ describe("buildConcentration", () => {
     expect(rows[0]).toMatchObject({ key: "tops", count: 3, wellStocked: false });
   });
 
+  it("marks only the fullest category as well stocked, even when a smaller one holds a near-duplicate cluster", () => {
+    const rows = buildConcentration([
+      ...Array.from({ length: 5 }, (_, i) => item({ categoryKey: "tops", colorFamily: i === 0 ? "white" : null })),
+      ...Array.from({ length: 4 }, () => item({ categoryKey: "bottoms", colorFamily: "blue" })),
+    ]);
+    expect(rows.map((r) => [r.key, r.wellStocked])).toEqual([
+      ["tops", true],
+      ["bottoms", false],
+    ]);
+    expect(rows[1].sentence).toBe("4 similar blue bottoms");
+  });
+
+  it("lets tied categories share the badge, and never marks a category under the minimum", () => {
+    const tied = buildConcentration([
+      ...Array.from({ length: 3 }, () => item({ categoryKey: "tops" })),
+      ...Array.from({ length: 3 }, () => item({ categoryKey: "bottoms" })),
+    ]);
+    expect(tied.map((r) => r.wellStocked)).toEqual([true, true]);
+    expect(buildConcentration([item(), item()])[0].wellStocked).toBe(false);
+  });
+
   it("gives the sentence to the largest cluster in a category", () => {
     const rows = buildConcentration([
       ...Array.from({ length: 3 }, () => item({ colorFamily: "navy" })),
