@@ -6,7 +6,7 @@ import { itemStatus, STATUS_BADGE, STATUS_LABEL } from "@/lib/considering/itemSt
 import styles from "./page.module.css";
 
 // One row on the Decisions page. The name opens the item's own page; the
-// badge says which status it's in; `meta` and `actions` vary by tab.
+// badge sits right after the name on every tab; `meta` and `actions` vary by tab.
 export function DecisionRow({
   item,
   meta,
@@ -14,7 +14,6 @@ export function DecisionRow({
   actions,
   badge,
   kept,
-  pillBesideName,
 }: {
   item: DesiredItem;
   meta?: ReactNode;
@@ -24,8 +23,6 @@ export function DecisionRow({
   badge?: { label: string; className: string };
   // On Let go rows: the piece you already own that won. Text first, picture second.
   kept?: WardrobeItem;
-  // Let go tab: the pill sits right after the name instead of under it.
-  pillBesideName?: boolean;
 }) {
   const price = item.price ? Number(item.price) : null;
   const status = itemStatus(item);
@@ -41,15 +38,14 @@ export function DecisionRow({
             <Link href={`/desired-items/${item.id}`} className={styles.rowName}>
               {item.itemName || "Untitled item"}
             </Link>
-            {pillBesideName && pill}
+            {pill}
           </div>
         </div>
         {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
       </div>
-      {(!pillBesideName || meta) && (
+      {meta && (
         <p className={styles.rowMeta}>
-          {!pillBesideName && pill}
-          {meta && <span>{meta}</span>}
+          <span>{meta}</span>
         </p>
       )}
       {kept && (
