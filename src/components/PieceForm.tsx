@@ -431,37 +431,24 @@ export function PieceForm({
                     setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
                   }}
                 />
-                {/* Stacked, like the form's own buttons: Set confirms, Cancel puts the
-                    old date back, Clear empties it. */}
+                {/* Full-width and stacked like a phone's own picker sheet. Set is the
+                    outlined secondary (the form's "Add to closet" stays the page's one
+                    filled button); Cancel is plain text and puts the old date back. */}
                 <div className={styles.dateActions}>
                   <button type="button" className="btn" onClick={() => setDateOpen(false)}>
                     Set
                   </button>
-                  <div className={styles.dateSecondary}>
-                    <button
-                      type="button"
-                      className="btn-quiet"
-                      onClick={() => {
-                        update({ ownedSince: dateBefore.current });
-                        setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(dateBefore.current, today) }));
-                        setDateOpen(false);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    {values.ownedSince && (
-                      <button
-                        type="button"
-                        className="btn-quiet"
-                        onClick={() => {
-                          update({ ownedSince: "" });
-                          setErrors((current) => ({ ...current, ownedSince: validateOwnedSince("", today) }));
-                        }}
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    type="button"
+                    className="btn-quiet"
+                    onClick={() => {
+                      update({ ownedSince: dateBefore.current });
+                      setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(dateBefore.current, today) }));
+                      setDateOpen(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}

@@ -230,11 +230,11 @@
 .dateActions {
   display: grid;
   gap: 0.5rem;
-  justify-items: start;
 }
 
-.dateSecondary {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
+.dateActions > button {
+  justify-content: center;
+  justify-self: stretch;
+  width: 100%;
+  min-height: 2.75rem;
 }
