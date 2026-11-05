@@ -453,6 +453,19 @@
   margin-top: 0;
 }
 
+/* The build-a-look button is another way to think it through, not part of the
+   answers above, so a divider sets it apart (phone and laptop alike), with equal
+   space on either side. It runs the full width, lined up with the fields. */
+.lookQuestion {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-line);
+}
+
+.lookQuestion :global(.action-group) {
+  max-width: none;
+}
+
 .questionLabel {
   font-weight: 500;
 }
@@ -984,6 +997,12 @@
 .stepNav button {
   width: auto;
   flex: 0 0 auto;
+}
+
+/* Next and See the cost match the 48px of Style what you already own and the
+   pause buttons on this card, so every outlined button here is one height. */
+.stepNav :global(.btn) {
+  min-height: 3rem;
 }
 
 .replaceSelect {
