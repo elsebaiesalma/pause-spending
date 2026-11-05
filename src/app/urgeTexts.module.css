@@ -1,0 +1,71 @@
+/* Phone-only. Bubbles run from loud (espresso, big) to quiet (blush, small). */
+.thread {
+  margin: var(--space-4) 0 0;
+}
+
+.caption {
+  margin: 0 0 var(--space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-rose-deep);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.hour {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-soft);
+}
+
+.bubble {
+  margin: 0;
+  max-width: 85%;
+  padding: 0.7rem 1.1rem;
+  border-radius: 1.4rem 1.4rem 0.4rem 1.4rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/* Text colours keep at least 4.5:1 on each fill. */
+.item[data-step="0"] .bubble {
+  background: var(--color-espresso);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.item[data-step="1"] .bubble {
+  background: var(--color-rose-deep);
+  color: #fff;
+  font-size: 1.375rem;
+}
+
+.item[data-step="2"] .bubble {
+  background: var(--color-rose);
+  color: var(--color-espresso);
+  font-size: 1.125rem;
+}
+
+.item[data-step="3"] .bubble {
+  background: var(--color-blush);
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+}

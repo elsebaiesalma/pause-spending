@@ -37,15 +37,17 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
             <span aria-hidden="true">&#10005;</span>
           </button>
           <div className={styles.head}>
-            <p className={styles.eyebrow}>Your month</p>
-            <div className={styles.titleRow}>
-              <h2 id="recap-heading" className={styles.title}>
-                Your {monthLabel} in PAUSE
-              </h2>
-              <a href={`/considering?tab=let-go&month=${recap.monthKey}`} className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0}>
-                See {monthLabel}&rsquo;s decisions
+            <div className={styles.eyebrowRow}>
+              <p className={styles.eyebrow}>Your month</p>
+              <a href={`/considering?tab=let-go&month=${recap.monthKey}`} className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0} aria-label={`See ${monthLabel}’s decisions`}>
+                {/* Phones: the short label fits on the eyebrow's line. */}
+                <span className={styles.ctaLong}>See {monthLabel}&rsquo;s decisions</span>
+                <span className={styles.ctaShort}>See decisions</span>
               </a>
             </div>
+            <h2 id="recap-heading" className={styles.title}>
+              Your {monthLabel} in PAUSE
+            </h2>
           </div>
 
           <dl className={styles.metrics}>

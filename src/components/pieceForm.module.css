@@ -216,6 +216,9 @@
   margin-top: 0.25rem;
 }
 
-.datePanel > button {
-  justify-self: start;
+.dateActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }

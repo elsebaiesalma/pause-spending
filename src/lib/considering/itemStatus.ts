@@ -37,7 +37,8 @@ export const STATUS_LABEL: Record<ItemStatus, string> = {
 // Badge tone classes from globals.css.
 export const STATUS_BADGE: Record<ItemStatus, string> = {
   draft: "badge badge--neutral",
-  deciding: "badge badge--neutral",
+  // Same tone as `undecided`: both read "Undecided", so both look the same.
+  deciding: "badge",
   paused: "badge badge--success",
   undecided: "badge",
   let_go: "badge badge--neutral",

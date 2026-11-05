@@ -67,29 +67,17 @@
   color: #fff;
 }
 
-/* The header and metrics reach into the right padding (kept clear of the close
-   button only for the eyebrow row), so the divider runs the full card width
-   and the title and button share a line. */
 .head {
   display: grid;
   gap: 0.25rem;
-  margin-right: calc(var(--recap-pad) - 4rem);
 }
 
-/* The button sits right after the title and wraps under it on narrow phones. */
-.titleRow {
-  display: block;
-}
-
-.titleRow .title {
-  display: inline;
-  margin-right: 0.75rem;
-}
-
-.titleRow .cta {
-  display: inline-flex;
-  vertical-align: middle;
-  margin-top: 0.25rem;
+/* The button sits right after the eyebrow, clear of the close button. */
+.eyebrowRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
 }
 
 .metrics {
@@ -178,7 +166,7 @@
 /* One observation from the month, with a lightbulb. */
 .tip {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.625rem;
   margin: 0;
   padding: 1rem 1.125rem;
@@ -202,12 +190,25 @@
 
 /* The outlined button, reversed for the dark card. */
 .recap .cta {
-  min-height: 2.25rem;
-  padding: 0.25rem 0.85rem;
-  font-size: 0.875rem;
+  min-height: 2rem;
+  padding: 0.125rem 0.7rem;
+  font-size: 0.8125rem;
   color: #fff;
   border-color: rgba(255, 255, 255, 0.45);
   background: transparent;
+}
+
+.ctaShort {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .ctaLong {
+    display: none;
+  }
+  .ctaShort {
+    display: inline;
+  }
 }
 
 .recap .cta:hover {
