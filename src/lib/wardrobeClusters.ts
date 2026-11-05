@@ -1,7 +1,11 @@
 import { CATEGORIES, OTHER_CATEGORY, categoryConfig } from "@/lib/wardrobeView";
 
-// "Well stocked": a category holds a cluster of 3 or more near-duplicate
-// items. Near-duplicates follow the same rule findSimilarWardrobeItems uses
+// "Well stocked": the category you own the most of (ties share it), with at
+// least WELL_STOCKED_MIN active pieces. That is a count, not a similarity
+// claim. Near-duplicate clusters are a separate signal: they drive the
+// "4 similar blue bottoms" sentence, not the badge.
+//
+// Near-duplicates follow the same rule findSimilarWardrobeItems uses
 // for the pause screen (src/lib/tagging/similarity.ts) - same category, same
 // color family, overlapping style tags - applied here in memory over a whole
 // wardrobe instead of one probe. Only active items count, and an item with no
@@ -103,6 +107,11 @@ export function buildConcentration(items: readonly ClusterItem[]): Concentration
   }
 
   const max = Math.max(0, ...counts.values());
+  const activeCounts = new Map<string, number>();
+  for (const item of items) {
+    if (item.status === "active") activeCounts.set(item.categoryKey, (activeCounts.get(item.categoryKey) ?? 0) + 1);
+  }
+  const activeMax = Math.max(0, ...activeCounts.values());
   const order = [...CATEGORIES, OTHER_CATEGORY];
   return order
     .filter((category) => (counts.get(category.key) ?? 0) > 0)
@@ -114,7 +123,7 @@ export function buildConcentration(items: readonly ClusterItem[]): Concentration
         label: categoryConfig(category.key).label,
         count,
         share: max === 0 ? 0 : count / max,
-        wellStocked: Boolean(cluster),
+        wellStocked: activeMax >= WELL_STOCKED_MIN && (activeCounts.get(category.key) ?? 0) === activeMax,
         sentence: cluster ? describeCluster(cluster) : null,
       };
     })

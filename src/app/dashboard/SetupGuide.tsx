@@ -22,7 +22,7 @@ export function SetupGuide({ steps, isDemo }: { steps: SetupStep[]; isDemo: bool
     if (step.id === "madeDecision") {
       return (
         <Link href="/considering" className="btn btn-primary">
-          Open Considering
+          Open Decisions
         </Link>
       );
     }

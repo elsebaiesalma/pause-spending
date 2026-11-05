@@ -14,6 +14,7 @@ export function DecisionRow({
   actions,
   badge,
   kept,
+  pillBesideName,
 }: {
   item: DesiredItem;
   meta?: ReactNode;
@@ -23,24 +24,34 @@ export function DecisionRow({
   badge?: { label: string; className: string };
   // On Let go rows: the piece you already own that won. Text first, picture second.
   kept?: WardrobeItem;
+  // Let go tab: the pill sits right after the name instead of under it.
+  pillBesideName?: boolean;
 }) {
   const price = item.price ? Number(item.price) : null;
   const status = itemStatus(item);
+  const pill = (
+    <span className={badge?.className ?? STATUS_BADGE[status]}>{badge?.label ?? STATUS_LABEL[status]}</span>
+  );
   return (
     <div className={styles.row}>
       <div className={styles.rowTop}>
         <div>
           {item.brand && <p className={styles.rowBrand}>{item.brand}</p>}
-          <Link href={`/desired-items/${item.id}`} className={styles.rowName}>
-            {item.itemName || "Untitled item"}
-          </Link>
+          <div className={styles.nameLine}>
+            <Link href={`/desired-items/${item.id}`} className={styles.rowName}>
+              {item.itemName || "Untitled item"}
+            </Link>
+            {pillBesideName && pill}
+          </div>
         </div>
         {price !== null && <span className={styles.rowPrice}>${price.toFixed(0)}</span>}
       </div>
-      <p className={styles.rowMeta}>
-        <span className={badge?.className ?? STATUS_BADGE[status]}>{badge?.label ?? STATUS_LABEL[status]}</span>
-        {meta && <span>{meta}</span>}
-      </p>
+      {(!pillBesideName || meta) && (
+        <p className={styles.rowMeta}>
+          {!pillBesideName && pill}
+          {meta && <span>{meta}</span>}
+        </p>
+      )}
       {kept && (
         <p className={styles.kept}>
           <span className={styles.keptArt} aria-hidden="true">

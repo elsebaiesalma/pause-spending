@@ -25,7 +25,8 @@ export function itemStatus(item: StatusFields): ItemStatus {
 
 export const STATUS_LABEL: Record<ItemStatus, string> = {
   draft: "Not confirmed",
-  deciding: "Not decided",
+  // Same word as the tab these items sit in, so one list never says two things.
+  deciding: "Undecided",
   paused: "Paused",
   undecided: "Undecided",
   let_go: "Let go",

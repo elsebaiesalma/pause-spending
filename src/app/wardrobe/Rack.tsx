@@ -300,12 +300,12 @@ export function Rack({
                   </span>
                   {entry.wellStocked && (
                     <span className={styles.dividerTag} aria-hidden="true">
-                      Similar pieces
+                      Well stocked
                     </span>
                   )}
                   <span className={styles.srOnly}>
                     {entry.label}, {entry.count} {entry.count === 1 ? "piece" : "pieces"}
-                    {entry.wellStocked ? ", has similar pieces" : ""}
+                    {entry.wellStocked ? ", well stocked" : ""}
                   </span>
                 </li>
               );
