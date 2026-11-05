@@ -39,9 +39,13 @@ export function ReflectionSteps({ questions, impact }: { questions: Step[]; impa
         )}
         {!onImpact && (
           <div className={styles.stepNext}>
-            <button type="button" className="action action--quiet" onClick={() => setIndex(index + 1)}>
-              Skip
-            </button>
+            {/* Not on the last question: its fields are all optional, so "See the cost"
+                already is the skip. */}
+            {index < total - 1 && (
+              <button type="button" className="action action--quiet" onClick={() => setIndex(index + 1)}>
+                Skip
+              </button>
+            )}
             <button type="button" className="btn" onClick={() => setIndex(index + 1)}>
               {index === total - 1 ? "See the cost" : "Next"}
             </button>

@@ -305,7 +305,6 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                   </label>
                 </div>
                 <div className={styles.question}>
-                  <p className={styles.questionLabel}>Or picture it with what you own</p>
                   <div className="action-group">
                     <BuildLookButton itemId={desiredItem.id} />
                   </div>

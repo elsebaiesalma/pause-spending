@@ -52,18 +52,18 @@ describe("PauseScreenPage: build a look, steps, and Buy anyway", () => {
   }
 
   it(
-    "offers 'Build this look from your closet' in A moment to think, returning to the pause screen",
+    "offers 'Style what you already own' in A moment to think, returning to the pause screen",
     async () => {
       fixture = await createTwoTenantFixture();
       const { userA } = fixture;
       const html = await render(userA);
 
-      expect(html).toContain("Build this look from your closet");
+      expect(html).toContain("Style what you already own");
       expect(html).toContain(`/lookbook/board?for=${userA.desiredItem.id}`);
       expect(html).toContain(encodeURIComponent(`/desired-items/${userA.desiredItem.id}/pause#reflection`));
       // The button is inside the reflection section, before the actions.
-      expect(html.indexOf("A moment to think")).toBeLessThan(html.indexOf("Build this look from your closet"));
-      expect(html.indexOf("Build this look from your closet")).toBeLessThan(html.indexOf("Pause for 24 hours"));
+      expect(html.indexOf("A moment to think")).toBeLessThan(html.indexOf("Style what you already own"));
+      expect(html.indexOf("Style what you already own")).toBeLessThan(html.indexOf("Pause for 24 hours"));
     },
     SLOW
   );

@@ -64,7 +64,7 @@ export function BuildLookButton({ itemId }: { itemId: string }) {
       className="btn action"
       onClick={remember}
     >
-      Build this look from your closet
+      Style what you already own
     </Link>
   );
 }
