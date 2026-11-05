@@ -5,7 +5,10 @@ import { PageHero } from "@/components/kit/PageHero";
 
 const DATE_FORMAT = new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-function partOfDay(hour: number): string {
+// After midnight it is still "evening" until 5am; nobody up at 12:30am
+// thinks of it as morning.
+export function partOfDay(hour: number): string {
+  if (hour < 5) return "evening";
   if (hour < 12) return "morning";
   if (hour < 18) return "afternoon";
   return "evening";

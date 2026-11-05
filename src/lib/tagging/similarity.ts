@@ -29,7 +29,7 @@ function lastWord(name: string | null | undefined): string | null {
 // tag. Same colour family counts most, then each shared tag, then the garment
 // word at the end of the name ("Tee" with "Tee", not with "Tank"), which breaks
 // ties between pieces that tag identically. Equal scores keep their fetch order.
-export function rankSimilarItems(items: WardrobeItem[], probe: SimilarityProbe): WardrobeItem[] {
+export function rankSimilarItems<T extends WardrobeItem>(items: T[], probe: SimilarityProbe): T[] {
   const shared = (a: string[] | undefined, b: string[]) => (a ?? []).filter((tag) => b.includes(tag)).length;
   const noun = lastWord(probe.itemName);
   const score = (item: WardrobeItem) =>
@@ -51,10 +51,14 @@ export function rankSimilarItems(items: WardrobeItem[], probe: SimilarityProbe):
 // the shortlist small and genuinely related rather than "everything in
 // this category" - with an AI pass over the shortlist (a later step)
 // generating the human-readable redundancy explanation.
+// A piece made from an order keeps its brand on the purchase, so the
+// shortlist carries the merchant for display.
+export type SimilarWardrobeItem = WardrobeItem & { sourcePurchase?: { merchant: string } | null };
+
 export async function findSimilarWardrobeItems(
   userId: string,
   probe: SimilarityProbe
-): Promise<WardrobeItem[]> {
+): Promise<SimilarWardrobeItem[]> {
   if (!probe.category) {
     return [];
   }
@@ -83,6 +87,7 @@ export async function findSimilarWardrobeItems(
       ...devWardrobeWhere(),
     },
     orderBy: { id: "asc" },
+    include: { sourcePurchase: { select: { merchant: true } } },
   });
   return rankSimilarItems(items, probe);
 }
