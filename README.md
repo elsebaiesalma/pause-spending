@@ -80,8 +80,6 @@ The wanting fades. For shoppers who care a lot about things, happiness peaks bef
 
 Young shoppers feel that regret. 53% of Gen Z say they're doing or considering a no buy approach (Intuit Credit Karma, 2025). That reads less like a wish to stop shopping and more like a wish to stop buying things they don't end up wanting. A checkpoint at the moment you buy helps you keep the purchases you'll be glad about.
 
-To keep it honest, most of the youth numbers come from industry surveys, and the delay studies are small. They all point the same way, though.
-
 ## Built with
 
 Next.js 16 and React 19, Prisma 7 on Neon Postgres, and Auth.js for sessions. The Anthropic API tags clothes and suggests outfits. Vitest runs the tests, and Vercel hosts the site.
