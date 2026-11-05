@@ -57,9 +57,10 @@ describe("data/mock-wardrobe.json", () => {
     expect(clusters.map((c) => `${c.categoryKey}:${c.colorFamily}:${c.itemIds.length}`)).toEqual(["bottoms:blue:4", "tops:white:3"]);
   });
 
-  it("includes the messy cases on purpose: 3 with no image, 2 with no price, 2 needing review", () => {
-    expect(items.filter((i) => i.image === null)).toHaveLength(3);
-    expect(items.filter((i) => i.price === null)).toHaveLength(2);
+  it("includes the messy cases on purpose: every piece has a photo, 1 with no price, 2 needing review", () => {
+    // A piece without a photo looks broken in the sample closet, so none ship.
+    expect(items.filter((i) => i.image === null)).toHaveLength(0);
+    expect(items.filter((i) => i.price === null)).toHaveLength(1);
     expect(items.filter((i) => i.needsReview)).toHaveLength(2);
     // And one very long bilingual name.
     expect(Math.max(...items.map((i) => i.name.length))).toBeGreaterThan(100);
@@ -89,7 +90,9 @@ describe("public/mock/README.md", () => {
 
   it("lists no image file the data does not use", () => {
     const listed = [...readme.matchAll(/^\| `([a-z0-9-]+\.(?:jpg|png|webp))` \|/gm)].map((m) => m[1]);
-    expect(listed.sort()).toEqual([...files].sort());
+    // The sample item (the second brown loafers) is not in the closet but
+    // still uses its photo.
+    expect(listed.sort()).toEqual([...files, "loafers-brown-tan.jpg"].sort());
   });
 });
 

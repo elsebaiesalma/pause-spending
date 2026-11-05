@@ -1,5 +1,4 @@
-/* The add box: input and its button on one row (stacked on small phones),
-   a small screenshot button beside it. */
+/* The add box: input and its button on one row (stacked on small phones). */
 
 .addItem {
   display: grid;
@@ -14,7 +13,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.625rem;
   align-items: stretch;
 }
@@ -24,8 +23,7 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .row > button,
-  .row > .shot {
+  .row > button {
     justify-self: stretch;
   }
 }
@@ -50,31 +48,4 @@
   margin: 0;
   font-size: 0.875rem;
   color: var(--color-warn);
-}
-
-.shot {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 3rem;
-  padding: 0 1rem;
-  border: 1px solid var(--color-line-strong);
-  border-radius: var(--radius-btn, 999px);
-  color: var(--color-ink);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.shot:hover,
-.shot[data-dragging] {
-  border-color: var(--color-espresso);
-  background: var(--color-bg-alt);
-}
-
-.shot:focus-within {
-  outline: 2px solid var(--color-accent, var(--color-espresso));
-  outline-offset: 2px;
 }

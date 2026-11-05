@@ -33,6 +33,16 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - Email sync must dedupe against a "proceeded" desired item when a matching order arrives (for when email parsing resumes). "Yes" creates no `Purchase`, so decide the matching rule (item name, price, date window).
 - Parked items are in the "Parked items" section below and in `BACKLOG.md`.
 
+## Feedback pass (2026-11-04 evening, branch `polaris-pass`)
+
+- **Edit dialogs are Home-only.** Settings (`/budget`, now titled "Budget & Goals") edits inline: `PlanValue` and the new `GoalEdit` open their fields under the row with Save and Cancel. `BudgetSheet` and `GoalSheet` are used on Home only.
+- **Landing:** no "Example" badge; the hero card is the sample closet's grey pinstripe coat vs grey wool coat (`HeroPreview`, photos from `public/mock/`); "Three simple steps"; the privacy FAQ became "Can I use my real orders to build my closet?" (coming soon, demo for now); `DemoBanner` returns null on `/`; the landing header always shows "Try the demo" (plus "Open app" when signed in) while Gmail is off.
+- **Sample item** (`SAMPLE_ITEM` in `src/lib/demo.ts`) is the Zara brown loafers with their photo; that piece is not in the mock closet (51 pieces, all with photos). Photoless mock items were removed.
+- **Pause screen:** two columns from 900px (comparison pinned left, questions + cost + decision stacked right); on phones a sticky strip with both thumbnails sits at the top of "A moment to think". Other matches are folded under "Also in your closet (N)".
+- **Concentration bars** are shaded deep rose to light rose (`.tinted` in `ProgressBar.module.css`), no longer brown. `MonthYearWheel` no longer prints "Not set".
+- **Add item** only takes typed text. Link and screenshot entry were removed from the UI because they are not read reliably; the API routes remain.
+- Not changed, asked the user: let-go money did not move the plan's "spent" figure in a test (only purchases count); the monthly recap shows only in the first 7 days of a month for the previous month.
+
 ## Polaris pass 3 (2026-11-04, branch `polaris-pass`)
 
 - **Receipt hero:** fixed 8-line window (`WINDOW_LINES`, `lineAt`, `tabTotals` in `src/lib/landing/receipt.ts`); new items join at the bottom and the track slides up one line per tick; the paper never changes size. Pause button sits centred on the paper, half see-through; no PAUSED stamp, no visible "example" caption (kept in the screen-reader caption). Hero copy: "Want it now? Want it tomorrow?".
@@ -122,7 +132,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 
 ## Mock wardrobe (stock photos added 2026-11-04)
 
-- Data: `data/mock-wardrobe.json` (55 items, CAD, with deliberate near-duplicates and messy cases: 3 white tops, a 4-piece blue bottoms cluster, 2 brown loafers, 2 grey coats; 3 items intentionally have no image); images: 52 cropped 800x1000 stock photos in `public/mock/`, each also listed in `data/mock-images.json` (its README lists each filename and brand; confirm photo licences before the repo goes public). Demo accounts get all of it automatically. Parsing and row-building: `src/lib/mockWardrobe.ts`; seeding and deleting: `src/lib/mockWardrobeDb.ts`.
+- Data: `data/mock-wardrobe.json` (51 items, CAD, with deliberate near-duplicates and messy cases: 3 white tops, a 4-piece blue bottoms cluster, 2 brown loafers, 2 grey coats; every piece has a photo; the Zara loafers are the demo sample item, not a closet piece); images: 52 cropped 800x1000 stock photos in `public/mock/`, each also listed in `data/mock-images.json` (its README lists each filename and brand; confirm photo licences before the repo goes public). Demo accounts get all of it automatically. Parsing and row-building: `src/lib/mockWardrobe.ts`; seeding and deleting: `src/lib/mockWardrobeDb.ts`.
 - `npx tsx scripts/seedMockWardrobe.ts` is a dry run; `--confirm` writes. Rows are tagged `source = "seed"` with fixed ids per user and item, so re-running updates instead of duplicating. An image is linked only if its file exists in `public/mock/`, so add images and re-run.
 - `npx tsx scripts/deleteSeededMockWardrobe.ts` (dry run; `--confirm` deletes) removes only `source = "seed"` rows, refuses if a real wardrobe item was made from a seed purchase, and drops looks left empty.
 - The real account was last seeded 2026-10-13 with the older 30-item set (no images). It has NOT been re-seeded with the 55-item photo set; ask first, run the dry run, and use `deleteSeededMockWardrobe.ts` for items whose keys were removed. `.env` has `DEV_WARDROBE_VIEW=seed` and `GMAIL_SYNC_PAUSED=true`; restart `next dev` after changing `.env`.

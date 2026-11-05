@@ -15,8 +15,7 @@ export default async function NewDesiredItemPage({ searchParams }: PageProps<"/d
       <PageHeader title="Pause a purchase" subtitle="Add what caught your eye. You'll see it next to your closet before deciding." />
 
       {/* Typed text with search configured lands here as ?q= and lists the
-          matches; otherwise one box takes a link or a name, and the zone
-          under it takes a screenshot (the same box as Home). */}
+          matches; otherwise one box takes a name. */}
       {searchAvailable && initialQuery ? (
         <div className="item-entry-flow__search">
           <SearchBox initialQuery={initialQuery} />

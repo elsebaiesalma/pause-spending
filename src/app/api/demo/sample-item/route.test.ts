@@ -55,7 +55,7 @@ describe("POST /api/demo/sample-item", () => {
     const items = await prisma.desiredItem.findMany({ where: { userId: user.id } });
     expect(items).toHaveLength(1);
     expect(items[0].userConfirmed).toBe(true);
-    expect(items[0].itemName).toBe("Black leather ankle boots");
+    expect(items[0].itemName).toBe("Suede penny loafers");
     expect(response.headers.get("location")).toContain(`/desired-items/${items[0].id}/pause`);
   });
 

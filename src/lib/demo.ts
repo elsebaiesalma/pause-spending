@@ -71,15 +71,19 @@ export function cleanForDemo(items: readonly MockItem[]): MockItem[] {
 }
 
 // What "Try a sample item" adds: a confirmed item that matches the sample
-// closet (it overlaps the Dr. Martens boots) and pushes this month's plan over,
-// so the first pause screen shows every part of the product.
+// closet (it overlaps the Everlane brown loafers) and pushes this month's plan
+// over, so the first pause screen shows every part of the product. It is the
+// second of the closet's two brown loafers, taken out of the mock closet
+// (data/mock-wardrobe.json) so it isn't owned and wanted at once.
 export const SAMPLE_ITEM = {
-  itemName: "Black leather ankle boots",
-  price: "189.00",
+  itemName: "Suede penny loafers",
+  brand: "Zara",
+  price: "119.00",
   category: "shoes",
   colorName: null,
-  colorFamily: "black",
-  styleTags: ["classic"],
+  colorFamily: "brown",
+  styleTags: ["classic", "suede"],
+  imageUrl: "/mock/loafers-brown-tan.jpg",
 } as const;
 
 // Every mock image is optional: an item whose file is missing from public/mock

@@ -970,7 +970,7 @@ a:focus-visible {
   border-top: 1px solid var(--color-line);
 }
 
-/* Budget & goals lives inside Settings, so it sits indented beneath it, under a
+/* Budget & Goals lives inside Settings, so it sits indented beneath it, under a
    thin guide line, rather than as a peer of Settings and Sign out. */
 .account-menu__item--sub {
   position: relative;

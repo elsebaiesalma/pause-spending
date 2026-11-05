@@ -1,14 +1,13 @@
-import { GarmentSilhouette } from "@/app/wardrobe/GarmentSilhouette";
 import styles from "./HeroPreview.module.css";
 
 // A static picture of the real pause screen for the landing hero, built from
 // the app's own parts (garment silhouettes, the budget bar) so it needs no
-// screenshot file and can't show a broken-image box. The numbers are an
-// example and labelled as one. It is decorative, so assistive tech gets one
+// screenshot file; the two coats are the sample closet's own photos. The numbers are an
+// example (spoken in the description, not shown as a badge). It is decorative, so assistive tech gets one
 // description instead of reading the fake buttons.
 const SPENT = 175;
 const PLAN = 250;
-const PRICE = 189;
+const PRICE = 259;
 const OVER = SPENT + PRICE - PLAN;
 
 export function HeroPreview() {
@@ -19,29 +18,30 @@ export function HeroPreview() {
     <figure
       className={styles.card}
       role="img"
-      aria-label={`Example of a PAUSE screen: black leather ankle boots for $${PRICE} next to the Dr. Martens boots you already own, and what buying them does to a $${PLAN} monthly plan.`}
+      aria-label={`Example of a PAUSE screen: an oversized pinstripe grey coat for $${PRICE} next to the grey wool coat you already own, and what buying them does to a $${PLAN} monthly plan.`}
     >
       <div aria-hidden="true">
         <div className={styles.top}>
           <span className={styles.label}>Before you buy</span>
-          <span className={styles.example}>Example</span>
         </div>
 
         <div className={styles.pair}>
           <div className={styles.piece}>
             <div className={styles.art}>
-              <GarmentSilhouette shape="boot" colorFamily="black" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/mock/coat-pinstripe-grey.jpg" alt="" width={800} height={1000} />
             </div>
             <p className={styles.kicker}>You want</p>
-            <p className={styles.name}>Black leather ankle boots</p>
+            <p className={styles.name}>Oversized Pinstripe Long Coat</p>
             <p className={styles.meta}>${PRICE}</p>
           </div>
           <div className={styles.piece}>
             <div className={styles.art}>
-              <GarmentSilhouette shape="boot" colorFamily="black" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/mock/coat-grey-wool.jpg" alt="" width={800} height={1000} />
             </div>
             <p className={styles.kicker}>You own</p>
-            <p className={styles.name}>Dr. Martens 1460 boots</p>
+            <p className={styles.name}>Oversized Wool Coat</p>
             <p className={styles.meta}>Bought Dec 2025</p>
           </div>
         </div>

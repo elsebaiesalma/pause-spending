@@ -9,7 +9,8 @@ import {
   goalProgress,
   isGoalStorageAvailable,
 } from "@/lib/goals/savingsGoal";
-import { GoalSheet, GoalStartChoice } from "../dashboard/GoalSheet";
+import { GoalStartChoice } from "../dashboard/GoalSheet";
+import { GoalEdit } from "./GoalEdit";
 import { ActionToast } from "@/components/ActionToast";
 import { getKeptSummary } from "@/lib/dashboard/kept";
 import { GoalStatus } from "../dashboard/GoalStatus";
@@ -22,7 +23,7 @@ function money(amount: number): string {
   return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
 }
 
-// Budget & goals: a monthly plan and a savings goal, each its own setting.
+// Budget & Goals: a monthly plan and a savings goal, each its own setting.
 // Use one, both or neither; Home shows what is on. The goal card is left out
 // entirely until the goals table exists, rather than showing a form that can
 // only fail.
@@ -49,7 +50,7 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
     <div className="page">
       <PageHeader
         back={{ href: "/account", label: "Settings" }}
-        title="Budget & goals"
+        title="Budget & Goals"
         subtitle="PAUSE only counts money you choose not to spend. It never moves any."
       />
 
@@ -111,29 +112,25 @@ export default async function BudgetPage(props?: { searchParams?: Promise<{ open
               onContent={
                 goal &&
                 progress && (
-                  <div className={styles.value}>
-                    <div className={styles.valueMain}>
-                      <p className={styles.valueLine}>
-                        {goal.name} · {money(progress.saved)} of {money(goal.target)}
-                      </p>
-                      <ProgressBar
-                        value={progress.saved}
-                        max={goal.target}
-                        label={`${goal.name}: ${money(progress.saved)} saved of ${money(goal.target)}`}
-                        step={0}
-                        tone="rose"
-                      />
-                    </div>
-                    <GoalSheet
-                      mode="save"
-                      triggerLabel="Edit goal"
-                      triggerClassName="btn"
-                      initial={{ name: goal.name, target: goal.target }}
-                      hasGoal
-                      nameMax={GOAL_NAME_MAX}
-                      returnTo="/budget"
-                    />
-                  </div>
+                  <GoalEdit
+                    name={goal.name}
+                    target={goal.target}
+                    nameMax={GOAL_NAME_MAX}
+                    progress={
+                      <div className={styles.valueMain}>
+                        <p className={styles.valueLine}>
+                          {goal.name} · {money(progress.saved)} of {money(goal.target)}
+                        </p>
+                        <ProgressBar
+                          value={progress.saved}
+                          max={goal.target}
+                          label={`${goal.name}: ${money(progress.saved)} saved of ${money(goal.target)}`}
+                          step={0}
+                          tone="rose"
+                        />
+                      </div>
+                    }
+                  />
                 )
               }
               offContent={
