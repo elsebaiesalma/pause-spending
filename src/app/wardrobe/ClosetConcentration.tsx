@@ -9,11 +9,17 @@ import styles from "./concentration.module.css";
 // width every category is shown, in two columns, so there is nothing to open.
 const COLLAPSED_ROWS = 4;
 
-// One shade per distinct count, darkest for the highest, never lighter than
-// the floor so the smallest bar still reads against its track.
-export function tintsByCount(counts: number[]): Map<number, number> {
+// Distinct steps from espresso through plum and deep rose to light pink, far
+// enough apart that neighbours never read as the same colour (tints of one hue
+// did). The count beside each bar carries the number, so colour is never the
+// only cue; the shaded bars sit on a paler track so the light steps still show.
+export const RANK_SHADES = ["#2a1208", "#5c2430", "#8e4752", "#b35f6d", "#cf8f98", "#e6bcc2"] as const;
+
+// One shade per distinct count, darkest for the highest; equal counts share a
+// shade, and past the last step the lightest one repeats.
+export function shadesByCount(counts: number[]): Map<number, string> {
   const distinct = [...new Set(counts)].sort((a, b) => b - a);
-  return new Map(distinct.map((count, rank) => [count, Math.max(1 - rank * 0.2, 0.35)]));
+  return new Map(distinct.map((count, rank) => [count, RANK_SHADES[Math.min(rank, RANK_SHADES.length - 1)]]));
 }
 
 // One row per category: a progress bar of that category's share of the whole
@@ -21,14 +27,14 @@ export function tintsByCount(counts: number[]): Map<number, number> {
 // it ("5 of 30 pieces"), and, for a well-stocked category, one sentence about
 // what is repeated. Never a percentage. Bars are shaded by count: the fullest
 // category is the darkest, every category with the same count shares a shade,
-// and each lower count is lighter (see tintsByCount). The near-duplicate
+// and each lower count is lighter (see shadesByCount). The near-duplicate
 // sentence (with its dot) carries the warning, not a different bar colour.
 export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
   const [expanded, setExpanded] = useState(false);
   if (rows.length === 0) return null;
 
   const total = rows.reduce((sum, row) => sum + row.count, 0);
-  const tints = tintsByCount(rows.map((row) => row.count));
+  const shades = shadesByCount(rows.map((row) => row.count));
   const canCollapse = rows.length > COLLAPSED_ROWS;
 
   return (
@@ -54,7 +60,7 @@ export function ClosetConcentration({ rows }: { rows: ConcentrationRow[] }) {
                 max={total}
                 label={`${row.label}: ${row.count} of ${total} pieces in your closet`}
                 step={index}
-                tint={tints.get(row.count)}
+                shade={shades.get(row.count)}
               />
             </span>
             {row.sentence && (

@@ -6,7 +6,7 @@ import { itemStatus, STATUS_BADGE, STATUS_LABEL, type ItemStatus } from "@/lib/c
 import { getReflectionAnswer } from "@/lib/pauseScreen/reflection";
 import { findSimilarWardrobeItems } from "@/lib/tagging/similarity";
 import { matchReason } from "@/lib/pauseScreen/matchReason";
-import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
+import { LocalTime } from "@/components/LocalTime";
 import { PageHeader } from "@/components/PageHeader";
 import { ItemArt } from "@/components/ItemArt";
 import styles from "./item.module.css";
@@ -60,7 +60,13 @@ export default async function DesiredItemPage({ params }: { params: Promise<{ id
         <section className={styles.locked}>
           <span className={STATUS_BADGE.paused}>{STATUS_LABEL.paused}</span>
           <p className={styles.lockedText}>
-            {item.waitUntil ? `It unlocks ${formatUnlockTime(item.waitUntil)}.` : "It's on pause."} Until then, the
+            {item.waitUntil ? (
+              <>
+                It <LocalTime iso={item.waitUntil.toISOString()} kind="unlock" />.
+              </>
+            ) : (
+              "It's on pause."
+            )} Until then, the
             details stay out of sight.
           </p>
           <div className={styles.actions}>

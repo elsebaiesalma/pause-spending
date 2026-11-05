@@ -63,6 +63,20 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
             </div>
           </dl>
 
+          {recap.tip && (
+            <p className={styles.tip}>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 18h6" />
+                <path d="M10 21h4" />
+                <path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" />
+              </svg>
+              <span>
+                <span className="sr-only">Tip: </span>
+                {recap.tip}
+              </span>
+            </p>
+          )}
+
           <a href="/considering?tab=let-go" className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0}>
             See {monthLabel}&rsquo;s decisions
           </a>

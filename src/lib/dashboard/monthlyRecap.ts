@@ -17,6 +17,9 @@ export type RecapItem = {
   decisionOutcome: string | null;
   price: number | null;
   category: string | null;
+  // The wait before the decision, when known; feeds the recap's tip.
+  pausedAt?: Date | null;
+  waitUntil?: Date | null;
 };
 
 export type MonthStats = {
@@ -29,6 +32,31 @@ export type MonthStats = {
   saved: number;
   mostResisted: { label: string; count: number } | null;
 };
+
+// One plain observation from the month's own decisions, or null when there is
+// nothing honest to say. Compares let-go rates after a 7-day wait and after a
+// 24-hour one, only when both happened; otherwise notes a high let-go share.
+export function recapTip(items: RecapItem[], monthKey: string): string | null {
+  const decided = items.filter(
+    (item) => item.userConfirmed && inMonth(item.createdAt, monthKey) && item.decisionOutcome !== null
+  );
+  const days = (item: RecapItem) =>
+    item.pausedAt && item.waitUntil ? (item.waitUntil.getTime() - item.pausedAt.getTime()) / 86_400_000 : null;
+  const long = decided.filter((item) => (days(item) ?? 0) >= 6);
+  const short = decided.filter((item) => {
+    const d = days(item);
+    return d !== null && d < 6;
+  });
+  const rate = (group: RecapItem[]) => group.filter((item) => item.decisionOutcome === "dropped").length / group.length;
+
+  if (long.length > 0 && short.length > 0 && rate(long) > rate(short)) {
+    return "Longer pauses work for you. You let go of more after a 7-day wait.";
+  }
+  if (decided.length >= 3 && rate(decided) >= 0.5) {
+    return "Pausing works for you. Most of what you paused, you decided you could do without.";
+  }
+  return null;
+}
 
 export function previousMonthKey(monthKey: string): string {
   const [year, month] = monthKey.split("-").map(Number);
@@ -86,6 +114,7 @@ export type MonthlyRecapData = {
   monthLabel: string;
   stats: MonthStats;
   comparison: string | null;
+  tip: string | null;
 };
 
 // allMonth: demo accounts see the recap all month, so every visitor sees it.
@@ -106,7 +135,16 @@ export async function loadMonthlyRecap(
       userConfirmed: true,
       createdAt: { gte: monthKeyToRange(beforeKey).start, lt: monthKeyToRange(recapKey).end },
     },
-    select: { createdAt: true, userConfirmed: true, pauseStatus: true, decisionOutcome: true, price: true, category: true },
+    select: {
+      createdAt: true,
+      userConfirmed: true,
+      pauseStatus: true,
+      decisionOutcome: true,
+      price: true,
+      category: true,
+      pausedAt: true,
+      waitUntil: true,
+    },
   });
   const items: RecapItem[] = rows.map((row) => ({ ...row, price: row.price === null ? null : Number(row.price) }));
 
@@ -118,5 +156,6 @@ export async function loadMonthlyRecap(
     monthLabel: formatMonthLabel(recapKey),
     stats,
     comparison: pausedComparison(stats, monthStats(items, beforeKey), formatMonthLabel(beforeKey)),
+    tip: recapTip(items, recapKey),
   };
 }

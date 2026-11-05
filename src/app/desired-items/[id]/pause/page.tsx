@@ -270,22 +270,22 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                   <div className={styles.reflectionForm}>
                 <div className={styles.reasonGrid}>
                   <label className={styles.reasonField}>
-                    <span className={styles.questionLabel}>One reason for</span>
+                    <span className={styles.questionLabel}>One reason for (optional)</span>
                     <input
                       type="text"
                       name="reflectionReasonFor"
                       maxLength={140}
-                      placeholder="Optional"
+                      placeholder="e.g. I'd wear it every week"
                       defaultValue={reflection?.reasonFor ?? ""}
                     />
                   </label>
                   <label className={styles.reasonField}>
-                    <span className={styles.questionLabel}>One reason against</span>
+                    <span className={styles.questionLabel}>One reason against (optional)</span>
                     <input
                       type="text"
                       name="reflectionReasonAgainst"
                       maxLength={140}
-                      placeholder="Optional"
+                      placeholder="e.g. I already own something close"
                       defaultValue={reflection?.reasonAgainst ?? ""}
                     />
                   </label>

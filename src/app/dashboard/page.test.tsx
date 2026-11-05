@@ -270,20 +270,21 @@ describe("DashboardPage (Home)", () => {
       vi.mocked(getSavingsGoal).mockResolvedValue(null);
     });
 
-    it("shows no recap outside the first week, and the recap right under the greeting when there is one", async () => {
+    it("shows no recap outside the first week, and the recap under Get to know PAUSE when there is one", async () => {
       expect(await render()).not.toContain("in PAUSE");
 
       vi.mocked(loadMonthlyRecap).mockResolvedValueOnce({
         monthKey: "2026-09",
         monthLabel: "September",
         comparison: null,
+        tip: null,
         stats: { confirmed: 3, paused: 3, letGo: 1, saved: 120, mostResisted: { label: "Shoes", count: 1 } },
       });
       const html = await render();
 
       expect(html).toContain("Your September in PAUSE");
       expect(html).toContain("See September’s decisions");
-      expect(html.indexOf("Your September in PAUSE")).toBeLessThan(html.indexOf("Get to know PAUSE"));
+      expect(html.indexOf("Get to know PAUSE")).toBeLessThan(html.indexOf("Your September in PAUSE"));
     });
 
     it("asks what would help most when neither a plan nor a goal is set, on the full row", async () => {

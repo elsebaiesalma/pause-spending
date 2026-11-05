@@ -1,3 +1,4 @@
+import demoDecisions from "../../data/demo-decisions.json";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -12,9 +13,9 @@ const items = parseMockWardrobe(raw);
 const readme = readFileSync(path.join("public", "mock", "README.md"), "utf8");
 
 describe("data/mock-wardrobe.json", () => {
-  it("is valid and about fifty-five items", () => {
-    expect(items.length).toBeGreaterThanOrEqual(50);
-    expect(items.length).toBeLessThanOrEqual(60);
+  it("is valid and about forty-five items (the demo's wanted pieces live in demo-decisions.json)", () => {
+    expect(items.length).toBeGreaterThanOrEqual(40);
+    expect(items.length).toBeLessThanOrEqual(50);
   });
 
   it("uses only the 15 color families, and every category the wardrobe knows", () => {
@@ -39,10 +40,10 @@ describe("data/mock-wardrobe.json", () => {
     }
   });
 
-  it("includes the near-duplicates on purpose: three white tops and two grey coats", () => {
+  it("includes the near-duplicates on purpose: two white tops and two grey coats", () => {
     const whiteTees = items.filter((i) => i.category === "tops" && i.colorFamily === "white");
     const greyCoats = items.filter((i) => i.category === "outerwear" && i.colorFamily === "grey");
-    expect(whiteTees).toHaveLength(3);
+    expect(whiteTees).toHaveLength(2);
     expect(greyCoats).toHaveLength(2);
     // Three white tops make Tops "well stocked", and four blue bottoms (jeans and cut-offs) do the same for Bottoms.
     const clusters = findClusters(
@@ -54,7 +55,7 @@ describe("data/mock-wardrobe.json", () => {
         status: "active",
       }))
     );
-    expect(clusters.map((c) => `${c.categoryKey}:${c.colorFamily}:${c.itemIds.length}`)).toEqual(["bottoms:blue:4", "tops:white:3"]);
+    expect(clusters.map((c) => `${c.categoryKey}:${c.colorFamily}:${c.itemIds.length}`)).toEqual(["bottoms:blue:4"]);
   });
 
   it("includes the messy cases on purpose: every piece has a photo, 1 with no price, 2 needing review", () => {
@@ -90,9 +91,10 @@ describe("public/mock/README.md", () => {
 
   it("lists no image file the data does not use", () => {
     const listed = [...readme.matchAll(/^\| `([a-z0-9-]+\.(?:jpg|png|webp))` \|/gm)].map((m) => m[1]);
-    // The sample item (the second brown loafers) is not in the closet but
-    // still uses its photo.
-    expect(listed.sort()).toEqual([...files, "loafers-brown-tan.jpg"].sort());
+    // The sample item (the second brown loafers) and the demo's decision
+    // history are not in the closet but still use their photos.
+    const wanted = ["loafers-brown-tan.jpg", ...demoDecisions.map((d) => d.image)];
+    expect(listed.sort()).toEqual([...files, ...wanted].sort());
   });
 });
 

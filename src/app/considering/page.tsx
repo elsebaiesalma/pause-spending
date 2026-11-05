@@ -6,7 +6,7 @@ import { getKeptPairs } from "@/lib/considering/keptPairs";
 import { pauseLengthLabel } from "@/lib/considering/pauseLength";
 import { getConsideringMeta } from "@/lib/considering/consideringMeta";
 import { parseDecisionsTab, type DecisionsTab } from "@/lib/considering/itemStatus";
-import { formatUnlockTime } from "@/lib/dashboard/unlockTime";
+import { LocalTime } from "@/components/LocalTime";
 import { requireUserIdOrRedirect } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { ActionToast } from "@/components/ActionToast";
@@ -103,12 +103,21 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
         ) : (
           <div className={styles.list}>
             {onPause.map(({ item, pausedAt, reflectionSummary }) => {
-              const unlockLabel = item.waitUntil ? formatUnlockTime(item.waitUntil) : null;
               return (
                 <DecisionRow
                   key={item.id}
                   item={item}
-                  meta={`Paused ${DATE_FORMAT.format(pausedAt)}${unlockLabel ? ` · ${unlockLabel}` : ""}`}
+                  meta={
+                    <>
+                      Paused <LocalTime iso={pausedAt.toISOString()} kind="date" />
+                      {item.waitUntil && (
+                        <>
+                          {" · "}
+                          <LocalTime iso={item.waitUntil.toISOString()} kind="unlock" />
+                        </>
+                      )}
+                    </>
+                  }
                   note={reflectionSummary}
                   actions={<LetGoButton id={item.id} />}
                 />

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ClosetConcentration, tintsByCount } from "./ClosetConcentration";
+import { ClosetConcentration, RANK_SHADES, shadesByCount } from "./ClosetConcentration";
 
 const row = (key: string, count: number, wellStocked: boolean) => ({
   key,
@@ -11,18 +11,18 @@ const row = (key: string, count: number, wellStocked: boolean) => ({
   sentence: wellStocked ? "3 similar white tops" : null,
 });
 
-describe("tintsByCount", () => {
-  it("gives the highest count the darkest shade, equal counts one shade, and each lower count a lighter one", () => {
-    const tints = tintsByCount([5, 5, 4, 4, 3, 3, 3]);
-    expect(tints.get(5)).toBe(1);
-    expect(tints.get(4)).toBeLessThan(tints.get(5)!);
-    expect(tints.get(3)).toBeLessThan(tints.get(4)!);
-    expect(tints.size).toBe(3);
+describe("shadesByCount", () => {
+  it("gives the highest count the darkest shade, equal counts one shade, and each lower count the next step", () => {
+    const shades = shadesByCount([5, 5, 4, 4, 3, 3, 3]);
+    expect(shades.get(5)).toBe(RANK_SHADES[0]);
+    expect(shades.get(4)).toBe(RANK_SHADES[1]);
+    expect(shades.get(3)).toBe(RANK_SHADES[2]);
+    expect(shades.size).toBe(3);
   });
 
-  it("never goes lighter than the floor", () => {
-    const tints = tintsByCount([9, 8, 7, 6, 5, 4, 3, 2, 1]);
-    expect(Math.min(...tints.values())).toBeGreaterThanOrEqual(0.35);
+  it("repeats the lightest step past the end", () => {
+    const shades = shadesByCount([9, 8, 7, 6, 5, 4, 3]);
+    expect(shades.get(3)).toBe(RANK_SHADES[RANK_SHADES.length - 1]);
   });
 });
 
@@ -34,7 +34,7 @@ describe("ClosetConcentration", () => {
     expect(html).toContain("3 similar white tops");
     expect(html).not.toMatch(/rose|warn/i);
     expect(html).toContain("Tops: 5 of 14 pieces");
-    const tints = [...html.matchAll(/--tint:([0-9.]+)/g)].map((m) => m[1]);
-    expect(tints).toEqual(["1", "1", "0.8"]);
+    const shades = [...html.matchAll(/background:(#[0-9a-f]{6})/g)].map((m) => m[1]);
+    expect(shades).toEqual([RANK_SHADES[0], RANK_SHADES[0], RANK_SHADES[1]]);
   });
 });

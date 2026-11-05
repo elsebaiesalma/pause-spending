@@ -130,13 +130,11 @@ export function MonthYearWheel({
   return (
     <div className={styles.wheel}>
       <div className={styles.picked} aria-live="polite">
+        {/* The field above already shows the month; this row only clears it. */}
         {current && (
-          <>
-            {MONTHS[current.month]} {current.year}
-            <button type="button" className="btn-quiet" onClick={() => onChange("")}>
-              Clear
-            </button>
-          </>
+          <button type="button" className="btn-quiet" onClick={() => onChange("")}>
+            Clear
+          </button>
         )}
       </div>
       <div className={styles.columns} data-unset={!current || undefined}>

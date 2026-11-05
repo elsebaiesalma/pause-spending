@@ -95,13 +95,13 @@ export default async function DashboardPage() {
       <PauseConfirmation />
       <ActionToast />
 
-      {recap && <MonthlyRecap recap={recap} />}
-
       {showGuide && (
         <CollapsibleGuide>
           <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />
         </CollapsibleGuide>
       )}
+
+      {recap && <MonthlyRecap recap={recap} />}
 
       <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
 
