@@ -148,6 +148,8 @@ export function PieceForm({
   const [suggestNote, setSuggestNote] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const [dateOpen, setDateOpen] = useState(false);
+  // The date when the picker opened, so Cancel can put it back.
+  const dateBefore = useRef("");
   const tagsTouched = useRef(false);
   const lastAsked = useRef("");
   const submitting = useRef(false);
@@ -402,7 +404,10 @@ export function PieceForm({
               aria-expanded={dateOpen}
               aria-labelledby="piece-owned-since-label piece-owned-since"
               aria-describedby={errors.ownedSince ? "piece-owned-since-error" : undefined}
-              onClick={() => setDateOpen((open) => !open)}
+              onClick={() => {
+                if (!dateOpen) dateBefore.current = values.ownedSince;
+                setDateOpen((open) => !open);
+              }}
             >
               <span data-empty={!ownedLabel || undefined}>{ownedLabel ?? "Select month and year"}</span>
               <span className={styles.dateChevron} aria-hidden="true" data-open={dateOpen || undefined} />
@@ -426,25 +431,37 @@ export function PieceForm({
                     setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
                   }}
                 />
-                {/* Secondary on the left, the action that closes on the right. */}
+                {/* Stacked, like the form's own buttons: Set confirms, Cancel puts the
+                    old date back, Clear empties it. */}
                 <div className={styles.dateActions}>
-                  {values.ownedSince ? (
+                  <button type="button" className="btn" onClick={() => setDateOpen(false)}>
+                    Set
+                  </button>
+                  <div className={styles.dateSecondary}>
                     <button
                       type="button"
                       className="btn-quiet"
                       onClick={() => {
-                        update({ ownedSince: "" });
-                        setErrors((current) => ({ ...current, ownedSince: validateOwnedSince("", today) }));
+                        update({ ownedSince: dateBefore.current });
+                        setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(dateBefore.current, today) }));
+                        setDateOpen(false);
                       }}
                     >
-                      Clear
+                      Cancel
                     </button>
-                  ) : (
-                    <span />
-                  )}
-                  <button type="button" className="btn" onClick={() => setDateOpen(false)}>
-                    Done
-                  </button>
+                    {values.ownedSince && (
+                      <button
+                        type="button"
+                        className="btn-quiet"
+                        onClick={() => {
+                          update({ ownedSince: "" });
+                          setErrors((current) => ({ ...current, ownedSince: validateOwnedSince("", today) }));
+                        }}
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
