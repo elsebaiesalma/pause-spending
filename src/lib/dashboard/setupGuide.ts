@@ -1,3 +1,4 @@
+import { DEMO_HISTORY_SOURCE } from "@/lib/demo";
 import { prisma } from "@/lib/prisma";
 
 // Home's setup guide: the three things that show what PAUSE does, in order.
@@ -20,10 +21,16 @@ export type SetupStep = {
 
 export async function getSetupProgress(userId: string): Promise<SetupProgress> {
   const [addedItem, madeDecision, builtLook] = await Promise.all([
-    prisma.desiredItem.count({ where: { userId, userConfirmed: true } }),
+    // A demo account's seeded history doesn't count: the guide is about what
+    // the visitor does.
+    prisma.desiredItem.count({ where: { userId, userConfirmed: true, sourceType: { not: DEMO_HISTORY_SOURCE } } }),
     // Any action on the pause screen moves the item off pending_confirmation.
     prisma.desiredItem.count({
-      where: { userId, OR: [{ pauseStatus: { not: "pending_confirmation" } }, { decisionOutcome: { not: null } }] },
+      where: {
+        userId,
+        sourceType: { not: DEMO_HISTORY_SOURCE },
+        OR: [{ pauseStatus: { not: "pending_confirmation" } }, { decisionOutcome: { not: null } }],
+      },
     }),
     prisma.look.count({ where: { userId } }),
   ]);

@@ -34,7 +34,7 @@ export default function LoginPage() {
       <div className="section">
         <DemoButton label="Try PAUSE with a sample closet" />
         <p className="page__note">
-          No account needed. You get a ready-made closet of 30 pieces to try it with.
+          No account needed. You get a ready-made closet to try it with.
         </p>
       </div>
 

@@ -79,7 +79,17 @@ export function SiteHeader({ initials, isDemo, gmailEnabled, signOutAction }: He
               Pause a purchase
             </Link>
           )}
-          {initials !== null ? (
+          {isLanding && !gmailEnabled ? (
+            // The landing page always offers the demo, signed in or not.
+            <>
+              {initials !== null && (
+                <Link href="/dashboard" className="site-header__link">
+                  Open app
+                </Link>
+              )}
+              <DemoButton label="Try the demo" pendingLabel="Setting up…" className="site-header__link" />
+            </>
+          ) : initials !== null ? (
             <>
               {isLanding && (
                 <Link href="/dashboard" className="site-header__link">
@@ -130,7 +140,7 @@ function AccountMenu({
           Settings
         </Link>
         <Link href="/budget" className="account-menu__item account-menu__item--sub" role="menuitem">
-          Budget &amp; goals
+          Budget &amp; Goals
         </Link>
         <form action={signOutAction}>
           <button type="submit" className="account-menu__item" role="menuitem">

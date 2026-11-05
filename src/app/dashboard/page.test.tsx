@@ -104,12 +104,12 @@ describe("DashboardPage (Home)", () => {
     expect(html).not.toContain("Sign out");
   });
 
-  it("has the smart add box and a screenshot button", async () => {
+  it("has the add box, which only offers typing", async () => {
     const html = await render();
 
-    expect(html).toContain("Paste a link or type what caught your eye");
-    expect(html).toContain("Add a screenshot");
-    expect(html).toContain('action="/api/desired-items/from-screenshot"');
+    expect(html).toContain("Type what caught your eye");
+    expect(html).not.toContain("Add a screenshot");
+    expect(html).not.toContain("Paste a link");
   });
 
   it("no longer shows the Kept band, On pause section or Recent purchases", async () => {

@@ -56,13 +56,13 @@ export default function Home() {
   const steps = [
     {
       title: "Add what caught your eye",
-      body: "Paste a link, upload a screenshot or type it in. Confirm the name, price and photo before anything else happens.",
+      body: "Type in the piece you're considering. Confirm its name and price, and add a photo if you like.",
     },
     {
       title: "See it next to your closet",
       body: gmail
-        ? "Your closet is built from real order confirmations. If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan."
-        : "If you already own something similar, PAUSE shows it with the reason, plus what this does to your monthly plan.",
+        ? "Your closet is built from real order confirmations. PAUSE shows the closest piece you already own, and how this purchase would affect your monthly budget."
+        : "PAUSE shows the closest piece you already own, and how this purchase would affect your monthly budget.",
     },
     {
       title: "Pause, then decide",
@@ -76,26 +76,25 @@ export default function Home() {
       a: "No. Nothing is blocked. PAUSE adds a moment between wanting something and buying it, and shows you what you already own. The decision stays yours.",
     },
     {
-      q: "What happens when a pause ends?",
-      a: "The item moves to Undecided without a notification. A reminder would bring the urge right back, so PAUSE stays quiet. You can come back to it whenever you like.",
+      q: "Why clothing?",
+      a: "Clothes are where \"I already own something like this\" happens most. Seeing the near-duplicate next to the new thing is the most useful pause.",
     },
     {
       q: "Where does my closet come from?",
       a: gmail
         ? "From the clothing, shoe and accessory order confirmations in your Gmail, read-only. You can also add pieces yourself."
-        : "In the demo, from a sample closet of 30 pieces, so you can try the whole flow right away. Each visitor gets their own copy.",
+        : "In the demo, from a sample closet, so you can try the whole flow right away. Each visitor gets their own copy.",
     },
     {
-      q: "Why clothing?",
-      a: "Clothes are where \"I already own something like this\" happens most. Seeing the near-duplicate next to the new thing is the most useful pause.",
+      q: "Can I use my real orders to build my closet?",
+      a: "Not yet. We're building a version that links your email and fills your closet automatically, with your privacy first. Until then, try everything with the demo.",
     },
     {
-      q: "Is my data private?",
-      a: gmail
-        ? "PAUSE only reads order confirmations, never sends or deletes anything, and you can delete everything in one step."
-        : "Yes. The demo doesn't ask for an email or a password, and nothing you do there is shared with other visitors.",
+      q: "What happens when a pause ends?",
+      a: "The item moves to Undecided without a notification. A reminder would bring the urge right back, so PAUSE stays quiet. You can come back to it whenever you like.",
     },
   ];
+
 
   const cta = gmail ? (
     <a href="/connect/gmail" className={styles.btnPrimary}>
@@ -128,7 +127,7 @@ export default function Home() {
       {/* Hero: a receipt that prints, gets stamped, and drops the repeats. */}
       <ReceiptHero
         actions={heroActions}
-        note={gmail ? undefined : "No account needed. Opens with a sample closet of 30 pieces."}
+        note={gmail ? undefined : "No account needed. Opens with a sample closet."}
       />
 
       {/* What PAUSE does, with the product itself. */}
@@ -154,7 +153,7 @@ export default function Home() {
       <section className={styles.section} id="how-it-works" aria-labelledby="how-heading">
         <span className={styles.eyebrow}>How it works</span>
         <h2 id="how-heading" className={styles.sectionHeading}>
-          Three steps, about a minute
+          Three simple steps
         </h2>
         <ol className={styles.steps}>
           {steps.map((step, i) => (
@@ -184,7 +183,7 @@ export default function Home() {
           </div>
           <UrgeCurve />
           <p className={styles.chartPayoff}>
-            The default is <strong>Pause for 24 hours</strong>.{" "}
+            The default is <strong>pause for 24 hours</strong>.{" "}
             <span className={styles.statSourceLight}>Moser, University of Michigan, 2020</span>
           </p>
           <div className={styles.findings}>
@@ -258,7 +257,7 @@ export default function Home() {
           <p className={styles.footerSub}>
             {gmail
               ? "Connect Gmail and PAUSE builds your closet from your real order history."
-              : "No sign-up. Opens with a sample closet of 30 pieces, so you can try it in a minute."}
+              : "No sign-up. Opens with a sample closet, so you can try it in a minute."}
           </p>
           {gmail ? (
             <a href="/connect/gmail" className={styles.btnLight}>

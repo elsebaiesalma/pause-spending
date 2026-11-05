@@ -19,7 +19,10 @@
 
 .recap {
   position: relative;
-  background: var(--color-blush);
+  /* Espresso, like the app's other dark bands; text is white and the one
+     accent is soft rose, which passes contrast on espresso. */
+  background: var(--color-espresso, #2a1208);
+  color: #fff;
   border-radius: var(--radius-card);
   padding: var(--space-3);
   padding-right: 4rem;
@@ -37,12 +40,12 @@
   padding: 0;
   border-color: transparent;
   background: transparent;
-  color: var(--color-ink-soft);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 1rem;
 }
 
 .recap .close:hover {
-  background: rgba(42, 18, 8, 0.06);
+  background: rgba(255, 255, 255, 0.1);
   border-color: transparent;
 }
 
@@ -52,7 +55,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-rose-deep);
+  color: var(--color-rose, #c98a92);
 }
 
 .title {
@@ -60,7 +63,7 @@
   font-family: var(--font-display);
   font-size: 1.375rem;
   line-height: 1.2;
-  color: var(--color-ink);
+  color: #fff;
 }
 
 .metrics {
@@ -74,13 +77,13 @@
   align-content: start;
   gap: 2px;
   padding: calc(var(--space-1) * 0.72) var(--space-2);
-  border-left: 1px solid var(--color-line-strong);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .metric dt {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-ink-soft);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .metric dd {
@@ -88,7 +91,7 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   line-height: 1.15;
-  color: var(--color-ink);
+  color: #fff;
 }
 
 .metric dd.text {
@@ -96,16 +99,16 @@
   overflow-wrap: anywhere;
 }
 
-/* Deep rose: the small-text accent that passes contrast on blush. */
+/* Soft rose: the accent that passes contrast on espresso. */
 .metric dd.accent {
-  color: var(--color-rose-deep);
+  color: var(--color-rose, #c98a92);
 }
 
 .metric dd.note {
   font-family: var(--font-body);
   font-size: 0.8125rem;
   line-height: 1.3;
-  color: var(--color-ink-soft);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* Two columns on a phone: drop the divider at the start of each row. */
@@ -119,13 +122,27 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .metric:nth-child(odd) {
-    border-left: 1px solid var(--color-line-strong);
+    border-left: 1px solid rgba(255, 255, 255, 0.18);
     padding-left: var(--space-2);
   }
   .metric:first-child {
     border-left: 0;
     padding-left: 0;
   }
+}
+
+/* The outlined button, reversed for the dark card. */
+.recap .cta {
+  justify-self: start;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+}
+
+.recap .cta:hover {
+  color: #fff;
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 @keyframes recapIn {

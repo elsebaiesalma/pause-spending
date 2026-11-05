@@ -49,10 +49,12 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
             <div className={styles.metric}>
               <dt>Let go</dt>
               <dd>{stats.letGo}</dd>
+              {stats.paused > 0 && <dd className={styles.note}>of the {stats.paused} you paused</dd>}
             </div>
             <div className={styles.metric}>
               <dt>Saved</dt>
               <dd className={styles.accent}>{dollars(stats.saved)}</dd>
+              <dd className={styles.note}>money you didn&rsquo;t spend</dd>
             </div>
             <div className={styles.metric}>
               <dt>Most resisted</dt>
@@ -61,7 +63,7 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
             </div>
           </dl>
 
-          <a href="/considering?tab=let-go" className="btn" tabIndex={dismissed ? -1 : 0}>
+          <a href="/considering?tab=let-go" className={`btn ${styles.cta}`} tabIndex={dismissed ? -1 : 0}>
             See {monthLabel}&rsquo;s decisions
           </a>
         </section>

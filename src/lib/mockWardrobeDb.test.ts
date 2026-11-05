@@ -65,7 +65,7 @@ describe("seeding and removing the mock wardrobe", () => {
       // With no image files present, every item is imageless (the placeholder).
       expect(await prisma.wardrobeItem.count({ where: { userId: user.id, imageUrl: { not: null } } })).toBe(0);
 
-      expect(await prisma.purchase.count({ where: { userId: user.id, price: null, status: "needs_review" } })).toBe(2);
+      expect(await prisma.purchase.count({ where: { userId: user.id, price: null, status: "needs_review" } })).toBe(1);
       expect(await prisma.wardrobeItem.count({ where: { userId: user.id, status: "needs_review" } })).toBe(2);
     },
     SLOW

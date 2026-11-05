@@ -87,6 +87,11 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
     <div className="page">
       <span className="page__eyebrow">Before you buy</span>
 
+      {/* Two columns on a wide screen: the comparison stays pinned on the left
+          while the questions, the cost and the decision stack on the right, so
+          nothing has to be remembered while scrolling. On a phone the
+          comparison is a compact strip that stays under the header. */}
+      <div className={styles.layout}>
       {/* 1. You want / you own */}
       <section className={styles.compare} aria-label="What you want next to what you own">
         <div className={styles.comparePair}>
@@ -164,8 +169,8 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         )}
 
         {others.length > 0 && (
-          <div className={styles.others}>
-            <h2 className={styles.othersTitle}>Also in your closet</h2>
+          <details className={styles.others}>
+            <summary className={styles.othersTitle}>Also in your closet ({others.length})</summary>
             <div className={styles.similarTrack}>
               {others.map((item) => (
                 <div key={item.id} className={styles.similarCard}>
@@ -180,7 +185,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
                 </div>
               ))}
             </div>
-          </div>
+          </details>
         )}
       </section>
 
@@ -191,6 +196,20 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
       <form method="POST" className={styles.form}>
         <div className={styles.columns}>
         <section className={`section ${styles.card}`} id="reflection">
+          <div className={styles.miniStrip} aria-hidden="true">
+            <span className={styles.miniThumb}>
+              <ItemArt item={desiredItem} />
+            </span>
+            <span className={styles.miniNames}>
+              {desiredItem.itemName || "This item"}
+              {closest ? ` vs ${closest.itemName}` : ""}
+            </span>
+            {closest && (
+              <span className={styles.miniThumb}>
+                <ItemArt item={closest} />
+              </span>
+            )}
+          </div>
           <h2 className={styles.cardTitle}>A moment to think</h2>
           <ReflectionSteps
             questions={[
@@ -320,6 +339,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
         </aside>
         </div>
       </form>
+      </div>
     </div>
   );
 }

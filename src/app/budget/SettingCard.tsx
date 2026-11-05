@@ -3,7 +3,7 @@
 import { useId, useState, type ReactNode } from "react";
 import styles from "./budget.module.css";
 
-// One Budget & goals setting, laid out as a Polaris annotated section: the
+// One Budget & Goals setting, laid out as a Polaris annotated section: the
 // title and a plain description on the left, the setting's card on the right
 // (stacked on phones). The card states the status as a badge ("On" / "Off")
 // and has one button that says exactly what it does. "Turn on" reveals the

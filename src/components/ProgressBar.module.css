@@ -16,7 +16,9 @@
 }
 
 .tinted {
-  background: color-mix(in srgb, var(--color-espresso, #2a1208) calc(var(--tint, 1) * 100%), var(--color-blush, #edd9d0));
+  /* Deep rose for the fullest, easing to a light rose that still reads against
+     the blush track (brown was too close from one shade to the next). */
+  background: color-mix(in srgb, var(--color-rose-deep, #8e4752) calc(var(--tint, 1) * 100%), #dba0a8);
 }
 
 .rose {

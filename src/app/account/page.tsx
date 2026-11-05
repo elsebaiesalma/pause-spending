@@ -97,7 +97,7 @@ export default async function AccountPage() {
       )}
 
       <section className={styles.block}>
-        <h2 className={styles.heading}>Budget &amp; goals</h2>
+        <h2 className={styles.heading}>Budget &amp; Goals</h2>
         {budget ? (
           <p className={styles.status}>
             Monthly plan: ${Number(budget.amount).toFixed(0)} for {formatMonthLabel(monthKey)}.
