@@ -40,7 +40,7 @@ describe("MonthlyRecap", () => {
   it("links to the let-go decisions with the month named", () => {
     const html = renderToStaticMarkup(<MonthlyRecap recap={RECAP} />);
 
-    expect(html).toContain('href="/considering?tab=let-go"');
+    expect(html).toContain('href="/considering?tab=let-go&amp;month=2026-10"');
     expect(html).toContain("See October’s decisions");
   });
 

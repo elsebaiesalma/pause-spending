@@ -389,7 +389,7 @@
     "colorFamily": "grey",
     "colorName": "Heather Grey",
     "price": 259,
-    "purchasedAt": "2026-10-02",
+    "purchasedAt": "2026-09-20",
     "tags": [
       "classic",
       "winter",
@@ -405,7 +405,7 @@
     "colorFamily": "metallic",
     "colorName": "Silver",
     "price": 36,
-    "purchasedAt": "2026-07-30",
+    "purchasedAt": "2026-10-02",
     "tags": [
       "party"
     ],
@@ -451,7 +451,7 @@
     "colorFamily": "brown",
     "colorName": "Camel",
     "price": 25,
-    "purchasedAt": "2026-07-02",
+    "purchasedAt": "2026-10-03",
     "tags": [
       "basic",
       "casual"
@@ -511,7 +511,7 @@
     "colorFamily": "orange",
     "colorName": "Terracotta",
     "price": 79.9,
-    "purchasedAt": "2026-09-27",
+    "purchasedAt": "2026-10-05",
     "tags": [
       "casual",
       "layering"
@@ -648,7 +648,7 @@
     "colorFamily": "navy",
     "colorName": "Midnight Navy",
     "price": 58,
-    "purchasedAt": "2026-08-14",
+    "purchasedAt": "2026-10-04",
     "tags": [
       "party",
       "satin"
