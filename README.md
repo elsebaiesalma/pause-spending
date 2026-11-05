@@ -11,11 +11,13 @@ PAUSE uses that gap. Before you buy a piece of clothing, you add it to PAUSE. It
 
 ## Why I built it
 
-We buy more clothes than ever, and we keep them for less time. Social media turned every feed into a storefront. Fast fashion made a new top cost less than lunch. Checkout takes one tap, your card is already saved, and buy now pay later splits the price into small pieces that feel like nothing.
+Online shopping is built for speed. Your card is saved, checkout takes one tap and buy now pay later splits the price into small pieces that feel like nothing. That's great when you know what you want. It's less great late at night when your feed decides for you.
 
-None of that is an accident. Shopping sites are built to make you act before you think. Countdown timers, low stock warnings, "12 people are looking at this." The urge to buy peaks quickly and fades just as quickly, so the faster you check out, the more of it you act on.
+The urge to buy peaks fast and fades just as fast. Countdown timers, low stock warnings and "12 people are looking at this" all push you to act before it fades. So a lot of impulse buys turn into regret. Some go back in a box. The rest sit in your closet with the tags still on.
 
-Waiting is the cheapest tool you have. PAUSE gives it back to you.
+That costs you money and time. It costs the store too, with shipping, handling and a sale that didn't stick. And we already buy more clothes than ever while wearing each one less.
+
+PAUSE puts a short wait between wanting and buying. If you still want it tomorrow, buy it and feel good about it. If you don't, you just saved yourself a return.
 
 ## Try it
 
@@ -43,7 +45,9 @@ Pauses end silently. You get no reminder and no notification. A reminder brings 
 
 PAUSE never shows a similarity percentage, on purpose. The piece you want doesn't have to be identical to one you own. If it's close, that's enough reason to stop and ask yourself if you really need another one. So the app shows which details match and a plain label like Very similar.
 
-The copy never scolds you. Saved only ever means money you kept. Buy anyway is always one tap away. PAUSE adds a moment of friction, not a wall.
+The copy never scolds you. Saved only ever means money you kept. Buy anyway is always one tap away.
+
+PAUSE adds friction on purpose. Most of ecommerce works hard to remove it, and for a purchase you're sure about, that's right. PAUSE only slows down the purchases you're unsure about, and only when you ask it to. A purchase you think through is one you're less likely to return, and a shopper who feels good about what they bought is more likely to come back. The goal is purchases you keep.
 
 The demo comes first. It lets anyone try the full product today, with no account and no inbox access.
 
@@ -56,11 +60,13 @@ The demo comes first. It lets anyone try the full product today, with no account
 
 ## The research behind it
 
-PAUSE grew out of reading on young adult overconsumption, the power of delay and how fast the urge to buy fades. Here's what stood out.
+PAUSE grew out of reading on impulse buying, the power of delay and how fast the urge to buy fades. Here's what stood out.
 
 Social media drives a lot of unplanned buying. Only 9% of Gen Z say their social media purchases are planned ahead (GoDaddy, 2024). Almost half of social media users have bought something on impulse after seeing it in their feed, and 68% of them regret at least one of those purchases (Bankrate and YouGov, 2023).
 
 Stress plays a part too. 37% of Gen Z say they "doom spend" to cope with stress (Intuit Credit Karma, 2024). And buy now pay later makes it easy to overdo it. 47% of its users paid late in the past year (LendingTree, 2026).
+
+Regret often ends in a return. US shoppers were expected to send back 19.3% of what they bought online in 2025, and total retail returns were projected to reach almost $850 billion (National Retail Federation, 2025).
 
 The pressure is designed in. A study of the top 200 US shopping sites found impulse triggers everywhere, from countdowns and low stock warnings to "people are looking" counters (Moser, Schoenebeck and Resnick, 2019).
 
@@ -72,7 +78,7 @@ Tone matters. Frequent impulse buyers asked for tools that slow them down, and r
 
 The wanting fades. For shoppers who care a lot about things, happiness peaks before the purchase and drops after it (Richins, 2013).
 
-Plenty of young people already want to buy less. 53% of Gen Z say they're doing or considering a no buy approach (Intuit Credit Karma, 2025). But wanting to buy less doesn't change much on its own. A tool that adds a checkpoint at the moment you buy does.
+Young shoppers feel that regret. 53% of Gen Z say they're doing or considering a no buy approach (Intuit Credit Karma, 2025). That reads less like a wish to stop shopping and more like a wish to stop buying things they don't end up wanting. A checkpoint at the moment you buy helps you keep the purchases you'll be glad about.
 
 To keep it honest, most of the youth numbers come from industry surveys, and the delay studies are small. They all point the same way, though.
 
