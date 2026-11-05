@@ -81,6 +81,7 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Text scale on Polaris's 12 / 14 / 16 steps:** `--text-xs` 12, `--text-sm` 14, `--text-md` 16, `--text-lg` 18, `--text-xl` 20. The old 13, 15, 17 and 19px sizes were folded into these. The logo, big numerals and the urge-text bubbles keep their own sizes.
 - **Removed duplicate colour tokens:** `--color-sage`, `--color-clay` (use `--color-rose`), `--color-ink-faint` (use `--color-ink-soft`), `--color-accent-dim` (use `--color-accent`).
 - The urge-text bubbles no longer overshoot (`cubic-bezier(0.2, 0.7, 0.2, 1)`). The rack sway keeps its overshoot on purpose.
+- **Two shadows** in `globals.css`: `--shadow-float` (menus, toasts, small pop-ups, the landing preview card) and `--shadow-overlay` (dialogs and sheets). The receipt paper keeps its own deep shadow, and the focus ring and goal pulse are not shadows in this sense.
 
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 

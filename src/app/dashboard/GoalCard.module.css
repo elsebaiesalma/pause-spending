@@ -164,7 +164,7 @@
   background: var(--color-surface);
   color: var(--color-ink);
   text-align: left;
-  box-shadow: 0 24px 60px rgba(42, 18, 8, 0.28);
+  box-shadow: var(--shadow-overlay);
 }
 
 @media (max-width: 600px) {
