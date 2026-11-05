@@ -14,6 +14,7 @@ const RECAP: MonthlyRecapData = {
   monthKey: "2026-10",
   monthLabel: "October",
   comparison: "2 more than September",
+  tip: "Longer pauses work for you. You let go of more after a 7-day wait.",
   stats: { confirmed: 5, paused: 5, letGo: 2, saved: 240, mostResisted: { label: "Shoes", count: 2 } },
 };
 

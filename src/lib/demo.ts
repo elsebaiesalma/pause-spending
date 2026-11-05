@@ -6,6 +6,7 @@ import { currentMonthKey, setBudgetForMonth } from "@/lib/budget";
 import { markLetGo, markSaved } from "@/lib/considering/consideringMeta";
 import mockWardrobeJson from "../../data/mock-wardrobe.json";
 import availableImages from "../../data/mock-images.json";
+import demoDecisionsJson from "../../data/demo-decisions.json";
 
 // Demo accounts: one fresh account per "Try the demo" click, pre-filled with
 // the mock wardrobe, so anyone can walk the whole pause flow without Google or
@@ -128,29 +129,26 @@ export const DEMO_HISTORY_SOURCE = "demo_history";
 // A little decision history, so Decisions isn't empty and Home's monthly recap
 // has a last month to look back on. monthsAgo 0 is this month (one Undecided,
 // one Let go); 1 is last month (the recap); 2 gives the recap its comparison.
+// Each one is a real sample-closet piece with its photo, kept out of
+// data/mock-wardrobe.json so nothing is both owned and wanted; each still has a
+// close match left in the closet (the COS tee for the Everlane tee, and so on).
 type DemoDecision = {
-  itemName: string;
+  key: string;
   brand: string;
-  price: number;
+  name: string;
   category: string;
   colorFamily: string;
+  price: number;
+  image: string;
+  tags: string[];
   outcome: "dropped" | "saved_for_later" | "proceeded";
-  monthsAgo: 0 | 1 | 2;
+  monthsAgo: number;
   day: number;
+  // How long it was paused before the decision (1 or 7), for the recap's tip.
+  waitDays: number;
 };
 
-export const DEMO_DECISIONS: readonly DemoDecision[] = [
-  { itemName: "Leather knee-high boots", brand: "Aldo", price: 220, category: "shoes", colorFamily: "black", outcome: "dropped", monthsAgo: 1, day: 4 },
-  { itemName: "Suede ankle boots", brand: "Steve Madden", price: 160, category: "shoes", colorFamily: "brown", outcome: "dropped", monthsAgo: 1, day: 9 },
-  { itemName: "Chelsea boots", brand: "Blundstone", price: 75, category: "shoes", colorFamily: "black", outcome: "dropped", monthsAgo: 1, day: 13 },
-  { itemName: "Cropped cardigan", brand: "Aritzia", price: 85, category: "knitwear", colorFamily: "cream", outcome: "dropped", monthsAgo: 1, day: 18 },
-  { itemName: "Satin midi skirt", brand: "Zara", price: 59, category: "bottoms", colorFamily: "green", outcome: "proceeded", monthsAgo: 1, day: 22 },
-  { itemName: "Striped boat-neck tee", brand: "Uniqlo", price: 30, category: "tops", colorFamily: "navy", outcome: "proceeded", monthsAgo: 1, day: 26 },
-  { itemName: "Puffer vest", brand: "Uniqlo", price: 60, category: "outerwear", colorFamily: "black", outcome: "dropped", monthsAgo: 2, day: 10 },
-  { itemName: "Linen wide-leg trousers", brand: "Mango", price: 70, category: "bottoms", colorFamily: "cream", outcome: "proceeded", monthsAgo: 2, day: 21 },
-  { itemName: "Oversized white shirt", brand: "COS", price: 89, category: "tops", colorFamily: "white", outcome: "saved_for_later", monthsAgo: 0, day: 0 },
-  { itemName: "Black faux-leather jacket", brand: "Zara", price: 99, category: "outerwear", colorFamily: "black", outcome: "dropped", monthsAgo: 0, day: 0 },
-];
+export const DEMO_DECISIONS = demoDecisionsJson as readonly DemoDecision[];
 
 // Months are UTC, like the budget and the recap. Day 0 means "today", so this
 // month's items never land in the future or slip into last month on the 1st.
@@ -167,18 +165,21 @@ async function seedDemoDecisions(userId: string): Promise<void> {
       data: {
         userId,
         sourceType: DEMO_HISTORY_SOURCE,
-        rawInput: decision.itemName,
-        itemName: decision.itemName,
+        rawInput: decision.name,
+        itemName: decision.name,
         brand: decision.brand,
         price: decision.price.toFixed(2),
         category: decision.category,
         colorFamily: decision.colorFamily,
-        styleTags: [],
+        styleTags: decision.tags,
+        imageUrl: DEMO_IMAGES.has(decision.image) ? `/mock/${decision.image}` : null,
         userConfirmed: true,
         userEdited: true,
         pauseStatus: decision.outcome === "saved_for_later" ? "saved_for_later" : "proceeded",
         decisionOutcome: decision.outcome,
         createdAt: at,
+        pausedAt: at,
+        waitUntil: new Date(at.getTime() + decision.waitDays * 86_400_000),
       },
     });
     // Same lifecycle stamps the resolve route writes; both degrade quietly.

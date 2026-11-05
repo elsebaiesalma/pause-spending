@@ -5,6 +5,7 @@ import {
   monthStats,
   pausedComparison,
   previousMonthKey,
+  recapTip,
   shouldShowRecap,
   type MonthStats,
   type RecapItem,
@@ -203,5 +204,31 @@ describe("loadMonthlyRecap", () => {
     await add(me.id, "2026-12-20T12:00:00Z");
     const recap = await loadMonthlyRecap(me.id, new Date("2027-01-02T12:00:00Z"));
     expect(recap).toMatchObject({ monthKey: "2026-12", monthLabel: "December" });
+  });
+});
+
+describe("recapTip", () => {
+  const at = (day: number) => new Date(Date.UTC(2026, 9, day, 12));
+  const item = (day: number, outcome: string | null, waitDays: number | null) => ({
+    createdAt: at(day),
+    userConfirmed: true,
+    pauseStatus: "proceeded",
+    decisionOutcome: outcome,
+    price: 50,
+    category: "tops",
+    pausedAt: waitDays === null ? null : at(day),
+    waitUntil: waitDays === null ? null : new Date(at(day).getTime() + waitDays * 86_400_000),
+  });
+
+  it("says longer pauses work when 7-day waits ended in more let-gos than 24-hour ones", () => {
+    const items = [item(3, "dropped", 7), item(5, "dropped", 7), item(8, "dropped", 1), item(9, "proceeded", 1)];
+    expect(recapTip(items, "2026-10")).toMatch(/^Longer pauses work for you/);
+  });
+
+  it("falls back to a let-go share, and says nothing when there is nothing honest to say", () => {
+    expect(recapTip([item(3, "dropped", null), item(4, "dropped", null), item(5, "proceeded", null)], "2026-10")).toMatch(
+      /^Pausing works for you/
+    );
+    expect(recapTip([item(3, "proceeded", 7), item(4, "dropped", 1)], "2026-10")).toBeNull();
   });
 });

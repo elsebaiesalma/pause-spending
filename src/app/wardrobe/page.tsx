@@ -84,8 +84,11 @@ export default async function WardrobePage({ searchParams }: PageProps<"/wardrob
         }
       />
       <ClosetTabs current="pieces" pieces={items.length} looks={lookCount} />
+      {/* Opens right under the tabs, above the concentration card and search,
+          so "Add a piece" shows its form where the eye already is. */}
+      {addPanel}
       <ClosetConcentration rows={concentration} />
-      <WardrobeBrowser items={items} wellStocked={wellStocked} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={addPanel} />
+      <WardrobeBrowser items={items} wellStocked={wellStocked} initialCategory={initialCategory} initialSort={initialSort} initialView={initialView} addPanel={null} />
     </div>
   );
 }

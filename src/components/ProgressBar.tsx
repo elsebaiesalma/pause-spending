@@ -11,7 +11,7 @@ export function ProgressBar({
   label,
   step = 0,
   tone = "espresso",
-  tint,
+  shade,
 }: {
   value: number;
   max: number;
@@ -19,16 +19,16 @@ export function ProgressBar({
   // Position in a stack of bars; each one starts 80ms after the one before.
   step?: number;
   tone?: "espresso" | "rose" | "warn";
-  // 0 to 1: how much of the espresso fill shows against the track, for bars
-  // that are shaded by rank. Leave it out for the full colour.
-  tint?: number;
+  // A fill colour for bars shaded by rank (see ClosetConcentration). Leave it
+  // out for the tone's colour.
+  shade?: string;
 }) {
   const safeMax = max > 0 ? max : 1;
   const clamped = Math.min(Math.max(value, 0), safeMax);
   const fraction = clamped / safeMax;
   return (
     <div
-      className={styles.track}
+      className={`${styles.track} ${shade ? styles.paleTrack : ""}`}
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}
@@ -36,8 +36,8 @@ export function ProgressBar({
       aria-valuenow={clamped}
     >
       <span
-        className={`${styles.fill} ${tone === "rose" ? styles.rose : tone === "warn" ? styles.warn : tint !== undefined ? styles.tinted : ""}`}
-        style={{ "--fill": fraction, "--step": step, ...(tint !== undefined ? { "--tint": tint } : {}) } as React.CSSProperties}
+        className={`${styles.fill} ${tone === "rose" ? styles.rose : tone === "warn" ? styles.warn : ""}`}
+        style={{ "--fill": fraction, "--step": step, ...(shade ? { background: shade } : {}) } as React.CSSProperties}
       />
     </div>
   );

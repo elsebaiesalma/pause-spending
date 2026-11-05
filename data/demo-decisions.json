@@ -1,0 +1,123 @@
+[
+  {
+    "key": "everlane-tee-white-flat",
+    "brand": "Everlane",
+    "name": "The Organic Cotton Crew Tee",
+    "category": "tops",
+    "colorFamily": "white",
+    "price": 34,
+    "image": "tee-white-flat.jpg",
+    "tags": [
+      "basic",
+      "casual",
+      "minimal"
+    ],
+    "outcome": "saved_for_later",
+    "monthsAgo": 0,
+    "day": 0,
+    "waitDays": 1
+  },
+  {
+    "key": "gap-tee-black-model",
+    "brand": "Gap",
+    "name": "Vintage Soft Crew Tee",
+    "category": "tops",
+    "colorFamily": "black",
+    "price": 30,
+    "image": "tee-black-model.jpg",
+    "tags": [
+      "basic",
+      "casual",
+      "minimal"
+    ],
+    "outcome": "dropped",
+    "monthsAgo": 0,
+    "day": 0,
+    "waitDays": 7
+  },
+  {
+    "key": "steve-madden-heels-burgundy-velvet",
+    "brand": "Steve Madden",
+    "name": "Velvet Ankle-Strap Pumps",
+    "category": "shoes",
+    "colorFamily": "red",
+    "price": 140,
+    "image": "heels-burgundy-velvet.jpg",
+    "tags": [
+      "party",
+      "statement"
+    ],
+    "outcome": "dropped",
+    "monthsAgo": 1,
+    "day": 6,
+    "waitDays": 7
+  },
+  {
+    "key": "mango-top-crochet-striped",
+    "brand": "Mango",
+    "name": "Striped Crochet Tie Top",
+    "category": "tops",
+    "colorFamily": "multi",
+    "price": 70,
+    "image": "top-crochet-striped.jpg",
+    "tags": [
+      "summer",
+      "statement"
+    ],
+    "outcome": "dropped",
+    "monthsAgo": 1,
+    "day": 12,
+    "waitDays": 7
+  },
+  {
+    "key": "everlane-tank-navy",
+    "brand": "Everlane",
+    "name": "Ribbed Racerback Tank",
+    "category": "tops",
+    "colorFamily": "navy",
+    "price": 32,
+    "image": "tank-navy.jpg",
+    "tags": [
+      "basic",
+      "casual"
+    ],
+    "outcome": "dropped",
+    "monthsAgo": 1,
+    "day": 19,
+    "waitDays": 1
+  },
+  {
+    "key": "roots-poncho-cream",
+    "brand": "Roots",
+    "name": "Fringed Knit Poncho",
+    "category": "knitwear",
+    "colorFamily": "cream",
+    "price": 98,
+    "image": "poncho-cream.jpg",
+    "tags": [
+      "boho",
+      "layering"
+    ],
+    "outcome": "proceeded",
+    "monthsAgo": 1,
+    "day": 25,
+    "waitDays": 1
+  },
+  {
+    "key": "cos-shirt-ruched-green",
+    "brand": "COS",
+    "name": "Textured Ruched Shirt",
+    "category": "tops",
+    "colorFamily": "green",
+    "price": 89,
+    "image": "shirt-ruched-green.jpg",
+    "tags": [
+      "classic",
+      "fitted"
+    ],
+    "outcome": "dropped",
+    "monthsAgo": 2,
+    "day": 15,
+    "waitDays": 1
+  }
+]

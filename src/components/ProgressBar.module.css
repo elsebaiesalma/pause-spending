@@ -15,10 +15,10 @@
   transform-origin: left;
 }
 
-.tinted {
-  /* Deep rose for the fullest, easing to a light rose that still reads against
-     the blush track (brown was too close from one shade to the next). */
-  background: color-mix(in srgb, var(--color-rose-deep, #8e4752) calc(var(--tint, 1) * 100%), #dba0a8);
+/* Rank-shaded bars: a near-white track, so even the lightest step shows. */
+.paleTrack {
+  background: #f5eeeb;
+  box-shadow: inset 0 0 0 1px rgba(42, 18, 8, 0.06);
 }
 
 .rose {

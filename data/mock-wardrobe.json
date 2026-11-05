@@ -108,21 +108,6 @@
     "image": "heels-red-tstrap.jpg"
   },
   {
-    "key": "steve-madden-heels-burgundy-velvet",
-    "brand": "Steve Madden",
-    "name": "Velvet Ankle-Strap Pumps",
-    "category": "shoes",
-    "colorFamily": "red",
-    "colorName": "Burgundy",
-    "price": 140,
-    "purchasedAt": "2026-10-05",
-    "tags": [
-      "party",
-      "statement"
-    ],
-    "image": "heels-burgundy-velvet.jpg"
-  },
-  {
     "key": "mango-dress-pleated-blue",
     "brand": "Mango",
     "name": "Pleated Halter Maxi Dress",
@@ -352,21 +337,6 @@
     "image": "skirt-bubble-white.jpg"
   },
   {
-    "key": "cos-shirt-ruched-green",
-    "brand": "COS",
-    "name": "Textured Ruched Shirt",
-    "category": "tops",
-    "colorFamily": "green",
-    "colorName": "Pistachio",
-    "price": 89,
-    "purchasedAt": "2026-03-15",
-    "tags": [
-      "classic",
-      "fitted"
-    ],
-    "image": "shirt-ruched-green.jpg"
-  },
-  {
     "key": "everlane-sweater-pink-chunky",
     "brand": "Everlane",
     "name": "Chunky Alpaca Crew Sweater",
@@ -473,21 +443,6 @@
     "image": "tee-black.jpg"
   },
   {
-    "key": "everlane-tank-navy",
-    "brand": "Everlane",
-    "name": "Ribbed Racerback Tank",
-    "category": "tops",
-    "colorFamily": "navy",
-    "colorName": "Washed Navy",
-    "price": 32,
-    "purchasedAt": "2026-06-11",
-    "tags": [
-      "basic",
-      "casual"
-    ],
-    "image": "tank-navy.jpg"
-  },
-  {
     "key": "aritzia-tank-white",
     "brand": "Aritzia",
     "name": "Cotton Rib Crop Tank",
@@ -534,21 +489,6 @@
     "image": "top-crochet-red.jpg"
   },
   {
-    "key": "mango-top-crochet-striped",
-    "brand": "Mango",
-    "name": "Striped Crochet Tie Top",
-    "category": "tops",
-    "colorFamily": "multi",
-    "colorName": "Camel and Black",
-    "price": 70,
-    "purchasedAt": "2026-07-19",
-    "tags": [
-      "summer",
-      "statement"
-    ],
-    "image": "top-crochet-striped.jpg"
-  },
-  {
     "key": "anthropologie-sweater-crochet-cream",
     "brand": "Anthropologie",
     "name": "Open-Knit Cropped Sweater",
@@ -562,21 +502,6 @@
       "textured"
     ],
     "image": "sweater-crochet-cream.jpg"
-  },
-  {
-    "key": "roots-poncho-cream",
-    "brand": "Roots",
-    "name": "Fringed Knit Poncho",
-    "category": "knitwear",
-    "colorFamily": "cream",
-    "colorName": "Natural",
-    "price": 98,
-    "purchasedAt": "2026-02-02",
-    "tags": [
-      "boho",
-      "layering"
-    ],
-    "image": "poncho-cream.jpg"
   },
   {
     "key": "mango-dress-ruffle-green",
@@ -623,22 +548,6 @@
       "classic"
     ],
     "image": "jeans-acne-navy.jpg"
-  },
-  {
-    "key": "everlane-tee-white-flat",
-    "brand": "Everlane",
-    "name": "The Organic Cotton Crew Tee",
-    "category": "tops",
-    "colorFamily": "white",
-    "colorName": "White",
-    "price": 34,
-    "purchasedAt": "2025-11-14",
-    "tags": [
-      "basic",
-      "casual",
-      "minimal"
-    ],
-    "image": "tee-white-flat.jpg"
   },
   {
     "key": "cos-tee-white-hanger",
@@ -745,22 +654,6 @@
       "cozy"
     ],
     "image": "sweater-ribbed-cream.jpg"
-  },
-  {
-    "key": "gap-tee-black-model",
-    "brand": "Gap",
-    "name": "Vintage Soft Crew Tee",
-    "category": "tops",
-    "colorFamily": "black",
-    "colorName": "Black",
-    "price": 30,
-    "purchasedAt": "2026-05-02",
-    "tags": [
-      "basic",
-      "casual",
-      "minimal"
-    ],
-    "image": "tee-black-model.jpg"
   },
   {
     "key": "aritzia-cami-navy-satin",
