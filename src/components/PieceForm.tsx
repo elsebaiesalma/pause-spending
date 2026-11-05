@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { COLOR_FAMILIES } from "@/lib/colorFamily";
-import { swatchFor } from "@/lib/colorSwatch";
 import { capitalizeFirst } from "@/lib/wardrobeDisplay";
 import { CATEGORIES } from "@/lib/wardrobeView";
 import {
@@ -16,6 +14,8 @@ import {
   validateOwnedSince,
   type TagSuggestion,
 } from "@/lib/pieceForm";
+import { ColorPicker } from "./ColorPicker";
+import { MonthYearWheel } from "./MonthYearWheel";
 import { WarnIcon } from "./WarnIcon";
 import styles from "./pieceForm.module.css";
 
@@ -119,6 +119,7 @@ export function PieceForm({
   cancelHref,
   submitLabel,
   brandPriceNote,
+  commonColors,
 }: {
   mode: "add" | "edit";
   action: string;
@@ -128,6 +129,8 @@ export function PieceForm({
   // Set for a piece that came from an order: its brand and price are the
   // order's, so those two fields are replaced by this note.
   brandPriceNote?: string;
+  // The colours this closet has most of; the picker shows these first.
+  commonColors: readonly string[];
 }) {
   const [values, setValues] = useState<PieceFormValues>(initial);
   const [errors, setErrors] = useState<{
@@ -143,6 +146,8 @@ export function PieceForm({
   const submitting = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
   const today = todayISO();
+  const thisYear = new Date().getFullYear();
+  const years = Array.from({ length: 41 }, (_, i) => thisYear - i);
 
   // Leaving with half a form filled asks first; submitting never does.
   useEffect(() => {
@@ -188,7 +193,6 @@ export function PieceForm({
         // Only fill what the person has left empty; their own choices stand.
         category: current.category || suggestion.category || "",
         colorFamily: current.colorFamily || suggestion.colorFamily || "",
-        colorName: current.colorName || suggestion.colorName || "",
         styleTags: force || !tagsTouched.current ? suggestion.styleTags : current.styleTags,
         useCaseTags: force || !tagsTouched.current ? suggestion.useCaseTags : current.useCaseTags,
       }));
@@ -241,7 +245,7 @@ export function PieceForm({
   const hasTags = values.styleTags.length > 0 || values.useCaseTags.length > 0;
   const showTags = hasTags || suggest !== "idle" || mode === "edit";
   const categoryKnown = CATEGORIES.some((c) => c.key === values.category);
-  const detailsOpen = Boolean(initial.brand || initial.price || initial.colorName || initial.ownedSince);
+  const detailsOpen = Boolean(initial.brand || initial.price || initial.ownedSince);
 
   return (
     <form ref={formRef} action={action} method="POST" className={styles.form} onSubmit={onSubmit} noValidate>
@@ -289,46 +293,13 @@ export function PieceForm({
         </select>
       </div>
 
-      <fieldset className={`${styles.field} ${styles.wide}`}>
-        <legend>Colour</legend>
-        <div className={styles.swatches}>
-          <label className={styles.swatch}>
-            <input
-              type="radio"
-              name="colorFamily"
-              value=""
-              checked={values.colorFamily === ""}
-              onChange={() => update({ colorFamily: "" })}
-            />
-            <span className={styles.dot} data-none="true" aria-hidden="true" />
-            <span>Not sure</span>
-          </label>
-          {COLOR_FAMILIES.map((family) => {
-            const swatch = swatchFor(family);
-            return (
-              <label key={family} className={styles.swatch}>
-                <input
-                  type="radio"
-                  name="colorFamily"
-                  value={family}
-                  checked={values.colorFamily === family}
-                  onChange={() => update({ colorFamily: family })}
-                />
-                <span
-                  className={styles.dot}
-                  aria-hidden="true"
-                  style={
-                    swatch?.kind === "multi"
-                      ? { background: `linear-gradient(135deg, ${swatch.a} 50%, ${swatch.b} 50%)` }
-                      : { background: swatch?.hex }
-                  }
-                />
-                <span>{capitalizeFirst(family)}</span>
-              </label>
-            );
-          })}
-        </div>
-      </fieldset>
+      <div className={styles.wide}>
+        <ColorPicker
+          common={commonColors}
+          value={{ family: values.colorFamily, other: values.colorName }}
+          onChange={(next) => update({ colorFamily: next.family, colorName: next.other })}
+        />
+      </div>
 
       {showTags && (
         <fieldset className={`${styles.field} ${styles.wide}`}>
@@ -399,32 +370,18 @@ export function PieceForm({
               </div>
             </>
           )}
-          <div className={styles.field}>
-            <label htmlFor="piece-color-name">Colour name</label>
-            <input
-              id="piece-color-name"
-              name="colorName"
-              value={values.colorName}
-              placeholder="e.g. Espresso"
-              autoComplete="off"
-              onChange={(event) => update({ colorName: event.target.value })}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="piece-owned-since">Owned since</label>
-            <input
-              id="piece-owned-since"
+          <div className={`${styles.field} ${styles.wide}`}>
+            <span className={styles.fieldLabel} id="piece-owned-since-label">
+              Owned since
+            </span>
+            <MonthYearWheel
               name="ownedSince"
-              type="date"
               value={values.ownedSince}
-              max={today}
-              aria-invalid={errors.ownedSince ? true : undefined}
-              aria-describedby={errors.ownedSince ? "piece-owned-since-error" : undefined}
-              onChange={(event) => {
-                update({ ownedSince: event.target.value });
-                if (errors.ownedSince) setErrors((current) => ({ ...current, ownedSince: null }));
+              years={years}
+              onChange={(next) => {
+                update({ ownedSince: next });
+                setErrors((current) => ({ ...current, ownedSince: validateOwnedSince(next, today) }));
               }}
-              onBlur={checkDate}
             />
             <FieldError id="piece-owned-since-error" message={errors.ownedSince} />
           </div>

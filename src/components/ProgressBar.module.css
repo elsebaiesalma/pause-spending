@@ -1,7 +1,7 @@
 .track {
   height: 8px;
   border-radius: 999px;
-  background: var(--color-blush, #f6eae3);
+  background: var(--color-blush, #edd9d0);
   overflow: hidden;
 }
 

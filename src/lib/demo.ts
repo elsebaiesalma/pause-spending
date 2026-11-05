@@ -77,7 +77,7 @@ export const SAMPLE_ITEM = {
   itemName: "Black leather ankle boots",
   price: "189.00",
   category: "shoes",
-  colorName: "Black",
+  colorName: null,
   colorFamily: "black",
   styleTags: ["classic"],
 } as const;

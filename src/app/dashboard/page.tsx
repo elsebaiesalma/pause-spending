@@ -19,6 +19,7 @@ import { ActionToast } from "@/components/ActionToast";
 import { isDemoEmail } from "@/lib/demo";
 import { getSetupProgress, nextStep, setupSteps } from "@/lib/dashboard/setupGuide";
 import { SetupGuide } from "./SetupGuide";
+import { DismissibleGuide } from "./DismissibleGuide";
 import { loadMonthlyRecap } from "@/lib/dashboard/monthlyRecap";
 import { loadPausePattern } from "@/lib/dashboard/pausePattern";
 import { GOAL_NAME_MAX, getSavingsGoal, isGoalStorageAvailable } from "@/lib/goals/savingsGoal";
@@ -29,6 +30,7 @@ import { EDIT_BUTTON_CLASS, MoneyCard } from "./MoneyCard";
 import { MoneyChoice } from "./MoneyChoice";
 import { PatternCard } from "./PatternCard";
 import styles from "./page.module.css";
+import { BudgetSheet } from "./BudgetSheet";
 
 const RACK_SLICE_ITEMS = 4;
 
@@ -95,7 +97,11 @@ export default async function DashboardPage() {
 
       {recap && <MonthlyRecap recap={recap} />}
 
-      {showGuide && <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />}
+      {showGuide && (
+        <DismissibleGuide>
+          <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />
+        </DismissibleGuide>
+      )}
 
       <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
 
@@ -131,9 +137,12 @@ export default async function DashboardPage() {
               title="This month"
               titleId="month-heading"
               action={
-                <a href="/budget#plan" className={EDIT_BUTTON_CLASS}>
-                  Edit budget
-                </a>
+                <BudgetSheet
+                  amount={planAmount}
+                  monthLabel={formatMonthLabel(monthKey)}
+                  triggerClassName={EDIT_BUTTON_CLASS}
+                  returnTo="/dashboard"
+                />
               }
               bar={
                 <ProgressBar

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
+import { resolveColor } from "@/lib/colorResolve";
 
 export async function POST(
   request: NextRequest,
@@ -24,7 +25,6 @@ export async function POST(
   const price = priceRaw ? Number(priceRaw) : null;
   const imageUrl = form.get("imageUrl")?.toString().trim() || null;
   const category = form.get("category")?.toString().trim() || null;
-  const colorName = form.get("colorName")?.toString().trim() || null;
   // Omitted/empty is legitimately "unknown" and stays null - only a
   // non-empty value outside the fixed list is malformed input, and silently
   // nulling that would drop the item out of color matching with no signal
@@ -36,6 +36,7 @@ export async function POST(
       { status: 400 }
     );
   }
+  const color = await resolveColor({ colorFamily, colorName: form.get("colorName")?.toString() });
   const styleTags =
     form
       .get("styleTags")
@@ -56,8 +57,8 @@ export async function POST(
         price: price !== null && Number.isFinite(price) ? price.toString() : null,
         imageUrl,
         category,
-        colorName,
-        colorFamily,
+        colorName: color.colorName,
+        colorFamily: color.colorFamily,
         styleTags,
         userConfirmed: true,
         userEdited: true,

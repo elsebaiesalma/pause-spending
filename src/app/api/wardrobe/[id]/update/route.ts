@@ -4,6 +4,7 @@ import { requireUserId } from "@/lib/session";
 import { isRecordNotFoundError } from "@/lib/prismaErrors";
 import { COLOR_FAMILIES, isColorFamily } from "@/lib/colorFamily";
 import { MAX_BRAND_LENGTH, parsePrice } from "@/lib/pieceForm";
+import { resolveColor } from "@/lib/colorResolve";
 
 function parseTags(value: string | null): string[] {
   if (!value) return [];
@@ -40,6 +41,9 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
     );
   }
 
+  // A typed colour ("Other") is filed under its closest family; a chosen family is kept.
+  const color = await resolveColor({ colorFamily, colorName: form.get("colorName")?.toString() });
+
   try {
     await updateWardrobeItem(id, userId, {
       itemName,
@@ -47,8 +51,8 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/wardrob
       // A piece from an order has no brand/price fields in its form, so the
       // form sends none; leave whatever is stored alone then.
       ...(form.has("price") || form.has("brand") ? { brand, price: price.value } : {}),
-      colorName: form.get("colorName")?.toString().trim() || null,
-      colorFamily,
+      colorName: color.colorName,
+      colorFamily: color.colorFamily,
       styleTags: parseTags(form.get("styleTags")?.toString() ?? null),
       useCaseTags: parseTags(form.get("useCaseTags")?.toString() ?? null),
       ownedSince: ownedSinceRaw ? new Date(ownedSinceRaw) : null,

@@ -6,6 +6,7 @@ vi.mock("./fonts", () => ({
 }));
 
 import Home from "./page";
+import { money, tabTotals } from "@/lib/landing/receipt";
 
 describe("Home (landing page)", () => {
   it("renders without needing a database - this is a static marketing page, not the dashboard", () => {
@@ -25,7 +26,7 @@ describe("Home (landing page)", () => {
     const stats: [string, string][] = [
       ["60% of Gen Z social media users have impulse-bought something they saw on social", "Bankrate/YouGov, 2023"],
       ["Only 9% of Gen Z say their social media purchases are planned", "GoDaddy, 2024"],
-      ["62% of Gen Z BNPL users regret a BNPL purchase", "LendingTree"],
+      ["62% of Gen Z users of Buy Now, Pay Later (BNPL) regret a BNPL purchase", "LendingTree"],
       ["A ~25-hour wait lowered both the urge to buy and purchase intent", "Moser, U. Michigan, 2020"],
     ];
     for (const [claim, source] of stats) {
@@ -92,14 +93,17 @@ describe("Home (landing page)", () => {
 
   it("shows the receipt band as a labelled example, with sums that match and the call to action", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("It adds up quietly.");
+    expect(html).toContain("Your closet might disagree.");
+    // Said to screen readers (not shown on the paper), and the resting receipt's sums match its lines.
     expect(html).toContain("An example, not real data");
     expect(html).toContain("$292.00");
-    expect(html).toContain("$223.00");
-    expect(html).toContain("$69.00");
+    const rest = tabTotals(0);
+    expect(html).toContain(money(rest.afterPause));
+    expect(html).toContain(money(rest.kept));
+    expect(html).not.toContain("PAUSED");
     expect(html).toContain('id="hero-heading"');
-    expect(html.indexOf("It adds up quietly.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
-    expect(html).toContain("Frequently asked questions");
+    expect(html.indexOf("Your closet might disagree.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
+    expect(html).toContain("Frequently Asked Questions");
     expect(html).not.toContain("Good to know");
   });
 });

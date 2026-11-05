@@ -3,7 +3,7 @@
   buttons and dark bands, one soft rose accent, warm blush tints.
 
     White     #FFFFFF  page background      Espresso  #2A1208  text, buttons, dark bands
-    Taupe     #6B5A52  secondary text       Blush     #F6EAE3  image tiles, tags, tints
+    Taupe     #6B5A52  secondary text       Blush     #EDD9D0  image tiles, tags, tints
     Soft rose #C98A92  accent FILLS only    Deep rose #8E4752  accent TEXT (labels, links)
     Warn      #A12B2B  warnings, always with an icon so colour is never the only cue
 
@@ -33,7 +33,7 @@
   --color-on-espresso-soft: #e3cfd2;
   --color-rose: #c98a92;
   --color-rose-deep: #8e4752;
-  --color-blush: #f6eae3;
+  --color-blush: #edd9d0;
   --color-sage: #c98a92;
   --color-clay: #c98a92;
   --color-warn: #a12b2b;

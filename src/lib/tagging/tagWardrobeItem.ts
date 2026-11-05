@@ -21,7 +21,6 @@ export async function ensureWardrobeItemTagged(item: WardrobeItem): Promise<Ward
     where: { id: item.id, userId: item.userId },
     data: {
       category: tags.category,
-      colorName: tags.colorName,
       colorFamily: tags.colorFamily,
       styleTags: tags.styleTags,
       useCaseTags: tags.useCaseTags,

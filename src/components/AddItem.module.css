@@ -1,5 +1,5 @@
 /* The add box: input and its button on one row (stacked on small phones),
-   the screenshot drop zone underneath at the same width. */
+   a small screenshot button beside it. */
 
 .addItem {
   display: grid;
@@ -14,7 +14,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.625rem;
   align-items: stretch;
 }
@@ -24,7 +24,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .row > button {
+  .row > button,
+  .row > .shot {
     justify-self: stretch;
   }
 }
@@ -51,41 +52,29 @@
   color: var(--color-warn);
 }
 
-.drop {
-  display: flex;
+.shot {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  min-height: 3.5rem;
-  padding: 0.75rem 1rem;
-  border: 1.5px dashed var(--color-line-strong);
-  border-radius: var(--radius-card, 12px);
-  color: var(--color-ink-soft);
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-btn, 999px);
+  color: var(--color-ink);
   font-size: 0.9375rem;
+  font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
-  text-align: center;
 }
 
-.drop:hover,
-.drop[data-dragging] {
+.shot:hover,
+.shot[data-dragging] {
   border-color: var(--color-espresso);
   background: var(--color-bg-alt);
-  color: var(--color-ink);
 }
 
-.drop:focus-within {
+.shot:focus-within {
   outline: 2px solid var(--color-accent, var(--color-espresso));
   outline-offset: 2px;
-}
-
-.dropIcon {
-  display: inline-flex;
-  color: var(--color-ink);
-}
-
-.dropText strong {
-  color: var(--color-ink);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }

@@ -76,3 +76,16 @@ describe("price", () => {
     expect(validatePrice("12.50")).toBeNull();
   });
 });
+
+describe("commonColors", () => {
+  it("lists the closet's most common families first, ties in picker order", async () => {
+    const { commonColors } = await import("./pieceForm");
+    expect(commonColors(["navy", "navy", "red", "red", "red", "grey", null, "teal"])).toEqual(["red", "navy", "grey"]);
+  });
+
+  it("tops up with black, white and brown for a small closet", async () => {
+    const { commonColors } = await import("./pieceForm");
+    expect(commonColors([])).toEqual(["black", "white", "brown"]);
+    expect(commonColors(["white"])).toEqual(["white", "black", "brown"]);
+  });
+});

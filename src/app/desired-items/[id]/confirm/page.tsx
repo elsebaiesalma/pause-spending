@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { devWardrobeWhere } from "@/lib/devWardrobeView";
 import { prisma } from "@/lib/prisma";
 import { requireUserIdOrRedirect } from "@/lib/session";
-import { COLOR_FAMILIES } from "@/lib/colorFamily";
+import { ColorPickerField } from "@/components/ColorPicker";
+import { commonColors } from "@/lib/pieceForm";
 import { BRAND_LIST } from "@/lib/brands/matchBrand";
 import styles from "./confirm.module.css";
 
@@ -61,6 +62,10 @@ export default async function ConfirmDesiredItemPage({
   const extractionFailed = !item.itemName;
   const isLowConfidence = item.itemNameConfidence === "low";
   const categoryOptions = await categoryOptionsFor(userId, item.category);
+  const closetColors = await prisma.wardrobeItem.findMany({
+    where: { userId, status: { not: "returned" }, ...devWardrobeWhere() },
+    select: { colorFamily: true },
+  });
 
   return (
     <div className="page page--narrow">
@@ -148,13 +153,13 @@ export default async function ConfirmDesiredItemPage({
                 ))}
               </select>
             </div>
-            <div className={styles.field}>
-              <label htmlFor="colorName">
-                Colour <span className={styles.optional}>Optional</span>
-              </label>
-              <input id="colorName" name="colorName" defaultValue={item.colorName ?? ""} placeholder="e.g. Navy" />
-            </div>
           </div>
+
+          <ColorPickerField
+            common={commonColors(closetColors.map((row) => row.colorFamily))}
+            initialFamily={item.colorFamily ?? ""}
+            initialOther={item.colorName ?? ""}
+          />
 
           {/* Rarely needed, so out of the way (Polaris: progressive disclosure). */}
           <details className={styles.more}>
@@ -163,17 +168,6 @@ export default async function ConfirmDesiredItemPage({
               <div className={styles.field}>
                 <label htmlFor="imageUrl">Photo link</label>
                 <input id="imageUrl" name="imageUrl" type="url" defaultValue={item.imageUrl ?? ""} placeholder="https://" />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="colorFamily">Colour group</label>
-                <select id="colorFamily" name="colorFamily" defaultValue={item.colorFamily ?? ""}>
-                  <option value="">Not set</option>
-                  {COLOR_FAMILIES.map((family) => (
-                    <option key={family} value={family}>
-                      {family.charAt(0).toUpperCase() + family.slice(1)}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className={styles.field}>
                 <label htmlFor="styleTags">Style words</label>

@@ -58,3 +58,20 @@ export function runningTotals(extra: number) {
   }
   return { all, kept, afterPause: all - kept };
 }
+
+// The hero receipt is a fixed-size window onto the tab: this many lines are
+// visible at once, and the paper never gets taller. The first window is the
+// four starting lines plus the first four of the feed, so the resting example
+// and the printing receipt begin identically.
+export const WINDOW_LINES = 8;
+
+// The ith line on the tab, counting the four starting lines first.
+export function lineAt(i: number): ReceiptLine {
+  return i < RECEIPT_LINES.length ? RECEIPT_LINES[i] : feedLine(i - RECEIPT_LINES.length);
+}
+
+// Totals for the tab as it stands once `extra` lines have scrolled in after the
+// first full window.
+export function tabTotals(extra: number) {
+  return runningTotals(extra + (WINDOW_LINES - RECEIPT_LINES.length));
+}

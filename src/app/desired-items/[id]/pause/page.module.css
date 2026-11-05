@@ -750,3 +750,144 @@
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
+
+/* ---------- Step-through reflection ---------- */
+
+.steps {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.stepCount {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.stepBody[hidden] {
+  display: none;
+}
+
+.stepNav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stepNext {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---------- Impact on the plan ---------- */
+
+.impact {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.impactRows {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.impactRows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.impactRows dt {
+  color: var(--color-ink-soft);
+}
+
+.impactRows dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.impactTotal {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-line);
+}
+
+.impactTotal dt {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.impactTotal dd {
+  font-weight: 700;
+}
+
+.impactTotal dd span {
+  font-weight: 400;
+  color: var(--color-ink-soft);
+}
+
+.impactBar {
+  position: relative;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: var(--color-bg-alt);
+  overflow: hidden;
+}
+
+.impactSpent,
+.impactItem {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.impactSpent {
+  left: 0;
+  background: var(--color-ink);
+}
+
+.impactItem {
+  background: var(--color-rose);
+}
+
+.impactMarker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-warn);
+}
+
+.impactKey {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-ink-soft);
+}
+
+.impactKey span::before {
+  content: "";
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-right: 0.375rem;
+  border-radius: 50%;
+}
+
+.impactKey [data-key="spent"]::before {
+  background: var(--color-ink);
+}
+
+.impactKey [data-key="item"]::before {
+  background: var(--color-rose);
+}
+
+.stepNav button {
+  width: auto;
+  flex: 0 0 auto;
+}

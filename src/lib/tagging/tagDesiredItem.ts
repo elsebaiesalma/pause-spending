@@ -25,7 +25,6 @@ export async function ensureDesiredItemTagged(item: DesiredItem): Promise<Desire
     where: { id: item.id, userId: item.userId },
     data: {
       category: tags.category,
-      colorName: tags.colorName,
       colorFamily: tags.colorFamily,
       styleTags: tags.styleTags,
     },

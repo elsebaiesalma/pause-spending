@@ -1,4 +1,4 @@
-import { isColorFamily, type ColorFamily } from "@/lib/colorFamily";
+import { COLOR_FAMILIES, isColorFamily, type ColorFamily } from "@/lib/colorFamily";
 import { CATEGORIES } from "@/lib/wardrobeView";
 
 // Small, pure rules for the Add a piece / Edit piece form, kept apart from the
@@ -85,4 +85,21 @@ export function toSuggestion(raw: {
     styleTags: clean(raw.styleTags, 4),
     useCaseTags: clean(raw.useCaseTags, 3),
   };
+}
+
+const DEFAULT_COMMON: readonly ColorFamily[] = ["black", "white", "brown"];
+
+// The families the colour picker shows first: the ones this closet has most of
+// (ties in the picker's own order), topped up with common basics for a closet
+// with fewer than three colours.
+export function commonColors(families: readonly (string | null)[], count = 3): ColorFamily[] {
+  const tally = new Map<ColorFamily, number>();
+  for (const family of families) {
+    if (family && isColorFamily(family)) tally.set(family, (tally.get(family) ?? 0) + 1);
+  }
+  const ranked = [...tally.entries()]
+    .sort((a, b) => b[1] - a[1] || COLOR_FAMILIES.indexOf(a[0]) - COLOR_FAMILIES.indexOf(b[0]))
+    .map(([family]) => family);
+  for (const basic of DEFAULT_COMMON) if (!ranked.includes(basic)) ranked.push(basic);
+  return ranked.slice(0, count);
 }
