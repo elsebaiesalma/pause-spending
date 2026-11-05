@@ -281,7 +281,7 @@ describe("DashboardPage (Home)", () => {
       const html = await render();
 
       expect(html).toContain("Your September in PAUSE");
-      expect(html).toContain("See September’s decisions");
+      expect(html).not.toContain("decisions");
       expect(html.indexOf("Get to know PAUSE")).toBeLessThan(html.indexOf("Your September in PAUSE"));
     });
 

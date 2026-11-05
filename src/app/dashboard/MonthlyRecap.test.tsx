@@ -37,11 +37,11 @@ describe("MonthlyRecap", () => {
     expect(html).not.toMatch(/\b(win|won|lose|lost|beat)\b/i);
   });
 
-  it("links to the let-go decisions with the month named", () => {
+  it("has no decisions button", () => {
     const html = renderToStaticMarkup(<MonthlyRecap recap={RECAP} />);
 
-    expect(html).toContain('href="/considering?tab=let-go&amp;month=2026-10"');
-    expect(html).toContain("See October’s decisions");
+    expect(html).not.toContain("decisions");
+    expect(html).not.toContain("/considering");
   });
 
   it("has a labelled dismiss button and is visible on the server", () => {

@@ -50,6 +50,12 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Landing, phones:** below 700px the urge graph is replaced by `UrgeTexts` (four texts to yourself, loud to quiet, same `URGE_MARKS` words).
 - **Recap card:** "See decisions" (short label on phones) sits beside "Your month"; the tip's lightbulb is vertically centred.
 
+## Mobile pass 3 (2026-11-05, branch `mobile-pass-3`)
+
+- The recap card has no "See decisions" button any more (phones and laptop). The month filter and `?tab=let-go&month=` links still work.
+- **Owned since picker:** Set (outlined) with Cancel (restores the date from when it opened) and Clear below it. Form buttons ("Add to closet" and Cancel) stack on phones with more space between, and sit side by side with a wider gap from 700px.
+- Vercel: `ssoProtection` is `all_except_custom_domains`, so every `.vercel.app` URL asks visitors for a Vercel login until protection is changed or a custom domain is added.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
