@@ -26,7 +26,7 @@ describe("Home (landing page)", () => {
     const stats: [string, string][] = [
       ["60% of Gen Z social media users have impulse-bought something they saw on social", "Bankrate/YouGov, 2023"],
       ["Only 9% of Gen Z say their social media purchases are planned", "GoDaddy, 2024"],
-      ["62% of Gen Z BNPL users regret a BNPL purchase", "LendingTree"],
+      ["62% of Gen Z users of Buy Now, Pay Later (BNPL) regret a BNPL purchase", "LendingTree"],
       ["A ~25-hour wait lowered both the urge to buy and purchase intent", "Moser, U. Michigan, 2020"],
     ];
     for (const [claim, source] of stats) {
@@ -103,7 +103,7 @@ describe("Home (landing page)", () => {
     expect(html).not.toContain("PAUSED");
     expect(html).toContain('id="hero-heading"');
     expect(html.indexOf("Your closet might disagree.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
-    expect(html).toContain("Frequently asked questions");
+    expect(html).toContain("Frequently Asked Questions");
     expect(html).not.toContain("Good to know");
   });
 });

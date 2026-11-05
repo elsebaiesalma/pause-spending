@@ -23,7 +23,7 @@ const STATS = [
   },
   {
     value: "62%",
-    claim: "62% of Gen Z BNPL users regret a BNPL purchase",
+    claim: "62% of Gen Z users of Buy Now, Pay Later (BNPL) regret a BNPL purchase",
     source: "LendingTree",
   },
   {
@@ -39,13 +39,13 @@ const FINDINGS = [
     title: "A few minutes of reflection helps too",
     body: "Asking what an item would replace, how much it is needed, and one reason for and against was the prompt shoppers in their 20s found most helpful.",
     source: "Han et al., WWW 2021",
-    feature: "So every pause starts with those questions.",
+    feature: "Every pause starts with those questions.",
   },
   {
     title: "Guilt doesn't work, and people don't want it",
     body: "Frequent impulse buyers asked for tools that help them deliberate, and rejected tools built on guilt, regret or being watched.",
     source: "Moser et al., CHI 2019",
-    feature: "So pauses end quietly, with no reminders or streaks.",
+    feature: "Pauses end quietly, with no reminders or streaks.",
   },
 ] as const;
 
@@ -184,7 +184,7 @@ export default function Home() {
           </div>
           <UrgeCurve />
           <p className={styles.chartPayoff}>
-            So the default is <strong>Pause for 24 hours</strong>.{" "}
+            The default is <strong>Pause for 24 hours</strong>.{" "}
             <span className={styles.statSourceLight}>Moser, University of Michigan, 2020</span>
           </p>
           <div className={styles.findings}>
@@ -237,7 +237,7 @@ export default function Home() {
         <div className={styles.faqGrid}>
           <div>
             <h2 id="faq-heading" className={styles.sectionHeading}>
-              Frequently asked questions
+              Frequently Asked Questions
             </h2>
           </div>
           <div className={styles.faqList}>
