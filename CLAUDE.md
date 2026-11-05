@@ -56,6 +56,12 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Owned since picker:** Set (outlined) with Cancel (restores the date from when it opened) and Clear below it. Form buttons ("Add to closet" and Cancel) stack on phones with more space between, and sit side by side with a wider gap from 700px.
 - Vercel: `ssoProtection` is `all_except_custom_domains`, so every `.vercel.app` URL asks visitors for a Vercel login until protection is changed or a custom domain is added.
 
+## Mobile pass 4 (2026-11-05, branch `mobile-pass-4`)
+
+- **Owned since picker:** full-width Set (outlined) and Cancel (plain, restores the date from when it opened) stacked under the wheel, no Clear. Laptop and phone alike.
+- **Landing, phones:** `UrgeTexts` is titled "Sound familiar?" and plays once when scrolled into view (typing dots, then each bubble, one by one; static with reduced motion or no script). Laptop keeps the graph.
+- **Vercel:** deployment protection changed 2026-11-05 from `all_except_custom_domains` to `preview`, so production `.vercel.app` URLs are public and previews still need a Vercel login.
+
 ## Cleanup pass (2026-11-05, branch `cleanup-pass`)
 
 - **Let go page** "You already have" uses the pause screen's ranking (`getClosestOwned` passes `itemName`), so the Everlane tee shows the COS tee.
