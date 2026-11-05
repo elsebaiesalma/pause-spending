@@ -67,16 +67,23 @@ export default function SearchBox({ initialQuery = "" }: { initialQuery?: string
     }
   }, []);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    if (query.trim().length < MIN_QUERY_LENGTH) {
+  // Typing below the minimum cancels any search in flight and clears the results right away.
+  // It lives in the change handler, not an effect, because it reacts to the person typing.
+  function handleQueryChange(next: string) {
+    setQuery(next);
+    if (next.trim().length < MIN_QUERY_LENGTH) {
       abortRef.current?.abort();
       sequenceRef.current += 1;
       setState({ status: "idle" });
       setActiveIndex(-1);
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // Too short to search: handleQueryChange has already reset the results.
+    if (query.trim().length < MIN_QUERY_LENGTH) return;
 
     debounceRef.current = setTimeout(() => runSearch(query.trim()), DEBOUNCE_MS);
     return () => {
@@ -137,7 +144,7 @@ export default function SearchBox({ initialQuery = "" }: { initialQuery?: string
         aria-autocomplete="list"
         autoComplete="off"
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event) => handleQueryChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="e.g. Zara navy wool blazer"
         style={{ minHeight: 44 }}

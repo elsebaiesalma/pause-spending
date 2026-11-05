@@ -34,6 +34,10 @@ export default function ConnectGmailPage() {
         </div>
       </div>
 
+      {/* A plain <a> on purpose: this is a route handler that redirects to Google, so it needs a
+          full page navigation. <Link> would try a client-side fetch of the route and can prefetch
+          it, and prefetching an OAuth start route is not safe. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a href="/api/auth/gmail/start" className="btn btn-primary section">
         Continue to Google
       </a>
