@@ -93,7 +93,7 @@ describe("Home (landing page)", () => {
 
   it("shows the receipt band as a labelled example, with sums that match and the call to action", () => {
     const html = renderToStaticMarkup(Home());
-    expect(html).toContain("Want it now? Want it tomorrow?");
+    expect(html).toContain("Your closet might disagree.");
     // Said to screen readers (not shown on the paper), and the resting receipt's sums match its lines.
     expect(html).toContain("An example, not real data");
     expect(html).toContain("$292.00");
@@ -102,7 +102,7 @@ describe("Home (landing page)", () => {
     expect(html).toContain(money(rest.kept));
     expect(html).not.toContain("PAUSED");
     expect(html).toContain('id="hero-heading"');
-    expect(html.indexOf("Want it now? Want it tomorrow?")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
+    expect(html.indexOf("Your closet might disagree.")).toBeLessThan(html.indexOf("Before you buy it, see what you already own."));
     expect(html).toContain("Frequently asked questions");
     expect(html).not.toContain("Good to know");
   });

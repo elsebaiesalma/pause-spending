@@ -84,11 +84,10 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
         <div className={styles.copy}>
           <span className={styles.eyebrow}>For the moment before checkout</span>
           <h1 id="hero-heading" className={styles.heading}>
-            Want it now? Want it tomorrow?
+            “I don’t have anything like it.” Your closet might disagree.
           </h1>
           <p className={styles.body}>
-            The urge to buy fades with time. PAUSE puts a day between wanting and buying, with your closet in view,
-            so you only keep what you still want.
+            PAUSE shows you what you already own before you buy.
           </p>
           <div className={styles.actions}>{actions}</div>
           {note && <p className={styles.note}>{note}</p>}
@@ -131,7 +130,14 @@ export function ReceiptHero({ actions, note }: { actions: ReactNode; note?: Reac
                     }}
                   >
                     <span className={styles.pauseIcon} aria-hidden="true">
-                      {mode === "paused" ? "▶" : "❚❚"}
+                      {mode === "paused" ? (
+                        "▶"
+                      ) : (
+                        <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" focusable="false">
+                          <rect x="3" y="2" width="3.5" height="12" rx="1" />
+                          <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
+                        </svg>
+                      )}
                     </span>
                     {mode === "paused" ? "Resume" : "Pause"}
                   </button>
