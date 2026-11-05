@@ -65,7 +65,7 @@ export default async function DashboardPage() {
     }),
     prisma.desiredItem.count({ where: { userId, pauseStatus: "waiting" } }),
     getSetupProgress(userId),
-    loadMonthlyRecap(userId),
+    loadMonthlyRecap(userId, new Date(), { allMonth: isDemoEmail(session.user?.email) }),
     getSavingsGoal(userId),
     loadPausePattern(userId),
     isGoalStorageAvailable(),

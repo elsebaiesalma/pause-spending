@@ -76,8 +76,8 @@ export function pausedComparison(current: MonthStats, previous: MonthStats, prev
   return `${Math.abs(difference)} ${difference > 0 ? "more" : "fewer"} than ${previousLabel}`;
 }
 
-export function shouldShowRecap(now: Date, lastMonth: MonthStats): boolean {
-  return now.getUTCDate() <= RECAP_WINDOW_DAYS && lastMonth.confirmed >= 1;
+export function shouldShowRecap(now: Date, lastMonth: MonthStats, allMonth = false): boolean {
+  return (allMonth || now.getUTCDate() <= RECAP_WINDOW_DAYS) && lastMonth.confirmed >= 1;
 }
 
 export type MonthlyRecapData = {
@@ -88,9 +88,14 @@ export type MonthlyRecapData = {
   comparison: string | null;
 };
 
-export async function loadMonthlyRecap(userId: string, now: Date = new Date()): Promise<MonthlyRecapData | null> {
+// allMonth: demo accounts see the recap all month, so every visitor sees it.
+export async function loadMonthlyRecap(
+  userId: string,
+  now: Date = new Date(),
+  { allMonth = false }: { allMonth?: boolean } = {}
+): Promise<MonthlyRecapData | null> {
   // The early return keeps the query off every Home load after the first week.
-  if (now.getUTCDate() > RECAP_WINDOW_DAYS) return null;
+  if (!allMonth && now.getUTCDate() > RECAP_WINDOW_DAYS) return null;
 
   const recapKey = previousMonthKey(monthKeyForDate(now));
   const beforeKey = previousMonthKey(recapKey);
@@ -106,7 +111,7 @@ export async function loadMonthlyRecap(userId: string, now: Date = new Date()): 
   const items: RecapItem[] = rows.map((row) => ({ ...row, price: row.price === null ? null : Number(row.price) }));
 
   const stats = monthStats(items, recapKey);
-  if (!shouldShowRecap(now, stats)) return null;
+  if (!shouldShowRecap(now, stats, allMonth)) return null;
 
   return {
     monthKey: recapKey,

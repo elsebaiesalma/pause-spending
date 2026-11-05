@@ -41,7 +41,9 @@ Next.js 16 + Prisma 7 on Neon Postgres, with Auth.js (Google sign-in) and a Gmai
 - **Pause screen:** two columns from 900px (comparison pinned left, questions + cost + decision stacked right); on phones a sticky strip with both thumbnails sits at the top of "A moment to think". Other matches are folded under "Also in your closet (N)".
 - **Concentration bars** are shaded deep rose to light rose (`.tinted` in `ProgressBar.module.css`), no longer brown. `MonthYearWheel` no longer prints "Not set".
 - **Add item** only takes typed text. Link and screenshot entry were removed from the UI because they are not read reliably; the API routes remain.
-- Not changed, asked the user: let-go money did not move the plan's "spent" figure in a test (only purchases count); the monthly recap shows only in the first 7 days of a month for the previous month.
+- **Demo history:** `createDemoSession` seeds `DEMO_DECISIONS` (`src/lib/demo.ts`): one Undecided and one Let go this month, six decisions last month (4 let go, $540, shoes most resisted) and two the month before, so Decisions isn't empty and the recap has numbers. They use `sourceType = "demo_history"` (`DEMO_HISTORY_SOURCE`), which Home's setup guide ignores.
+- **Monthly recap** is espresso with white text and soft-rose accents, with notes under Let go and Saved. Demo accounts see it all month (`loadMonthlyRecap(..., { allMonth })`); real accounts keep the first-7-days window.
+- Decided against hover sub-menus in the nav (no hover on phones; Closet already has Pieces | Looks tabs).
 
 ## Polaris pass 3 (2026-11-04, branch `polaris-pass`)
 

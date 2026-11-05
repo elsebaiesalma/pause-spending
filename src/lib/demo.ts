@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { parseMockWardrobe, type MockItem } from "@/lib/mockWardrobe";
 import { seedMockWardrobe } from "@/lib/mockWardrobeDb";
 import { currentMonthKey, setBudgetForMonth } from "@/lib/budget";
+import { markLetGo, markSaved } from "@/lib/considering/consideringMeta";
 import mockWardrobeJson from "../../data/mock-wardrobe.json";
 import availableImages from "../../data/mock-images.json";
 
@@ -108,6 +109,7 @@ export async function createDemoSession(): Promise<{ sessionToken: string; expir
     dryRun: false,
   });
   await setBudgetForMonth(user.id, currentMonthKey(), DEMO_MONTHLY_BUDGET);
+  await seedDemoDecisions(user.id);
 
   // A database session row, exactly what Auth.js would write after a Google
   // sign-in (session strategy is "database"), so auth() and every page treat a
@@ -117,4 +119,70 @@ export async function createDemoSession(): Promise<{ sessionToken: string; expir
   await prisma.session.create({ data: { sessionToken, userId: user.id, expires } });
 
   return { sessionToken, expires };
+}
+
+// Seeded history is marked with its own source, so Home's setup guide still
+// starts at step one for a new visitor (see setupGuide.ts).
+export const DEMO_HISTORY_SOURCE = "demo_history";
+
+// A little decision history, so Decisions isn't empty and Home's monthly recap
+// has a last month to look back on. monthsAgo 0 is this month (one Undecided,
+// one Let go); 1 is last month (the recap); 2 gives the recap its comparison.
+type DemoDecision = {
+  itemName: string;
+  brand: string;
+  price: number;
+  category: string;
+  colorFamily: string;
+  outcome: "dropped" | "saved_for_later" | "proceeded";
+  monthsAgo: 0 | 1 | 2;
+  day: number;
+};
+
+export const DEMO_DECISIONS: readonly DemoDecision[] = [
+  { itemName: "Leather knee-high boots", brand: "Aldo", price: 220, category: "shoes", colorFamily: "black", outcome: "dropped", monthsAgo: 1, day: 4 },
+  { itemName: "Suede ankle boots", brand: "Steve Madden", price: 160, category: "shoes", colorFamily: "brown", outcome: "dropped", monthsAgo: 1, day: 9 },
+  { itemName: "Chelsea boots", brand: "Blundstone", price: 75, category: "shoes", colorFamily: "black", outcome: "dropped", monthsAgo: 1, day: 13 },
+  { itemName: "Cropped cardigan", brand: "Aritzia", price: 85, category: "knitwear", colorFamily: "cream", outcome: "dropped", monthsAgo: 1, day: 18 },
+  { itemName: "Satin midi skirt", brand: "Zara", price: 59, category: "bottoms", colorFamily: "green", outcome: "proceeded", monthsAgo: 1, day: 22 },
+  { itemName: "Striped boat-neck tee", brand: "Uniqlo", price: 30, category: "tops", colorFamily: "navy", outcome: "proceeded", monthsAgo: 1, day: 26 },
+  { itemName: "Puffer vest", brand: "Uniqlo", price: 60, category: "outerwear", colorFamily: "black", outcome: "dropped", monthsAgo: 2, day: 10 },
+  { itemName: "Linen wide-leg trousers", brand: "Mango", price: 70, category: "bottoms", colorFamily: "cream", outcome: "proceeded", monthsAgo: 2, day: 21 },
+  { itemName: "Oversized white shirt", brand: "COS", price: 89, category: "tops", colorFamily: "white", outcome: "saved_for_later", monthsAgo: 0, day: 0 },
+  { itemName: "Black faux-leather jacket", brand: "Zara", price: 99, category: "outerwear", colorFamily: "black", outcome: "dropped", monthsAgo: 0, day: 0 },
+];
+
+// Months are UTC, like the budget and the recap. Day 0 means "today", so this
+// month's items never land in the future or slip into last month on the 1st.
+export function demoDecisionDate(monthsAgo: number, day: number, now: Date = new Date()): Date {
+  if (monthsAgo === 0 || day === 0) return now;
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - monthsAgo, day, 15));
+}
+
+async function seedDemoDecisions(userId: string): Promise<void> {
+  const now = new Date();
+  for (const decision of DEMO_DECISIONS) {
+    const at = demoDecisionDate(decision.monthsAgo, decision.day, now);
+    const item = await prisma.desiredItem.create({
+      data: {
+        userId,
+        sourceType: DEMO_HISTORY_SOURCE,
+        rawInput: decision.itemName,
+        itemName: decision.itemName,
+        brand: decision.brand,
+        price: decision.price.toFixed(2),
+        category: decision.category,
+        colorFamily: decision.colorFamily,
+        styleTags: [],
+        userConfirmed: true,
+        userEdited: true,
+        pauseStatus: decision.outcome === "saved_for_later" ? "saved_for_later" : "proceeded",
+        decisionOutcome: decision.outcome,
+        createdAt: at,
+      },
+    });
+    // Same lifecycle stamps the resolve route writes; both degrade quietly.
+    if (decision.outcome === "saved_for_later") await markSaved(item.id, userId, at);
+    if (decision.outcome === "dropped") await markLetGo(item.id, userId, false, at);
+  }
 }
