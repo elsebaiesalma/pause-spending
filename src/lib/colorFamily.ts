@@ -2,7 +2,7 @@ import { TAGGING_MODEL } from "@/lib/anthropicModels";
 // The fixed set redundancy matching compares on. Kept as an app-validated
 // String column (matching this codebase's existing convention for
 // status/pauseStatus) rather than a Postgres native enum - see
-// implementation/plan.md Step 2.
+// docs/implementation/plan.md Step 2.
 export const COLOR_FAMILIES = [
   "black",
   "navy",

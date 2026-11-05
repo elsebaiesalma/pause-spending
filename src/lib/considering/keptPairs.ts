@@ -2,8 +2,8 @@ import type { DesiredItem, WardrobeItem } from "@prisma/client";
 import { findSimilarWardrobeItems } from "@/lib/tagging/similarity";
 
 // The piece you already own that "won" when something was let go: the same
-// closest match the pause screen put next to it (first of the rule-based
-// shortlist, since matching has no finer ranking). Items let go before they
+// closest match the pause screen put next to it (first of the ranked
+// shortlist, using the same probe so both screens agree). Items let go before they
 // were tagged simply have no pair. Never calls the model: it only reads tags
 // that already exist.
 export async function getClosestOwned(userId: string, item: DesiredItem): Promise<WardrobeItem | null> {
@@ -12,6 +12,7 @@ export async function getClosestOwned(userId: string, item: DesiredItem): Promis
     category: item.category,
     colorFamily: item.colorFamily,
     styleTags: item.styleTags,
+    itemName: item.itemName,
   });
   return similar[0] ?? null;
 }

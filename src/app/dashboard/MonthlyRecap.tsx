@@ -9,7 +9,8 @@ function dollars(amount: number): string {
   return `$${amount.toFixed(0)}`;
 }
 
-// A quiet look back at last month, on Home for the first week only. The server
+// A quiet look back, on Home: last month for the first week of a new month, or the
+// current month for demo accounts. The server
 // render is always "not dismissed", so a person who dismissed it sees it for a
 // frame before it folds away; the alternative (hiding until storage is read)
 // would hide it for everyone whose storage is unavailable.
@@ -65,10 +66,11 @@ export function MonthlyRecap({ recap }: { recap: MonthlyRecapData }) {
 
           {recap.tip && (
             <p className={styles.tip}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M9 18h6" />
-                <path d="M10 21h4" />
-                <path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" />
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {/* A lit bulb: the glass and base, then short rays around it. */}
+                <path d="M9.5 20h5" fill="none" />
+                <path d="M12 6.5a4.5 4.5 0 0 0-2.6 8.2c.4.4.6.9.6 1.5h4c0-.6.2-1.1.6-1.5A4.5 4.5 0 0 0 12 6.5Z" />
+                <path d="M12 1.5v1.5M4.6 4.6l1.1 1.1M19.4 4.6l-1.1 1.1M1.5 11H3M21 11h1.5" fill="none" />
               </svg>
               <span>
                 <span className="sr-only">Tip: </span>

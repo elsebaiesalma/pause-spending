@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   loadMonthlyRecap,
+  localDate,
   monthStats,
   pausedComparison,
   previousMonthKey,
@@ -205,6 +206,31 @@ describe("loadMonthlyRecap", () => {
     const recap = await loadMonthlyRecap(me.id, new Date("2027-01-02T12:00:00Z"));
     expect(recap).toMatchObject({ monthKey: "2026-12", monthLabel: "December" });
   });
+
+  it("recaps the current month all month for demo accounts, compared with last month", async () => {
+    const me = await makeUser();
+    await add(me.id, "2026-11-02T12:00:00Z", { decisionOutcome: "dropped", price: "50", category: "tops" });
+    await add(me.id, "2026-10-15T12:00:00Z");
+    const recap = await loadMonthlyRecap(me.id, new Date("2026-11-20T12:00:00Z"), { allMonth: true });
+    expect(recap).toMatchObject({
+      monthKey: "2026-11",
+      monthLabel: "November",
+      comparison: "Same as October",
+      stats: { confirmed: 1, letGo: 1, saved: 50 },
+    });
+  });
+
+  it("reads the month in the person's time zone", async () => {
+    const me = await makeUser();
+    await add(me.id, "2026-11-01T01:00:00Z", { decisionOutcome: "dropped", price: "20" });
+    await add(me.id, "2026-10-12T12:00:00Z");
+    // 03:00 UTC on 1 December is still 30 November in Toronto.
+    const at = new Date("2026-12-01T03:00:00Z");
+    const toronto = await loadMonthlyRecap(me.id, at, { allMonth: true, timeZone: "America/Toronto" });
+    expect(toronto?.monthKey).toBe("2026-11");
+    const utc = await loadMonthlyRecap(me.id, at, { allMonth: true });
+    expect(utc).toBeNull();
+  });
 });
 
 describe("recapTip", () => {
@@ -230,5 +256,14 @@ describe("recapTip", () => {
       /^Pausing works for you/
     );
     expect(recapTip([item(3, "proceeded", 7), item(4, "dropped", 1)], "2026-10")).toBeNull();
+  });
+});
+
+describe("localDate", () => {
+  it("shifts to the local calendar day and ignores unknown zones", () => {
+    const at = new Date("2026-12-01T03:00:00Z");
+    expect(localDate(at, "America/Toronto").toISOString().slice(0, 10)).toBe("2026-11-30");
+    expect(localDate(at, "Not/AZone")).toBe(at);
+    expect(localDate(at, null)).toBe(at);
   });
 });

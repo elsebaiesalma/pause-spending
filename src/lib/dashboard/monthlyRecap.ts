@@ -117,16 +117,40 @@ export type MonthlyRecapData = {
   tip: string | null;
 };
 
-// allMonth: demo accounts see the recap all month, so every visitor sees it.
+// The calendar date in the person's own time zone, as a Date whose UTC parts
+// read as that local date. The rest of this file (month keys, the first-week
+// window) reads UTC parts, so shifting once here keeps them unchanged. An
+// unknown or missing zone falls back to UTC.
+export function localDate(now: Date, timeZone?: string | null): Date {
+  if (!timeZone) return now;
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(now);
+    const get = (type: string) => Number(parts.find((part) => part.type === type)?.value);
+    return new Date(Date.UTC(get("year"), get("month") - 1, get("day"), 12));
+  } catch {
+    return now;
+  }
+}
+
+// allMonth: demo accounts see the recap all month, and it covers the current
+// month (in the person's time zone), so every visitor sees live numbers. Real
+// accounts get last month's recap during the first week of the new month.
 export async function loadMonthlyRecap(
   userId: string,
   now: Date = new Date(),
-  { allMonth = false }: { allMonth?: boolean } = {}
+  { allMonth = false, timeZone = null }: { allMonth?: boolean; timeZone?: string | null } = {}
 ): Promise<MonthlyRecapData | null> {
+  const today = localDate(now, timeZone);
   // The early return keeps the query off every Home load after the first week.
-  if (!allMonth && now.getUTCDate() > RECAP_WINDOW_DAYS) return null;
+  if (!allMonth && today.getUTCDate() > RECAP_WINDOW_DAYS) return null;
 
-  const recapKey = previousMonthKey(monthKeyForDate(now));
+  const thisKey = monthKeyForDate(today);
+  const recapKey = allMonth ? thisKey : previousMonthKey(thisKey);
   const beforeKey = previousMonthKey(recapKey);
 
   const rows = await prisma.desiredItem.findMany({
@@ -149,7 +173,7 @@ export async function loadMonthlyRecap(
   const items: RecapItem[] = rows.map((row) => ({ ...row, price: row.price === null ? null : Number(row.price) }));
 
   const stats = monthStats(items, recapKey);
-  if (!shouldShowRecap(now, stats, allMonth)) return null;
+  if (!shouldShowRecap(today, stats, allMonth)) return null;
 
   return {
     monthKey: recapKey,

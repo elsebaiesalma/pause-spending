@@ -48,7 +48,7 @@
       "statement"
     ],
     "outcome": "dropped",
-    "monthsAgo": 1,
+    "monthsAgo": 0,
     "day": 6,
     "waitDays": 7
   },
@@ -65,7 +65,7 @@
       "statement"
     ],
     "outcome": "dropped",
-    "monthsAgo": 1,
+    "monthsAgo": 0,
     "day": 12,
     "waitDays": 7
   },
@@ -82,7 +82,7 @@
       "casual"
     ],
     "outcome": "dropped",
-    "monthsAgo": 1,
+    "monthsAgo": 0,
     "day": 19,
     "waitDays": 1
   },
@@ -99,7 +99,7 @@
       "layering"
     ],
     "outcome": "proceeded",
-    "monthsAgo": 1,
+    "monthsAgo": 0,
     "day": 25,
     "waitDays": 1
   },
@@ -116,7 +116,7 @@
       "fitted"
     ],
     "outcome": "dropped",
-    "monthsAgo": 2,
+    "monthsAgo": 1,
     "day": 15,
     "waitDays": 1
   }

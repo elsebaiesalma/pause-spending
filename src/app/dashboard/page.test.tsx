@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
+vi.mock("next/headers", () => ({
+  cookies: async () => ({ get: () => undefined }),
+}));
+
 vi.mock("@/lib/considering/consideringMeta", () => ({
   sweepEndedPauses: vi.fn().mockResolvedValue([]),
 }));
