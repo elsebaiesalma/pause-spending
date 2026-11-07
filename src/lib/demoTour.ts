@@ -5,7 +5,7 @@
 
 // Which screen a step belongs to. Moving between steps on the same page is a
 // plain state change; moving to another page navigates.
-export type TourPage = "home" | "pause" | "decisions" | "closet";
+export type TourPage = "home" | "pause" | "decisions" | "closet" | "looks";
 
 export type TourNext =
   | { kind: "stay" }
@@ -97,7 +97,17 @@ export const TOUR_STEPS: readonly TourStep[] = [
     path: /^\/wardrobe\/?$/,
     targets: ['[data-tour="closet-tabs"]'],
     title: "Your closet",
-    body: "Everything you own, as a grid or a rack, plus outfits you build from it. PAUSE uses it to find what you already have.",
+    body: "Everything you own, as a grid or a rack. PAUSE uses it to find what you already have.",
+    nextLabel: "Next",
+    next: { kind: "go", href: "/lookbook" },
+  },
+  {
+    id: "looks",
+    page: "looks",
+    path: /^\/lookbook\/?$/,
+    targets: ['[data-tour="new-look"]'],
+    title: "Style what you already own",
+    body: "If something you want is close to a piece you have, build a look from your closet first. Think of a new way to wear it before you buy something new.",
     nextLabel: "Done",
     next: { kind: "finish" },
   },

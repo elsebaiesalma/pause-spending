@@ -46,6 +46,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
   const firstName = session.user?.name?.trim().split(/\s+/)[0] ?? null;
+  const isDemo = isDemoEmail(session.user?.email);
 
   // Pauses end silently: anything whose wait has passed quietly becomes Saved
   // for later. Nothing on Home announces it.
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
     prisma.desiredItem.count({ where: { userId, pauseStatus: "waiting" } }),
     getSetupProgress(userId),
     loadMonthlyRecap(userId, new Date(), {
-      allMonth: isDemoEmail(session.user?.email),
+      allMonth: isDemo,
       timeZone: timeZone ?? null,
     }),
     getSavingsGoal(userId),
@@ -84,7 +85,9 @@ export default async function DashboardPage() {
   const quote = quoteForDay();
 
   const steps = setupSteps(setupProgress);
-  const showGuide = nextStep(steps) !== null;
+  // A demo visitor gets the guided tour and a "Use sample item" button beside
+  // the add box instead of this checklist.
+  const showGuide = !isDemo && nextStep(steps) !== null;
   // Plan and goal are each optional. Whichever is on leads; the other is one
   // quiet line, never a second filled button. With neither, ask which would help.
   const hasPlan = planAmount !== null;
@@ -101,13 +104,13 @@ export default async function DashboardPage() {
 
       {showGuide && (
         <CollapsibleGuide>
-          <SetupGuide steps={steps} isDemo={isDemoEmail(session.user?.email)} />
+          <SetupGuide steps={steps} />
         </CollapsibleGuide>
       )}
 
       {recap && <MonthlyRecap recap={recap} />}
 
-      <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} />
+      <AddItem searchAvailable={Boolean(process.env.BRAVE_SEARCH_API_KEY)} primary={!showGuide} sampleItem={isDemo} />
 
       {needsReviewCount > 0 && (
         <div className={styles.statusLines}>

@@ -33,6 +33,13 @@ describe("tour steps", () => {
     });
   });
 
+  it("ends on the looks page, which is where outfits are built", () => {
+    const last = TOUR_STEPS[TOUR_STEPS.length - 1];
+    expect(last.id).toBe("looks");
+    expect(last.path.test("/lookbook")).toBe(true);
+    expect(last.path.test("/lookbook/board")).toBe(false);
+  });
+
   it("matches the real pause screen address but not other pages", () => {
     const pause = TOUR_STEPS.find((s) => s.id === "compare")!;
     expect(pause.path.test("/desired-items/abc123/pause")).toBe(true);
