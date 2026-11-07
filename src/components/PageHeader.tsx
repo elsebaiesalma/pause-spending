@@ -38,9 +38,10 @@ export type TabItem = { href: string; label: string; count?: number; current: bo
 
 // Views of the same list (Polaris tabs). Plain links, so each view has its
 // own URL and works without JavaScript.
-export function Tabs({ items, label }: { items: TabItem[]; label: string }) {
+// `tour` marks the tabs as a stop on the demo tour (see DemoTour).
+export function Tabs({ items, label, tour }: { items: TabItem[]; label: string; tour?: string }) {
   return (
-    <nav className={styles.tabs} aria-label={label}>
+    <nav className={styles.tabs} aria-label={label} data-tour={tour}>
       {items.map((item) => (
         <Link
           key={item.href}

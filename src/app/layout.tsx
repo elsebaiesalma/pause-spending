@@ -5,6 +5,7 @@ import { auth, signOut } from "@/lib/auth";
 import { initialsFor } from "@/lib/initials";
 import { DevViewBanner } from "@/components/DevViewBanner";
 import { DemoBanner } from "@/components/DemoBanner";
+import { DemoTour } from "@/components/DemoTour";
 import { isDemoEmail, isGmailEnabled } from "@/lib/demo";
 import { SiteHeader, SiteMain, SiteTabBar } from "@/components/SiteNav";
 import "./globals.css";
@@ -49,6 +50,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         {isDemo && <DemoBanner />}
         <SiteMain signedIn={initials !== null}>{children}</SiteMain>
         <SiteTabBar signedIn={initials !== null} />
+        {isDemo && session?.user?.id && <DemoTour userId={session.user.id} />}
       </body>
     </html>
   );

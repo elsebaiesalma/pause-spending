@@ -159,6 +159,11 @@ function AccountMenu({
         <Link href="/budget" className="account-menu__item account-menu__item--sub" role="menuitem">
           Budget &amp; Goals
         </Link>
+        {isDemo && (
+          <Link href="/dashboard?tour=1" className="account-menu__item" role="menuitem">
+            Take the tour
+          </Link>
+        )}
         <form action={signOutAction}>
           <button type="submit" className="account-menu__item" role="menuitem">
             Sign out
@@ -199,6 +204,7 @@ export function SiteTabBar({ signedIn }: { signedIn: boolean }) {
       <Link
         href={PAUSE_HREF}
         className="tab-bar__item tab-bar__item--pause"
+        data-tour="pause-tab"
         aria-current={pathname === PAUSE_HREF ? "page" : undefined}
       >
         <span className="tab-bar__plus" aria-hidden="true">

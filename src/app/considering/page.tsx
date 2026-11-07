@@ -119,6 +119,7 @@ export default async function ConsideringPage(props?: { searchParams?: Promise<R
       />
       <Tabs
         label="Decisions"
+        tour="decisions-tabs"
         items={tabs.map((t) => ({
           href: tabHref(t.key, monthParam),
           label: t.label,
