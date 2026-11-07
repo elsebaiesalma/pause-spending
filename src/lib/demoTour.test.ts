@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TOUR_STEPS, TOUR_STOPS, parseTourState, placeTooltip, tourKey } from "./demoTour";
+import { TOUR_STEPS, TOUR_STOPS, parseTourState, placeTooltip, stepForPath, tourKey } from "./demoTour";
 
 const VIEWPORT = { w: 390, h: 800 };
 const CARD = { w: 300, h: 200 };
@@ -66,6 +66,28 @@ describe("saved progress", () => {
     expect(parseTourState("banana")).toEqual({ status: "active", step: 0 });
     expect(parseTourState(String(TOUR_STEPS.length))).toEqual({ status: "active", step: 0 });
     expect(parseTourState("-1")).toEqual({ status: "active", step: 0 });
+  });
+});
+
+describe("stepForPath", () => {
+  const indexOf = (id: string) => TOUR_STEPS.findIndex((s) => s.id === id);
+
+  it("stays on the current step while the visitor is on its page", () => {
+    expect(stepForPath(indexOf("month"), "/dashboard")).toBe(indexOf("month"));
+  });
+
+  it("moves on to the pause screen when the visitor opens the sample item themselves", () => {
+    expect(stepForPath(indexOf("add"), "/desired-items/abc/pause")).toBe(indexOf("compare"));
+  });
+
+  it("never jumps back to an earlier step", () => {
+    expect(stepForPath(indexOf("decisions"), "/dashboard")).toBeNull();
+    expect(stepForPath(indexOf("looks"), "/wardrobe")).toBeNull();
+  });
+
+  it("ignores pages the tour does not cover", () => {
+    expect(stepForPath(0, "/budget")).toBeNull();
+    expect(stepForPath(0, "/lookbook/board")).toBeNull();
   });
 });
 

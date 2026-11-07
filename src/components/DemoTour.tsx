@@ -7,6 +7,7 @@ import {
   TOUR_STOPS,
   parseTourState,
   placeTooltip,
+  stepForPath,
   tourKey,
   type Rect,
   type Size,
@@ -80,6 +81,21 @@ export function DemoTour({ userId }: { userId: string }) {
     save(key, "0");
     router.replace(pathname);
   }, [key, pathname, router]);
+
+  // The lit-up part of the page is live, so the visitor can click it and land
+  // on a later step's page (the sample item button opens its pause screen). The
+  // tour picks up from there. Only a page change counts, so "Back" is not undone
+  // while the browser is still on the page it is leaving.
+  const activeStep = state.status === "active" ? state.step : null;
+  const lastPath = useRef<string | null>(null);
+  useEffect(() => {
+    if (activeStep === null) return;
+    const changed = lastPath.current !== pathname;
+    lastPath.current = pathname;
+    if (!changed) return;
+    const target = stepForPath(activeStep, pathname);
+    if (target !== null && target !== activeStep) save(key, String(target));
+  }, [activeStep, pathname, key]);
 
   if (state.status === "done") return null;
   const step = TOUR_STEPS[state.step];
@@ -178,8 +194,19 @@ function TourCard({ step, index, storageKey }: { step: TourStep; index: number; 
   const hole = layout.hole;
   const stop = index; // the welcome card is stop 0, so the first real stop is 1
 
+  // Everything outside the lit-up area soaks up clicks so the visitor stays on
+  // the step. The lit-up area itself has nothing over it, so it works as normal.
+  const blockers = hole
+    ? [
+        { left: 0, top: 0, width: viewport.w, height: hole.top },
+        { left: 0, top: hole.bottom, width: viewport.w, height: Math.max(0, viewport.h - hole.bottom) },
+        { left: 0, top: hole.top, width: hole.left, height: hole.bottom - hole.top },
+        { left: hole.right, top: hole.top, width: Math.max(0, viewport.w - hole.right), height: hole.bottom - hole.top },
+      ]
+    : null;
+
   return (
-    <div className={styles.root} role="dialog" aria-modal="true" aria-labelledby="tour-title">
+    <div className={styles.root}>
       <svg className={styles.dim} aria-hidden="true" focusable="false">
         <defs>
           <mask id="tour-dim-mask">
@@ -198,6 +225,11 @@ function TourCard({ step, index, storageKey }: { step: TourStep; index: number; 
         </defs>
         <rect width="100%" height="100%" className={styles.dimFill} mask="url(#tour-dim-mask)" />
       </svg>
+      {blockers ? (
+        blockers.map((box, i) => <div key={i} className={styles.blocker} style={box} />)
+      ) : (
+        <div className={`${styles.blocker} ${styles.blockerFull}`} />
+      )}
       {hole && (
         <div
           className={styles.ring}
@@ -212,7 +244,9 @@ function TourCard({ step, index, storageKey }: { step: TourStep; index: number; 
 
       <div
         ref={cardRef}
-        className={styles.card}
+        className={`${styles.card} ${step.hero ? styles.hero : ""}`}
+        role="dialog"
+        aria-labelledby="tour-title"
         style={{
           left: layout.left,
           top: layout.top,
@@ -225,6 +259,19 @@ function TourCard({ step, index, storageKey }: { step: TourStep; index: number; 
             style={{ left: layout.arrowLeft }}
             aria-hidden="true"
           />
+        )}
+        {step.hero && (
+          <>
+            <span className={styles.glyph} aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="22" height="22" fill="currentColor" focusable="false">
+                <rect x="3" y="2" width="3.5" height="12" rx="1" />
+                <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
+              </svg>
+            </span>
+            <p className={styles.logo} aria-hidden="true">
+              PAUSE<span className={styles.logoDot}>.</span>
+            </p>
+          </>
         )}
         {stop > 0 && (
           <p className={styles.count}>

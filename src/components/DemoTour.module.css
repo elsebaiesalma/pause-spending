@@ -5,6 +5,18 @@
   position: fixed;
   inset: 0;
   z-index: 200;
+  /* Clicks pass through to the page. Only the blockers and the card catch
+     them, which leaves the lit-up area usable. */
+  pointer-events: none;
+}
+
+.blocker {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.blockerFull {
+  inset: 0;
 }
 
 .dim {
@@ -36,6 +48,7 @@
   background: var(--color-surface);
   color: var(--color-ink);
   box-shadow: var(--shadow-overlay);
+  pointer-events: auto;
 }
 
 .arrow {
@@ -88,4 +101,94 @@
   display: flex;
   gap: 0.75rem;
   margin-left: auto;
+}
+
+/* The opening card: a darker card with the logo, centred. Rose on espresso is
+   the one place the accent works as text. */
+.hero {
+  width: min(24rem, calc(100vw - 2rem));
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border: 1px solid rgba(201, 138, 146, 0.4);
+  background: linear-gradient(160deg, var(--color-primary-hover), var(--color-espresso) 62%);
+  color: #fff;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero {
+    animation: heroRise 0.4s ease-out;
+  }
+}
+
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-rose);
+  color: var(--color-espresso);
+}
+
+.logo {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-display);
+  font-size: var(--heading-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #fff;
+}
+
+.logoDot {
+  color: var(--color-rose);
+}
+
+.hero .title {
+  margin-top: var(--space-2);
+  font-size: var(--heading-sm);
+  color: var(--color-rose);
+}
+
+.hero .body {
+  color: var(--color-on-espresso-soft);
+}
+
+/* Stacked and centred: the way on first, full width, with skip under it. */
+.hero .actions {
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+.hero .buttons {
+  margin-left: 0;
+}
+
+.hero .buttons button {
+  width: 100%;
+  min-height: 3rem;
+  border-color: var(--color-rose);
+  background: var(--color-rose);
+  color: var(--color-espresso);
+}
+
+.hero .buttons button:hover {
+  border-color: var(--color-blush);
+  background: var(--color-blush);
+  color: var(--color-espresso);
+}
+
+.hero .actions > button {
+  align-self: center;
+  color: var(--color-on-espresso-soft);
+  text-decoration-color: rgba(227, 207, 210, 0.5);
 }
