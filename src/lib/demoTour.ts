@@ -26,6 +26,8 @@ export type TourStep = {
   body: string;
   nextLabel: string;
   next: TourNext;
+  // The opening card: the logo, a darker card, centred. Points at nothing.
+  hero?: boolean;
 };
 
 const HOME = /^\/dashboard\/?$/;
@@ -36,10 +38,11 @@ export const TOUR_STEPS: readonly TourStep[] = [
     page: "home",
     path: HOME,
     targets: [],
-    title: "Welcome to PAUSE",
-    body: "PAUSE gives you a moment to think before you buy clothes. This short tour walks through a sample closet. Nothing here is real.",
+    title: "A moment before you buy",
+    body: "Welcome to PAUSE. This short tour walks through a sample closet, and you can try anything you see along the way. Nothing here is real.",
     nextLabel: "Start the tour",
     next: { kind: "stay" },
+    hero: true,
   },
   {
     id: "month",
@@ -55,9 +58,12 @@ export const TOUR_STEPS: readonly TourStep[] = [
     id: "add",
     page: "home",
     path: HOME,
-    targets: ['[data-tour="pause-tab"]', '[data-tour="add"]'],
+    // The add box comes first on every screen size: it holds "Use sample item",
+    // which the visitor can press while this step is showing. The phone tab bar
+    // is the fallback if the box is ever missing.
+    targets: ['[data-tour="add"]', '[data-tour="pause-tab"]'],
     title: "Start here",
-    body: "Add anything you're thinking of buying. Next, we'll add a sample item so you can see what happens.",
+    body: "Add anything you're thinking of buying. Type it in, or press Use sample item to see what happens.",
     nextLabel: "Add a sample item",
     next: { kind: "post", action: "/api/demo/sample-item" },
   },
@@ -131,6 +137,17 @@ export function parseTourState(raw: string | null): TourState {
   const step = Number(raw);
   if (Number.isInteger(step) && step >= 0 && step < TOUR_STEPS.length) return { status: "active", step };
   return { status: "active", step: 0 };
+}
+
+// The visitor can use the lit-up part of the page, and that can take them
+// somewhere new (the sample item button opens its pause screen). When they land
+// on a page that belongs to a later step, the tour carries on from there.
+export function stepForPath(current: number, pathname: string): number | null {
+  if (TOUR_STEPS[current].path.test(pathname)) return current;
+  for (let i = current + 1; i < TOUR_STEPS.length; i++) {
+    if (TOUR_STEPS[i].path.test(pathname)) return i;
+  }
+  return null;
 }
 
 export type Rect = { left: number; top: number; right: number; bottom: number };
