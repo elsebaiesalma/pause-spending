@@ -10,11 +10,25 @@ import styles from "./AddItem.module.css";
 //
 // Polaris: one primary action, never disabled. Pressing Continue with an
 // empty box explains what to do instead of doing nothing.
-export function AddItem({ searchAvailable, primary = true }: { searchAvailable: boolean; primary?: boolean }) {
+//
+// In a demo, "Use sample item" sits beside Continue and takes the visitor
+// straight to a pause screen without typing. It becomes the one filled button,
+// since it is the path a first-time visitor should take.
+export function AddItem({
+  searchAvailable,
+  primary = true,
+  sampleItem = false,
+}: {
+  searchAvailable: boolean;
+  primary?: boolean;
+  sampleItem?: boolean;
+}) {
   const [value, setValue] = useState("");
+  const [samplePending, setSamplePending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputId = useId();
   const errorId = useId();
+  const sampleFormId = useId();
 
   const action = searchAvailable ? "/desired-items/new" : "/api/desired-items/from-text";
   const field = searchAvailable ? "q" : "text";
@@ -31,7 +45,7 @@ export function AddItem({ searchAvailable, primary = true }: { searchAvailable: 
       <form
         action={action}
         method={searchAvailable ? "GET" : "POST"}
-        className={styles.row}
+        className={`${styles.row} ${sampleItem ? styles.rowWithSample : ""}`}
         onSubmit={onSubmit}
         noValidate
       >
@@ -52,10 +66,26 @@ export function AddItem({ searchAvailable, primary = true }: { searchAvailable: 
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
         />
-        <button type="submit" className={primary ? "btn btn-primary" : "btn"}>
+        <button type="submit" className={primary && !sampleItem ? "btn btn-primary" : "btn"}>
           Continue
         </button>
+        {/* Submits the separate form below, so the button can sit in this row
+            without nesting forms. */}
+        {sampleItem && (
+          <button
+            type="submit"
+            form={sampleFormId}
+            className="btn btn-primary"
+            disabled={samplePending}
+            aria-busy={samplePending}
+          >
+            {samplePending ? "Opening…" : "Use sample item"}
+          </button>
+        )}
       </form>
+      {sampleItem && (
+        <form id={sampleFormId} action="/api/demo/sample-item" method="POST" onSubmit={() => setSamplePending(true)} />
+      )}
       {error && (
         <p id={errorId} className={styles.error} role="alert">
           {error}

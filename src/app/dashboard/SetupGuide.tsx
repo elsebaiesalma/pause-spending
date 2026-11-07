@@ -1,19 +1,16 @@
 import Link from "next/link";
-import { DemoButton } from "@/components/DemoButton";
 import { nextStep, type SetupStep } from "@/lib/dashboard/setupGuide";
 import styles from "./SetupGuide.module.css";
 
 // Polaris-style setup guide: progress, the steps, and one action for the
 // next step only. Hidden once everything is done (Home decides that).
-export function SetupGuide({ steps, isDemo }: { steps: SetupStep[]; isDemo: boolean }) {
+export function SetupGuide({ steps }: { steps: SetupStep[] }) {
   const doneCount = steps.filter((s) => s.done).length;
   const next = nextStep(steps);
 
   function action(step: SetupStep) {
     if (step.id === "addedItem") {
-      return isDemo ? (
-        <DemoButton action="/api/demo/sample-item" label="Try a sample item" pendingLabel="Opening…" className="btn btn-primary" />
-      ) : (
+      return (
         <Link href="/desired-items/new" className="btn btn-primary">
           Add an item
         </Link>

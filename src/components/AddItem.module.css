@@ -49,3 +49,24 @@
   font-size: var(--text-sm);
   color: var(--color-warn);
 }
+
+/* In a demo the row holds a second button. On a phone the input takes the first
+   line and the two buttons share the second; from 640px everything sits on one
+   line. */
+.rowWithSample {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rowWithSample .input {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 640px) {
+  .rowWithSample {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .rowWithSample .input {
+    grid-column: auto;
+  }
+}

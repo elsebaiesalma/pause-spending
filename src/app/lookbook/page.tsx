@@ -32,7 +32,7 @@ export default async function LookbookPage() {
         title="Closet"
         subtitle="Something new, from what you own."
         action={
-          <Link href="/lookbook/board" className="btn btn-primary">
+          <Link href="/lookbook/board" className="btn btn-primary" data-tour="new-look">
             New look
           </Link>
         }
@@ -43,7 +43,7 @@ export default async function LookbookPage() {
         <EmptyState
           title="Build your first look"
           action={
-            <Link href="/lookbook/board" className="btn btn-primary">
+            <Link href="/lookbook/board" className="btn btn-primary" data-tour="new-look">
               Start from a suggestion
             </Link>
           }

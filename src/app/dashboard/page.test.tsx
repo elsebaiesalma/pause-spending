@@ -235,6 +235,24 @@ describe("DashboardPage (Home)", () => {
       expect(html).toContain('href="/desired-items/new"');
     });
 
+    it("gives a demo account a sample item button instead of the setup guide", async () => {
+      vi.mocked(auth).mockResolvedValueOnce({
+        user: { id: "u1", name: "Guest", email: "guest-1@demo.pause.test" },
+      } as never);
+
+      const html = renderToStaticMarkup(await DashboardPage());
+
+      expect(html).not.toContain("Get to know PAUSE");
+      expect(html).toContain("Use sample item");
+      expect(html).toContain('action="/api/demo/sample-item"');
+    });
+
+    it("offers no sample item button to a real account", async () => {
+      const html = await render();
+
+      expect(html).not.toContain("Use sample item");
+    });
+
     it("hides the setup guide once every step is done", async () => {
       vi.mocked(prisma.desiredItem.count).mockResolvedValue(1);
       vi.mocked(prisma.look.count).mockResolvedValueOnce(1);
