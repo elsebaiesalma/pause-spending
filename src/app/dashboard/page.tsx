@@ -122,7 +122,7 @@ export default async function DashboardPage() {
       {showMoneyChoice ? (
         <MoneyChoice goalAvailable={goalAvailable} />
       ) : (
-        <div className={styles.money}>
+        <div className={styles.money} data-tour="money">
           {planAmount === null || remaining === null ? (
             <section className={styles.card} aria-labelledby="month-heading">
               <h2 id="month-heading" className={styles.cardTitle}>

@@ -102,7 +102,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           comparison is a compact strip that stays under the header. */}
       <div className={styles.layout}>
       {/* 1. You want / you own */}
-      <section className={styles.compare} aria-label="What you want next to what you own">
+      <section className={styles.compare} data-tour="compare" aria-label="What you want next to what you own">
         <div className={styles.comparePair}>
           <div className={styles.compareItem}>
             <p className={styles.compareKicker}>You want</p>
@@ -209,7 +209,7 @@ export default async function PauseScreenPage({ params }: PageProps<"/desired-it
           src/lib/pauseScreen/reflection.ts). */}
       <form method="POST" className={styles.form}>
         <div className={styles.columns}>
-        <section className={`section ${styles.card}`} id="reflection">
+        <section className={`section ${styles.card}`} id="reflection" data-tour="reflection">
           <div className={styles.miniStrip} aria-hidden="true">
             <span className={styles.miniThumb}>
               <ItemArt item={desiredItem} />

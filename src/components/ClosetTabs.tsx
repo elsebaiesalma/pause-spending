@@ -5,6 +5,7 @@ export function ClosetTabs({ current, pieces, looks }: { current: "pieces" | "lo
   return (
     <Tabs
       label="Closet"
+      tour="closet-tabs"
       items={[
         { href: "/wardrobe", label: "Pieces", count: pieces, current: current === "pieces" },
         { href: "/lookbook", label: "Looks", count: looks, current: current === "looks" },

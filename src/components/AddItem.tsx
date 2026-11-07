@@ -27,7 +27,7 @@ export function AddItem({ searchAvailable, primary = true }: { searchAvailable: 
   };
 
   return (
-    <div className={styles.addItem}>
+    <div className={styles.addItem} data-tour="add">
       <form
         action={action}
         method={searchAvailable ? "GET" : "POST"}

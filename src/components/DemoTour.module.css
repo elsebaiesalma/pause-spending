@@ -1,0 +1,91 @@
+/* The tour sits over everything, including the header and the phone tab bar.
+   The dim is drawn with an SVG mask so the lit-up area can have rounded corners
+   without adding a new shadow to the scale. */
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Same scrim as the confirmation dialogs. */
+.dimFill {
+  fill: rgba(42, 18, 8, 0.45);
+}
+
+/* A rose outline so the lit-up part reads as chosen, not just uncovered. */
+.ring {
+  position: absolute;
+  border: 2px solid var(--color-rose);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.card {
+  position: absolute;
+  width: min(22rem, calc(100vw - 2rem));
+  box-sizing: border-box;
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-overlay);
+}
+
+.arrow {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  background: var(--color-surface);
+  transform: rotate(45deg);
+}
+
+.arrowUp {
+  top: -7px;
+}
+
+.arrowDown {
+  bottom: -7px;
+}
+
+.count {
+  margin: 0 0 0.25rem;
+  font-size: var(--text-xs);
+  color: var(--color-ink-soft);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--heading-sm);
+}
+
+.body {
+  margin: 0.5rem 0 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+}
+
+/* Skip on the left, the way on on the right, so the one filled button is the
+   last thing the eye lands on (Polaris). */
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: var(--space-3);
+}
+
+.buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+}
